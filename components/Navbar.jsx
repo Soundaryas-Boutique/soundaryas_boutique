@@ -1,33 +1,35 @@
 import React from 'react';
+import { FiUser, FiHeart, FiShoppingCart } from 'react-icons/fi';
 
 const Navbar = () => {
   return (
     <>
-      <nav className="w-full z-50 bg-white shadow-sm">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <div className="text-red-500 font-bold text-3xl">LOGO</div>
-          <div className="flex gap-4 text-red-500 text-2xl md:text-xl">
-            <a href="">I1</a>
-            <a href="">I2</a>
-            <a href="">I3</a>
+      {/* Top Bar (non-sticky) */}
+      <div className="w-full shadow-sm border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="text-[#8B0000] font-bold text-xl tracking-wide">Soundarya's Boutique</div>
+          <div className="flex gap-6 items-center text-[#8B0000]">
+            <FiUser className="w-5 h-5 cursor-pointer" />
+            <FiHeart className="w-5 h-5 cursor-pointer" />
+            <FiShoppingCart className="w-5 h-5 cursor-pointer" />
           </div>
         </div>
+      </div>
 
-
-      </nav>
-        {/* Category Bar */}
-        <div className="flex text-2xl sticky top-0 md:text-sm justify-center gap-4 px-6 py-2 border-b border-gray-200 bg-white text-red-500">
-          <a href="">C1</a>
-          <a href="">C2</a>
-          <a href="">C3</a>
-          <a href="">C4</a>
-          <a href="">C5</a>
-          <a href="">C6</a>
-          <a href="">C7</a>
-          <a href="">C8</a>
-          <a href="">C9</a>
+      {/* Category Bar (sticky) */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-[1440px] mx-auto px-4 py-2 flex justify-center gap-5 text-[#A52A2A] font-semibold">
+          <a href="#">Silk Sarees</a>
+          <a href="#">Cotton Sarees</a>
+          <a href="#">Kanchipuram</a>
+          <a href="#">Banarasi</a>
+          <a href="#">Bridal</a>
+          <a href="#">Daily Wear</a>
+          <a href="#">Collections</a>
+          <a href="#">Offers</a>
+          <a href="#">New Arrivals</a>
         </div>
+      </div>
     </>
   );
 };
