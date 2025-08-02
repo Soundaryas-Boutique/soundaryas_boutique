@@ -1,4 +1,5 @@
 import "./globals.css";
+import Navbar from "../../components/Navbar";
 
 export const metadata = {
   title: "Soundarya's Boutique",
@@ -9,6 +10,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-white text-black">
+        <Navbar />
         {children}
       </body>
     </html>
