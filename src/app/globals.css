@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+@theme inline{
+    --font-main: var(--font-cinzel);
+}
