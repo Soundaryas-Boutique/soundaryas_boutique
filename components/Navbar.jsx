@@ -6,8 +6,8 @@ const Navbar = () => {
       <nav className="w-full z-50 bg-white shadow-sm">
         {/* Top Bar */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-          <div className="text-red-500 font-bold text-xl">LOGO</div>
-          <div className="flex gap-4 text-red-500">
+          <div className="text-red-500 font-bold text-3xl">LOGO</div>
+          <div className="flex gap-4 text-red-500 text-2xl">
             <a href="">I1</a>
             <a href="">I2</a>
             <a href="">I3</a>
@@ -17,7 +17,7 @@ const Navbar = () => {
 
       </nav>
         {/* Category Bar */}
-        <div className="flex sticky top-0 justify-center gap-4 px-6 py-2 border-b border-gray-200 bg-white text-red-500">
+        <div className="flex text-2xl sticky top-0 justify-center gap-4 px-6 py-2 border-b border-gray-200 bg-white text-red-500">
           <a href="">C1</a>
           <a href="">C2</a>
           <a href="">C3</a>
