@@ -1,105 +1,78 @@
 'use client'
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
+import Image from 'next/image';
 
-import Image from "next/image";
-import { useSwipeable } from "react-swipeable";
+const images = [
+  '/images/banner1.jpg',
+  '/images/banner2.jpg',
+  '/images/banner3.jpg',
+];
 
 const SlidingBanner = () => {
-  const sliderData = [
-    {
-      id: 1,
-      title: "Experience Pure Sound - Your Perfect Headphones Awaits!",
-      offer: "Limited Time Offer 30% Off",
-      buttonText1: "Buy now",
-      buttonText2: "Find more",
-      link: "",
+  const [current, setCurrent] = useState(0);
+  const length = images.length;
 
-    },
-    {
-      id: 2,
-      title: "Next-Level Gaming Starts Here - Discover PlayStation 5 Today!",
-      offer: "Hurry up only few lefts!",
-      buttonText1: "Shop Now",
-      buttonText2: "Explore Deals",
-      link: "",
-   
-    },
-    {
-      id: 3,
-      title: "Power Meets Elegance - Apple MacBook Pro is Here for you!",
-      offer: "Exclusive Deal 40% Off",
-      buttonText1: "Order Now",
-      buttonText2: "Learn More",
-      link: "",
-
-    },
-  ];
-
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const autoSlideDelay = 5000;
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setCurrentSlide((prev) => (prev + 1) % sliderData.length);
-    }, autoSlideDelay);
-
-    return () => clearTimeout(timeout);
-  }, [currentSlide, sliderData.length]);
-
-  const handleSlideChange = (index) => {
-    setCurrentSlide(index);
+  const prevSlide = () => {
+    setCurrent((prev) => (prev === 0 ? length - 1 : prev - 1));
   };
 
-  const handlers = useSwipeable({
-    onSwipedLeft: () =>
-      setCurrentSlide((prev) => (prev + 1) % sliderData.length),
-    onSwipedRight: () =>
-      setCurrentSlide((prev) =>
-        prev === 0 ? sliderData.length - 1 : prev - 1
-      ),
-    preventScrollOnSwipe: true,
-    trackMouse: true,
-  });
+  const nextSlide = () => {
+    setCurrent((prev) => (prev === length - 1 ? 0 : prev + 1));
+  };
 
   return (
-    <div {...handlers} className="relative max-w-9xl overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* Slides Container */}
       <div
         className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        style={{ transform: `translateX(-${current * 100}%)`, width: `${length * 100}%` }}
       >
-        {sliderData.map((slide, index) => (
-          <div
-            key={slide.id}
-            className="flex flex-col-reverse min-h-full md:flex-row items-center justify-between min-w-full"
-          >
-            <div className="flex items-center flex-1 justify-center w-full">
-              <Image
-                draggable={false}
-                className="block md:hidden w-full object-contain shadow-2xl"
-                src={slide.imgMobileSrc || slide.imgSrc}
-                alt={`Slide ${index + 1} Mobile`}
-              />
-              <Image
-                draggable={false}
-                className="hidden md:block w-full object-contain shadow-2xl"
-                src={slide.imgSrc}
-                alt={`Slide ${index + 1} Desktop`}
-              />
-            </div>
+        {images.map((src, index) => (
+          <div key={index} className="w-full flex-shrink-0 h-screen relative">
+            <Image
+              src={src}
+              alt={`Slide ${index + 1}`}
+              layout="fill"
+              objectFit="cover"
+              priority={index === 0}
+            />
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col items-end justify-center gap-2 mt-8 relative -top-44 -left-10">
-        {sliderData.map((_, index) => (
-          <div
+      {/* Left Arrow */}
+      <button
+        onClick={prevSlide}
+        className="absolute top-1/2 left-6 transform -translate-y-1/2 text-white text-4xl bg-black/30 px-3 py-1 rounded-full hover:bg-black/60 z-10"
+      >
+        ‹
+      </button>
+
+      {/* Right Arrow */}
+      <button
+        onClick={nextSlide}
+        className="absolute top-1/2 right-6 transform -translate-y-1/2 text-white text-4xl bg-black/30 px-3 py-1 rounded-full hover:bg-black/60 z-10"
+      >
+        ›
+      </button>
+
+      {/* Indicators */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-10">
+        {images.map((_, index) => (
+          <button
             key={index}
-            onClick={() => handleSlideChange(index)}
-            className={`h-4 w-4  cursor-pointer ${currentSlide === index ? "bg-gray-700" : "bg-gray-700/30"
-              }`}
-          ></div>
+            onClick={() => setCurrent(index)}
+            className={`w-4 h-4 rounded-full ${
+              current === index ? 'bg-white' : 'bg-gray-500'
+            }`}
+          />
         ))}
+      </div>
+
+      {/* Optional Overlay (e.g., heading/text) */}
+      <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center text-white bg-black/30 z-0">
+        {/* <h1 className="text-5xl font-bold">Welcome</h1> */}
       </div>
     </div>
   );

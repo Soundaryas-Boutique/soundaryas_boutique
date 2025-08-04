@@ -219,6 +219,11 @@
   resolved "https://registry.npmjs.org/@nolyfill/is-core-module/-/is-core-module-1.0.39.tgz"
   integrity sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==
 
+"@popperjs/core@^2.11.8":
+  version "2.11.8"
+  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
+  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
+
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@rtsao/scc/-/scc-1.1.0.tgz"
@@ -570,6 +575,11 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+bootstrap@^5.3.7:
+  version "5.3.7"
+  resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.3.7.tgz"
+  integrity sha512-7KgiD8UHjfcPBHEpDNg+zGz8L3LqR3GVwqZiBRFX04a1BCArZOz1r2kjly2HQ0WokqTO0v1nF+QAt8dsW4lKlw==
 
 brace-expansion@^1.1.7:
   version "1.1.12"
@@ -1634,6 +1644,11 @@ jiti@*, jiti@^2.4.2:
   version "2.5.1"
   resolved "https://registry.npmjs.org/jiti/-/jiti-2.5.1.tgz"
   integrity sha512-twQoecYPiVA5K/h6SxtORw/Bs3ar+mLUtoPSc7iMXzQzK8d7eJ/R09wmTwAjiamETn1cXYPGfNnu7DMoHgu12w==
+
+jquery@^3.7.1:
+  version "3.7.1"
+  resolved "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz"
+  integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
 
 "js-tokens@^3.0.0 || ^4.0.0":
   version "4.0.0"
