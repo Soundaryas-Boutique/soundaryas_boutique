@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useEffect ,useState, useRef } from 'react';
 import { FiUser, FiHeart, FiShoppingCart, FiMenu, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const Navbar = () => {
@@ -43,11 +43,25 @@ const Navbar = () => {
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-    if (!isMobileMenuOpen) {
+    const newState = !isMobileMenuOpen;
+    setIsMobileMenuOpen(newState);
+
+    if (newState) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    if (!newState) {
       setActiveMobileCategory(null);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, []);
 
   const toggleMobileCategory = (index) => {
     setActiveMobileCategory(activeMobileCategory === index ? null : index);
