@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Cinzel } from 'next/font/google';
 import Navbar from "../../components/Navbar";
+import AuthProvider from "../../components/AuthProvider";
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -16,10 +17,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <AuthProvider>
       <body className={`${cinzel.variable} min-h-screen bg-white text-black font-main`}>
         <Navbar />
         {children}
       </body>
+      </AuthProvider>
     </html>
   );
 }

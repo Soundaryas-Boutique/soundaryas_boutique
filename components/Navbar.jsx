@@ -2,7 +2,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FiUser, FiHeart, FiShoppingCart, FiMenu, FiX, FiChevronDown, FiChevronUp, FiMail } from 'react-icons/fi';
 
+import Link from 'next/link';
+import { useSession, signOut, signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
+
 const Navbar = () => {
+
+  const { data: session, status } = useSession();
+
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
@@ -109,7 +116,10 @@ const Navbar = () => {
               <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
             </button>
             
-            <FiShoppingCart className="w-5 h-5 cursor-pointer" />
+            <Link href="/Cart" className="relative">
+              <FiShoppingCart className="w-5 h-5 cursor-pointer" />
+            
+            </Link>
           </div>
         </div>
       </div>
