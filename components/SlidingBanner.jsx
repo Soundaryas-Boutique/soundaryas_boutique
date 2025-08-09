@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const slides = [
   { 
@@ -30,22 +30,31 @@ const SlidingBanner = () => {
     setCurrentSlide((prevSlide) => (prevSlide - 1 + slides.length) % slides.length);
   };
 
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+  }, 5000); // 6 seconds
+
+  return () => clearInterval(interval);
+}, []); // Always empty array so hook shape stays the same
+
+
   return (
     <div className="relative w-full mx-auto">
       <div className="relative overflow-hidden rounded-lg">
         <div
-          className="flex transition-transform duration-500 ease-in-out"
+          className="flex transition-transform duration-[1000ms] ease-in-out" // 1s animation
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
           {slides.map((slide) => (
             <div key={slide.id} className="flex-shrink-0 w-full">
-              {/* Mobile Image (hidden on desktop) */}
+              {/* Mobile Image */}
               <img 
                 src={slide.mobileImage} 
                 alt={`Mobile Slide ${slide.id}`} 
                 className="w-full h-auto object-cover md:hidden"
               />
-              {/* Desktop Image (hidden on mobile) */}
+              {/* Desktop Image */}
               <img 
                 src={slide.image} 
                 alt={`Slide ${slide.id}`} 
@@ -57,40 +66,18 @@ const SlidingBanner = () => {
         
         {/* Navigation Buttons */}
         <div className="absolute inset-0 flex items-center justify-between px-4 z-30">
-          <button 
-            onClick={prevSlide} 
-            type="button" 
-            className="flex items-center justify-center p-2 group focus:outline-none"
-            data-carousel-prev
-          >
+          <button onClick={prevSlide} className="flex items-center justify-center p-2 group focus:outline-none">
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60">
-              <svg 
-                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" 
-                aria-hidden="true" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 6 10"
-              >
+              <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" viewBox="0 0 6 10" fill="none">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1 1 5l4 4"/>
               </svg>
               <span className="sr-only">Previous</span>
             </span>
           </button>
           
-          <button 
-            onClick={nextSlide} 
-            type="button" 
-            className="flex items-center justify-center p-2 group focus:outline-none"
-            data-carousel-next
-          >
+          <button onClick={nextSlide} className="flex items-center justify-center p-2 group focus:outline-none">
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60">
-              <svg 
-                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" 
-                aria-hidden="true" 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 6 10"
-              >
+              <svg className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" viewBox="0 0 6 10" fill="none">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
               </svg>
               <span className="sr-only">Next</span>
