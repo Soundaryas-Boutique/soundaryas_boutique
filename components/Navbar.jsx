@@ -168,7 +168,7 @@ const Navbar = () => {
           >
             {activeDropdown !== null && (
               <div className="max-w-[1440px] mx-auto">
-                <div className="grid grid-cols-3 gap-6 p-6">
+                <div className="grid grid-cols-3 gap-6 p-6 text-center">
                   {categories?.[activeDropdown]?.subcategories?.map((sub, subIndex) => (
                     <div key={subIndex} className="p-2">
                       <a 
