@@ -28,11 +28,11 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="flex overflow-x-auto md:hidden gap-4">
+        <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden pt-10"
+              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden"
             >
               <img
                 src={`/sample_product_images/picture${item}.webp`}
@@ -87,19 +87,18 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="flex overflow-x-auto md:hidden gap-4">
+        <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden pt-10 relative"
+              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative"
             >
               <img
                 src={`/sample_product_images/picture${item}.webp`}
                 alt={`Best Seller ${item}`}
                 className="w-full object-contain"
               />
-              {/* New Tag */}
-              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-secondary font-bold px-2 py-1">
                 New
               </div>
               <div className="p-2">
