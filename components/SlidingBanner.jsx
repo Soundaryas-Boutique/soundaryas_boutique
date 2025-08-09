@@ -1,78 +1,115 @@
-'use client'
-
+"use client"
 import React, { useState } from 'react';
-import Image from 'next/image';
 
-const images = [
-  '/images/banner1.jpg',
-  '/images/banner2.jpg',
-  '/images/banner3.jpg',
+const slides = [
+  { 
+    id: 1, 
+    image: '/slider_images/banner_1.webp',
+    mobileImage: '/slider_images/banner_1_mobile.webp' 
+  },
+  { 
+    id: 2, 
+    image: '/slider_images/banner_2.webp',
+    mobileImage: '/slider_images/banner_2_mobile.webp' 
+  },
+  { 
+    id: 3, 
+    image: '/slider_images/banner_3.webp',
+    mobileImage: '/slider_images/banner_3_mobile.webp' 
+  },
 ];
 
 const SlidingBanner = () => {
-  const [current, setCurrent] = useState(0);
-  const length = images.length;
-
-  const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? length - 1 : prev - 1));
-  };
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const nextSlide = () => {
-    setCurrent((prev) => (prev === length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prevSlide) => (prevSlide - 1 + slides.length) % slides.length);
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
-      {/* Slides Container */}
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${current * 100}%)`, width: `${length * 100}%` }}
-      >
-        {images.map((src, index) => (
-          <div key={index} className="w-full flex-shrink-0 h-screen relative">
-            <Image
-              src={src}
-              alt={`Slide ${index + 1}`}
-              layout="fill"
-              objectFit="cover"
-              priority={index === 0}
-            />
-          </div>
-        ))}
+    <div className="relative w-full mx-auto">
+      <div className="relative overflow-hidden rounded-lg">
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+        >
+          {slides.map((slide) => (
+            <div key={slide.id} className="flex-shrink-0 w-full">
+              {/* Mobile Image (hidden on desktop) */}
+              <img 
+                src={slide.mobileImage} 
+                alt={`Mobile Slide ${slide.id}`} 
+                className="w-full h-auto object-cover md:hidden"
+              />
+              {/* Desktop Image (hidden on mobile) */}
+              <img 
+                src={slide.image} 
+                alt={`Slide ${slide.id}`} 
+                className="hidden w-full h-auto object-cover md:block"
+              />
+            </div>
+          ))}
+        </div>
+        
+        {/* Navigation Buttons */}
+        <div className="absolute inset-0 flex items-center justify-between px-4 z-30">
+          <button 
+            onClick={prevSlide} 
+            type="button" 
+            className="flex items-center justify-center p-2 group focus:outline-none"
+            data-carousel-prev
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60">
+              <svg 
+                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" 
+                aria-hidden="true" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 6 10"
+              >
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 1 1 5l4 4"/>
+              </svg>
+              <span className="sr-only">Previous</span>
+            </span>
+          </button>
+          
+          <button 
+            onClick={nextSlide} 
+            type="button" 
+            className="flex items-center justify-center p-2 group focus:outline-none"
+            data-carousel-next
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60">
+              <svg 
+                className="w-4 h-4 text-white dark:text-gray-800 rtl:rotate-180" 
+                aria-hidden="true" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 6 10"
+              >
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <span className="sr-only">Next</span>
+            </span>
+          </button>
+        </div>
       </div>
-
-      {/* Left Arrow */}
-      <button
-        onClick={prevSlide}
-        className="absolute top-1/2 left-6 transform -translate-y-1/2 text-white text-4xl bg-black/30 px-3 py-1 rounded-full hover:bg-black/60 z-10"
-      >
-        ‹
-      </button>
-
-      {/* Right Arrow */}
-      <button
-        onClick={nextSlide}
-        className="absolute top-1/2 right-6 transform -translate-y-1/2 text-white text-4xl bg-black/30 px-3 py-1 rounded-full hover:bg-black/60 z-10"
-      >
-        ›
-      </button>
-
-      {/* Indicators */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-10">
-        {images.map((_, index) => (
+      
+      {/* Dots Indicator */}
+      <div className="flex justify-center mt-4">
+        {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrent(index)}
-            className={`w-4 h-4 rounded-full ${
-              current === index ? 'bg-white' : 'bg-gray-500'
+            className={`w-3 h-3 mx-1 rounded-full ${
+              index === currentSlide ? 'bg-gray-800/60' : 'bg-gray-300'
             }`}
+            onClick={() => setCurrentSlide(index)}
           />
         ))}
-      </div>
-
-      {/* Optional Overlay (e.g., heading/text) */}
-      <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-center text-white bg-black/30 z-0">
-        {/* <h1 className="text-5xl font-bold">Welcome</h1> */}
       </div>
     </div>
   );
