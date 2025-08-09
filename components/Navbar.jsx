@@ -1,13 +1,16 @@
 "use client";
-import React, { useEffect ,useState, useRef } from 'react';
-import { FiUser, FiHeart, FiShoppingCart, FiMenu, FiX, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import React, { useEffect, useState, useRef } from 'react';
+import { FiUser, FiHeart, FiShoppingCart, FiMenu, FiX, FiChevronDown, FiChevronUp, FiMail } from 'react-icons/fi';
 
 const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [email, setEmail] = useState('');
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
+  const popupRef = useRef(null);
 
   const categories = [
     { name: "Silk Sarees", subcategories: ["Designer Silk", "Traditional Silk", "Printed Silk"] },
@@ -57,15 +60,21 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, []);
-
   const toggleMobileCategory = (index) => {
     setActiveMobileCategory(activeMobileCategory === index ? null : index);
   };
+
+  const openPopup = () => {
+    setIsPopupOpen(true);
+    document.body.classList.add("overflow-hidden");
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+    document.body.classList.remove("overflow-hidden");
+    setEmail('');
+  };
+
 
   return (
     <>
@@ -91,6 +100,15 @@ const Navbar = () => {
           <div className="flex gap-6 items-center text-[#8B0000]">
             <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+            
+            <button
+              onClick={openPopup}
+              className="hidden lg:block"
+              aria-label="Subscribe to newsletter"
+            >
+              <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
+            </button>
+            
             <FiShoppingCart className="w-5 h-5 cursor-pointer" />
           </div>
         </div>
@@ -131,7 +149,7 @@ const Navbar = () => {
             {activeDropdown !== null && (
               <div className="max-w-[1440px] mx-auto">
                 <div className="grid grid-cols-3 gap-6 p-6">
-                  {categories[activeDropdown].subcategories.map((sub, subIndex) => (
+                  {categories?.[activeDropdown]?.subcategories?.map((sub, subIndex) => (
                     <div key={subIndex} className="p-2">
                       <a 
                         href="#" 
@@ -164,7 +182,6 @@ const Navbar = () => {
           <nav className="mt-4">
             {categories.map((category, index) => (
               <div key={index} className="">
-                {/* Mobile Category Header with Toggle */}
                 <div 
                   className="flex justify-between items-center py-3 px-2 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
                   onClick={() => toggleMobileCategory(index)}
@@ -179,7 +196,6 @@ const Navbar = () => {
                   )}
                 </div>
                 
-                {/* Mobile Subcategory Dropdown */}
                 <div className={`overflow-hidden transition-all duration-300 ${
                   activeMobileCategory === index ? 'max-h-[500px]' : 'max-h-0'
                 }`}>
@@ -198,6 +214,46 @@ const Navbar = () => {
           </nav>
         </div>
       </div>
+
+      {/* Newsletter Subscription Popup Modal */}
+      {isPopupOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
+          <div ref={popupRef} className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4 transform transition-transform duration-300 ease-in-out scale-100">
+            <div className="flex justify-between items-center border-b pb-3 mb-4">
+              <h3 className="text-xl font-semibold text-[#A52A2A]">Subscribe to our Newsletter</h3>
+              <button 
+                onClick={closePopup}
+                className="text-gray-500 hover:text-[#8B0000] transition-colors duration-200"
+                aria-label="Close popup"
+              >
+                <FiX className="w-6 h-6" />
+              </button>
+            </div>
+            <form className="space-y-4">
+              <p className="text-gray-600">Get the latest updates on new arrivals and special offers directly in your inbox.</p>
+              <div>
+                <label htmlFor="email" className="sr-only">Email address</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 px-4 bg-[#A52A2A] text-white font-medium rounded-md hover:bg-[#8B0000] transition-colors duration-200"
+              >
+                Subscribe
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 };
