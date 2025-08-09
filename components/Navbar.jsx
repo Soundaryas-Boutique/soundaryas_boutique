@@ -105,7 +105,9 @@ const Navbar = () => {
           
           {/* Icons (Right side) */}
           <div className="flex gap-6 items-center text-[#8B0000]">
-            <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
+          <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
+
+
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
             
             <button
@@ -120,6 +122,14 @@ const Navbar = () => {
               <FiShoppingCart className="w-5 h-5 cursor-pointer" />
             
             </Link>
+
+            {status === "authenticated" ? (
+            <button onClick={() => redirect("/logoutsecurity")}>
+              Logout
+            </button>
+          ) : (
+            <button onClick={() => signIn()}>Login</button>
+          )}
           </div>
         </div>
       </div>
