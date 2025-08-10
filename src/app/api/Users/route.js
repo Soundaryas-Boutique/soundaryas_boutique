@@ -1,12 +1,14 @@
 // src/app/api/Users/route.js
-
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { connectDB } from "@/app/lib/mongoose"; // <-- central connection helper
 import User from "@/app/(models)/User";
 
 // POST /api/Users
 export async function POST(req) {
   try {
+    await connectDB(); // <-- connect once before DB operations
+
     const body = await req.json();
     const userData = body.formData;
 
@@ -25,7 +27,7 @@ export async function POST(req) {
     }
 
     // Check for duplicate email
-    const duplicate = await User.findOne({ email: userData.email }).lean().exec();
+    const duplicate = await User.findOne({ email: userData.email }).lean();
     if (duplicate) {
       return NextResponse.json(
         { message: "User already exists (Email)" },
