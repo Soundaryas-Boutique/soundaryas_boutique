@@ -105,7 +105,10 @@ const Navbar = () => {
           
           {/* Icons (Right side) */}
           <div className="flex gap-6 items-center text-[#8B0000]">
+          
+          <Link href="/Profile" className="relative">
           <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
+          </Link>
 
 
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
