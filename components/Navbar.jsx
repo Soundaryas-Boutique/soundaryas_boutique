@@ -121,7 +121,7 @@ const Navbar = () => {
               <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
             </button>
             
-            <Link href="/Cart" className="relative">
+            <Link href={status === "authenticated"?"/Cart":"/Denied"} className="relative">
               <FiShoppingCart className="w-5 h-5 cursor-pointer" />
             
             </Link>
