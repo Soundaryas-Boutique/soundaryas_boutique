@@ -99,7 +99,11 @@ const Navbar = () => {
           {/* Logo (Center) */}
           <div className="flex-1 flex justify-center lg:justify-start">
             <div className="text-[#8B0000] text-xl tracking-wide font-semibold">
+              <Link href="/" className="flex items-center">
               Soundarya's Boutique
+              </Link>
+
+
             </div>
           </div>
           
