@@ -130,6 +130,11 @@ export default function Signin() {
                     </Link>
                   </span>
                 </div>
+                <div className="mt-4">
+        <Link href="/forgot-password" className="text-blue-500 hover:underline">
+          Forgot your password?
+        </Link>
+      </div>
               </form>
             );
           }
