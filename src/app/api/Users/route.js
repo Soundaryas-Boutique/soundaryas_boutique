@@ -1,18 +1,15 @@
-// src/app/api/Users/route.js
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { connectDB } from "@/app/lib/mongoose"; // <-- central connection helper
+import { connectDB } from "@/app/lib/mongoose";
 import User from "@/app/(models)/User";
 
-// POST /api/Users
+// POST /api/Users — Create a user
 export async function POST(req) {
   try {
-    await connectDB(); // <-- connect once before DB operations
-
+    await connectDB();
     const body = await req.json();
     const userData = body.formData;
 
-    // Validate required fields
     if (
       !userData?.name ||
       !userData?.email ||
@@ -26,7 +23,6 @@ export async function POST(req) {
       );
     }
 
-    // Check for duplicate email
     const duplicate = await User.findOne({ email: userData.email }).lean();
     if (duplicate) {
       return NextResponse.json(
@@ -35,11 +31,9 @@ export async function POST(req) {
       );
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     userData.password = hashedPassword;
 
-    // Create user
     await User.create(userData);
 
     return NextResponse.json(
@@ -48,6 +42,39 @@ export async function POST(req) {
     );
   } catch (error) {
     console.error("Error creating user:", error);
+    return NextResponse.json(
+      { message: "Server error", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+// GET /api/Users?email=...
+export async function GET(req) {
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json(
+        { message: "Email query parameter is required" },
+        { status: 400 }
+      );
+    }
+
+    const user = await User.findOne({ email }).lean();
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(user, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching user:", error);
     return NextResponse.json(
       { message: "Server error", error: error.message },
       { status: 500 }

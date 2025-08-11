@@ -1,40 +1,31 @@
-//This is my custom hook created to fetch user information
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+export default function useUserInfo(email) {
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    console.log("Email passed to hook:", email);
+
+    if (!email) return;
 
 
-export default function useUserInfo(){
-
-    const { data: session, status:sessionStatus } = useSession();
-    const [userInfo, setUserInfo] = useState(null);
-    const [status, setStatus] = useState('loading');
-
-
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            setStatus('loading');
-
-            if (sessionStatus === "authenticated" && session?.user?._id) {
-                try {
-                  const res = await fetch(`/api/users?id=${session.user._id}`);
-                  if (!res.ok) {
-                    throw new Error(`Failed to fetch user info: ${res.statusText}`);
-                  }
-                  const data = await res.json();
-                  setUserInfo(data);
-                  setStatus("loaded");
-                } catch (err) {
-                  console.error(err);
-                  setUserInfo(null);
-                  setStatus("error");
-                }
-              } else if (sessionStatus === "unauthenticated") {
-                setUserInfo(null);
-                setStatus("unauthenticated");
-              }
+    const fetchUserInfo = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`/api/Users?email=${email}`);
+        setUserInfo(res.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchUserInfo();
-},[sessionStatus,session]);
-    return { userInfo, status,session,setUserInfo };
+  }, [email]);
+
+  return { userInfo, loading, error };
 }
