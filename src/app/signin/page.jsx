@@ -78,7 +78,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-20">
+    <div className="flex flex-col items-center justify-center gap-6 py-20 ">
       {status === "unauthenticated" && providers ? (
         Object.values(providers).map((provider, index) => {
           const config = getButtonConfig(provider.id);
@@ -88,7 +88,7 @@ export default function Signin() {
               <form
                 key={provider.id}
                 onSubmit={handleCredentialsLogin}
-                className={`w-80 p-6 rounded-lg shadow transition-all duration-1000 ease-out ${
+                className={`w-[500px] p-6 rounded-lg shadow transition-all duration-1000 bg-gray-200 ease-out ${
                   loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
                 style={{ transitionDelay: `${800 + index * 200}ms` }}
@@ -105,7 +105,7 @@ export default function Signin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full mb-3 px-4 py-2 border rounded-lg focus:outline-none"
+                  className="w-full mb-3 px-4 py-2 mt-3 border rounded-lg focus:outline-none"
                 />
                 <input
                   type="password"
@@ -113,19 +113,19 @@ export default function Signin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full mb-4 px-4 py-2 border rounded-lg focus:outline-none"
+                  className="w-full mb-4 px-4 mt-3 py-2 border rounded-lg focus:outline-none"
                 />
 
                 
                 <button
                   type="submit"
-                  className={`w-full py-2 rounded-lg font-semibold ${config.bg}`}
+                  className={`w-full py-2 rounded-lg mt-3 font-semibold ${config.bg}`}
                 >
                   Login
                 </button>
-                <div>
+                <div className="mt-10">
                   New User ? <span>
-                    <Link href="/CreateUser" className="text-blue-500 hover:underline">
+                    <Link href="/CreateUser" className="text-blue-500 hover:underline mt-20">
                       Create Account
                     </Link>
                   </span>

@@ -24,11 +24,7 @@ const Navbar = () => {
     { name: "Cotton Sarees", subcategories: ["Casual Cotton", "Fancy Cotton", "Printed Cotton"] },
     { name: "Kanchipuram", subcategories: ["Traditional Kanchipuram", "Modern Kanchipuram"] },
     { name: "Banarasi", subcategories: ["Traditional Banarasi", "Contemporary Banarasi"] },
-    { name: "Bridal", subcategories: ["Bridal Silk", "Bridal Cotton"] },
-    { name: "Daily Wear", subcategories: ["Casual Wear", "Office Wear"] },
-    { name: "Collections", subcategories: ["Festive Collection", "Seasonal Collection"] },
-    { name: "Offers", subcategories: ["Discounts", "Special Offers"] },
-    { name: "New Arrivals", subcategories: ["Latest Trends", "New Styles"] },
+   ,
   ];
 
   const handleCategoryEnter = (index) => {
