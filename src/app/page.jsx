@@ -1,9 +1,9 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
 
 export default function HomePage() {
-
   const [sarees, setSarees] = useState([]);
 
   useEffect(() => {
@@ -26,9 +26,10 @@ export default function HomePage() {
         {/* Desktop grid */}
         <div className="grid grid-cols-5 gap-8 hidden md:grid pt-10">
           {sarees.map((saree) => (
-            <div
+            <Link
               key={saree._id}
-              className="bg-white hover:shadow-md transition overflow-hidden"
+              href={`/product/${saree._id}`}
+              className="bg-white hover:shadow-md transition overflow-hidden block"
             >
               {saree.imgSrc && (
                 <img
@@ -45,16 +46,17 @@ export default function HomePage() {
                   ₹{saree.price}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         {/* Mobile horizontal scroll */}
         <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
           {sarees.map((saree) => (
-            <div
+            <Link
               key={saree._id}
-              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden"
+              href={`/product/${saree._id}`}
+              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden block"
             >
               {saree.imgSrc && (
                 <img
@@ -71,7 +73,7 @@ export default function HomePage() {
                   ₹{saree.price}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -90,14 +92,17 @@ export default function HomePage() {
 
       {/* New Arrivals */}
       <section className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
-        <h2 className="text-3xl font-bold text-center text-[#B22222]">NEW ARRIVALS</h2>
-        
+        <h2 className="text-3xl font-bold text-center text-[#B22222]">
+          NEW ARRIVALS
+        </h2>
+
         {/* Desktop grid */}
         <div className="grid grid-cols-5 gap-8 hidden md:grid pt-10">
           {sarees.map((saree) => (
-            <div
+            <Link
               key={saree._id}
-              className="bg-white hover:shadow-md transition overflow-hidden relative"
+              href={`/product/${saree._id}`}
+              className="bg-white hover:shadow-md transition overflow-hidden relative block"
             >
               {saree.imgSrc && (
                 <img
@@ -118,16 +123,17 @@ export default function HomePage() {
                   ₹{saree.price}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
         {/* Mobile horizontal scroll */}
         <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
           {sarees.map((saree) => (
-            <div
+            <Link
               key={saree._id}
-              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative"
+              href={`/product/${saree._id}`}
+              className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative block"
             >
               {saree.imgSrc && (
                 <img
@@ -147,11 +153,11 @@ export default function HomePage() {
                   ₹{saree.price}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
-        {/* View All button centered at the bottom */}
+        {/* View All button */}
         <div className="text-center mt-6">
           <button
             className="px-4 py-2 font-medium text-gray-500 rounded 
