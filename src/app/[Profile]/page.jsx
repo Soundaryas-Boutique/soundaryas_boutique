@@ -31,6 +31,17 @@ export default function ProfilePage() {
       <p><strong>Email:</strong> {userInfo?.email}</p>
       <p><strong>Phone:</strong> {userInfo?.phone}</p>
       <p><strong>Address:</strong> {userInfo?.address}</p>
+
+      <Link href="/Edit">
+        <button className="bg-blue-500 text-white px-4 py-2 rounded">
+          Edit Profile
+        </button>        
+      </Link>
+      <Link href="/">
+        <button className="bg-gray-500 text-white px-4 py-2 rounded ml-2">
+          Back to Home
+        </button>
+      </Link>                                                              
     </div>
   );
 }
