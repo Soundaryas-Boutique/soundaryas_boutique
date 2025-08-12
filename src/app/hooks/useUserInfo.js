@@ -16,6 +16,7 @@ export default function useUserInfo(email) {
       try {
         setLoading(true);
         const res = await axios.get(`/api/Users?email=${email}`);
+        console.log("User info response:", res);
         setUserInfo(res.data);
       } catch (err) {
         setError(err);
