@@ -19,25 +19,20 @@ export default function ProfilePage() {
       </div>
     );
   }
-
+  console.log(userInfo);
   if (error) return <p>{error.message}</p>;
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Profile</h1>
-      <p><strong>Name:</strong> {userInfo?.name}</p>
-      <p><strong>Email:</strong> {userInfo?.email}</p>
-      <p><strong>Phone:</strong> {userInfo?.phone}</p>
-      <p><strong>Address:</strong> {userInfo?.address}</p>
-
-      {/* Edit Profile Button */}
-      <div className="mt-6">
-        <Link href={`/Edit/${encodeURIComponent(email)}`}>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Edit Profile
-          </button>
-        </Link>
+    <div className="flex flex-col md:flex-row  p-4">
+      {/*Left side*/}
+      <div className="w-80 border-r h-screen">
+        Left side
       </div>
+      {/*Right side*/}
+      <div className="ml-9">
+        <h1 className="text-2xl font-bold mb-4">Profile Information</h1>
+        <p className="mb-2"><strong>Email:</strong> {userInfo?.email}</p>
+    </div>
     </div>
   );
 }
