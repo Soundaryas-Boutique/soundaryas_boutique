@@ -34,8 +34,8 @@ export default function ProfilePage() {
 
       {/*Right side*/}
       <div className="ml-9">
-        <h1 className="text-2xl font-bold mb-4">Profile Information</h1>
-        <p className="mb-2"><strong>Email:</strong> {userInfo?.email}</p>
+        <h1 className="text-2xl font-bold mb-4">Order Details..</h1>
+     
     </div>
     </div>
   );

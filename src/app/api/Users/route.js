@@ -15,7 +15,11 @@ export async function POST(req) {
       !userData?.email ||
       !userData?.password ||
       !userData?.phone ||
-      !userData?.address
+      !userData?.address||
+      !userData?.state ||
+      !userData?.country ||
+      !userData?.pincode ||
+      !userData?.city
     ) {
       return NextResponse.json(
         { message: "All fields are required" },

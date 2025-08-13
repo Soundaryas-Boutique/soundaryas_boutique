@@ -10,6 +10,7 @@ export default function ProfilePage() {
 
   const { userInfo, loading, error } = useUserInfo(email);
   console.log(status);
+  console.log(userInfo);
 
 
   if (status === "unauthenticated" ) {
@@ -28,13 +29,23 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col md:flex-row  p-4">
       {/*Left side*/}
+      
       <ProfileNav />
-
 
       {/*Right side*/}
       <div className="ml-9">
-        <h1 className="text-2xl font-bold mb-4">Profile Information</h1>
-        <p className="mb-2"><strong>Email:</strong> {userInfo?.email}</p>
+      <h1 className="text-2xl font-bold mb-4">Account Details</h1>
+        
+        <div>
+        <p className="mb-2"> {userInfo?.name}</p>
+        <p className="mb-2"> {userInfo?.phone}</p>
+        <p className="mb-2"> {userInfo?.email}</p>
+        </div>
+        <div className="mt-24">
+        <h1 className="text-2xl font-bold mb-4">Address</h1>
+        <p className="mb-2"> {userInfo?.address},{userInfo?.city},<br></br>{userInfo?.state},{userInfo?.country},{userInfo?.pincode}</p>
+       
+        </div>
     </div>
     </div>
   );

@@ -9,6 +9,10 @@ const userSchema = new Schema(
     address: String,
     resetToken: String,
     resetTokenExpiry: Date,
+    state:String,
+    country:String,
+    pincode: String,
+    city: String,
   },
   {
     timestamps: true,
