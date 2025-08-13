@@ -8,10 +8,11 @@ export default function ProfilePage() {
   const email = session?.user?.email;
 
   const { userInfo, loading, error } = useUserInfo(email);
-  console.log(status);
 
+ 
+  console.log(userInfo);
 
-  if (status === "unauthenticated" ) {
+  if (status === "unauthenticated") {
     return (
       <div className="relative items-center justify-center flex flex-col h-screen -top-20">
         <p>Please Login to continue.</p>
@@ -21,7 +22,7 @@ export default function ProfilePage() {
       </div>
     );
   }
-  console.log(userInfo);
+  
   if (error) return <p>{error.message}</p>;
 
   return (
@@ -37,7 +38,7 @@ export default function ProfilePage() {
             <Link href="/profile/settings">Settings</Link>
           </li>
           <li className="hover:bg-gray-100 p-2 rounded">
-            <Link href="Profile/Orders">Orders</Link>
+            <Link href="/Profile/Orders">Orders</Link>
           </li>
         </ul>
       </div>
