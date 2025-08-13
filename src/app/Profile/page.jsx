@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react";
 import useUserInfo from "@/app/hooks/useUserInfo";
 import Link from "next/link";
+import ProfileNav from "../../../components/ProfileNav";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -27,20 +28,7 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col md:flex-row  p-4">
       {/*Left side*/}
-      <div className="w-80 border-r h-screen  p-4">
-      
-        <ul className="space-y-2">
-          <li className="hover:bg-gray-100 p-2 rounded">
-            <Link href="/Profile">Profile</Link>
-          </li>
-          <li className="hover:bg-gray-100 p-2 rounded">
-            <Link href="/profile/settings">Settings</Link>
-          </li>
-          <li className="hover:bg-gray-100 p-2 rounded">
-            <Link href="Profile/Orders">Orders</Link>
-          </li>
-        </ul>
-      </div>
+      <ProfileNav />
 
 
       {/*Right side*/}
