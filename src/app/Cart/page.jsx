@@ -13,7 +13,7 @@ const page = () => {
     const { userInfo, loading, error } = useUserInfo(email);
   
 
-  if (status === "loading" || loading) 
+  if (status === "unauthenticated" ) 
     return(
       <div className="relative items-center justify-center flex flex-col h-screen -top-20">
         <p>Please Login to continue.</p>
