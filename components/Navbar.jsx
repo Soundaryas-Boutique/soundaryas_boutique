@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FiUser, 
   FiHeart, 
@@ -10,9 +10,8 @@ import {
   FiChevronUp, 
   FiMail 
 } from 'react-icons/fi';
-
 import Link from 'next/link';
-import { useSession, signOut, signIn } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 const Navbar = () => {
@@ -29,7 +28,6 @@ const Navbar = () => {
   const [phone, setPhone] = useState('');
   const [exclusive, setExclusive] = useState(false);
 
-  const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
   const popupRef = useRef(null);
 
@@ -94,21 +92,34 @@ const Navbar = () => {
     setExclusive(false);
   };
 
-  // Handle newsletter form submission
-  const handleNewsletterSubmit = (e) => {
+  // Fixed newsletter submission
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = {
-      name,
-      email,
-      phone,
-      exclusive,
-    };
+    const formData = { name, email, phone, exclusive };
 
-    console.log("Newsletter Subscription:", formData);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    // TODO: send to API or MongoDB backend
-    closePopup();
+      const data = await res.json();
+      console.log("API Response:", data);
+
+      if (res.ok) {
+        alert("Subscribed successfully!");
+        closePopup();
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
   };
 
   return (
@@ -124,7 +135,7 @@ const Navbar = () => {
             />
           </div>
           
-          {/* Logo (Center) */}
+          {/* Logo */}
           <div className="flex-1 flex justify-center lg:justify-start">
             <div className="text-[#8B0000] text-xl tracking-wide font-semibold">
               <Link href="/" className="flex items-center">
@@ -133,7 +144,7 @@ const Navbar = () => {
             </div>
           </div>
           
-          {/* Icons (Right side) */}
+          {/* Icons */}
           <div className="flex gap-6 items-center text-[#8B0000]">
             <Link href="/Profile" className="relative">
               <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
@@ -164,7 +175,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Desktop Category Bar with Dropdown */}
+      {/* Desktop Category Bar */}
       <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200 hidden lg:block">
         <div className="relative">
           <div className="flex justify-center gap-5 text-[#A52A2A] font-medium px-4 py-2">
@@ -186,32 +197,6 @@ const Navbar = () => {
                 />
               </div>
             ))}
-          </div>
-
-          <div
-            ref={dropdownRef}
-            className={`absolute left-0 w-full bg-white shadow-lg transition-all duration-300 ease-out ${
-              activeDropdown !== null ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-            }`}
-            onMouseEnter={handleDropdownEnter}
-            onMouseLeave={handleDropdownLeave}
-          >
-            {activeDropdown !== null && (
-              <div className="max-w-[1440px] mx-auto">
-                <div className="grid grid-cols-3 gap-6 p-6 text-center">
-                  {categories?.[activeDropdown]?.subcategories?.map((sub, subIndex) => (
-                    <div key={subIndex} className="p-2">
-                      <a 
-                        href="#" 
-                        className="text-[#A52A2A] hover:text-[#8B0000] transition-colors duration-200"
-                      >
-                        {sub}
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -282,9 +267,8 @@ const Navbar = () => {
             <form className="space-y-4" onSubmit={handleNewsletterSubmit}>
               <p className="text-gray-600">Get the latest updates on new arrivals and special offers directly in your inbox.</p>
               
-              {/* Name Input */}
+              {/* Name */}
               <div>
-                <label htmlFor="name" className="sr-only">Name</label>
                 <input
                   type="text"
                   id="name"
@@ -297,9 +281,8 @@ const Navbar = () => {
                 />
               </div>
 
-              {/* Email Input */}
+              {/* Email */}
               <div>
-                <label htmlFor="email" className="sr-only">Email address</label>
                 <input
                   type="email"
                   id="email"
@@ -312,9 +295,8 @@ const Navbar = () => {
                 />
               </div>
 
-              {/* Phone Input */}
+              {/* Phone */}
               <div>
-                <label htmlFor="phone" className="sr-only">Phone number</label>
                 <input
                   type="tel"
                   id="phone"
