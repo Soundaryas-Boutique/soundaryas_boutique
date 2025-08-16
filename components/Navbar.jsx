@@ -1,20 +1,34 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
-import { FiUser, FiHeart, FiShoppingCart, FiMenu, FiX, FiChevronDown, FiChevronUp, FiMail } from 'react-icons/fi';
+import { 
+  FiUser, 
+  FiHeart, 
+  FiShoppingCart, 
+  FiMenu, 
+  FiX, 
+  FiChevronDown, 
+  FiChevronUp, 
+  FiMail 
+} from 'react-icons/fi';
 
 import Link from 'next/link';
 import { useSession, signOut, signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 const Navbar = () => {
-
   const { data: session, status } = useSession();
 
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  // Newsletter form states
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [exclusive, setExclusive] = useState(false);
+
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
   const popupRef = useRef(null);
@@ -24,7 +38,6 @@ const Navbar = () => {
     { name: "Cotton Sarees", subcategories: ["Casual Cotton", "Fancy Cotton", "Printed Cotton"] },
     { name: "Kanchipuram", subcategories: ["Traditional Kanchipuram", "Modern Kanchipuram"] },
     { name: "Banarasi", subcategories: ["Traditional Banarasi", "Contemporary Banarasi"] },
-   ,
   ];
 
   const handleCategoryEnter = (index) => {
@@ -75,9 +88,28 @@ const Navbar = () => {
   const closePopup = () => {
     setIsPopupOpen(false);
     document.body.classList.remove("overflow-hidden");
+    setName('');
     setEmail('');
+    setPhone('');
+    setExclusive(false);
   };
 
+  // Handle newsletter form submission
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name,
+      email,
+      phone,
+      exclusive,
+    };
+
+    console.log("Newsletter Subscription:", formData);
+
+    // TODO: send to API or MongoDB backend
+    closePopup();
+  };
 
   return (
     <>
@@ -96,20 +128,16 @@ const Navbar = () => {
           <div className="flex-1 flex justify-center lg:justify-start">
             <div className="text-[#8B0000] text-xl tracking-wide font-semibold">
               <Link href="/" className="flex items-center">
-              Soundarya's Boutique
+                Soundarya&apos;s Boutique
               </Link>
-
-
             </div>
           </div>
           
           {/* Icons (Right side) */}
           <div className="flex gap-6 items-center text-[#8B0000]">
-          
-          <Link href="/Profile" className="relative">
-          <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
-          </Link>
-
+            <Link href="/Profile" className="relative">
+              <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
+            </Link>
 
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
             
@@ -123,16 +151,15 @@ const Navbar = () => {
             
             <Link href={status === "authenticated"?"/Cart":"/Denied"} className="relative">
               <FiShoppingCart className="w-5 h-5 cursor-pointer" />
-            
             </Link>
 
             {status === "authenticated" ? (
-            <button onClick={() => redirect("/logoutsecurity")}>
-              Logout
-            </button>
-          ) : (
-            <button onClick={() => signIn()}>Login</button>
-          )}
+              <button onClick={() => redirect("/logoutsecurity")}>
+                Logout
+              </button>
+            ) : (
+              <button onClick={() => signIn()}>Login</button>
+            )}
           </div>
         </div>
       </div>
@@ -252,8 +279,25 @@ const Navbar = () => {
                 <FiX className="w-6 h-6" />
               </button>
             </div>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleNewsletterSubmit}>
               <p className="text-gray-600">Get the latest updates on new arrivals and special offers directly in your inbox.</p>
+              
+              {/* Name Input */}
+              <div>
+                <label htmlFor="name" className="sr-only">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
+                  required
+                />
+              </div>
+
+              {/* Email Input */}
               <div>
                 <label htmlFor="email" className="sr-only">Email address</label>
                 <input
@@ -267,6 +311,36 @@ const Navbar = () => {
                   required
                 />
               </div>
+
+              {/* Phone Input */}
+              <div>
+                <label htmlFor="phone" className="sr-only">Phone number</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="Enter your phone number"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
+                />
+              </div>
+
+              {/* Checkbox */}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="exclusive"
+                  checked={exclusive}
+                  onChange={(e) => setExclusive(e.target.checked)}
+                  className="h-4 w-4 text-[#8B0000] focus:ring-[#A52A2A] border-gray-300 rounded"
+                />
+                <label htmlFor="exclusive" className="ml-2 text-gray-700">
+                  Send me exclusive offers and updates
+                </label>
+              </div>
+
+              {/* Submit */}
               <button
                 type="submit"
                 className="w-full py-3 px-4 bg-[#A52A2A] text-white font-medium rounded-md hover:bg-[#8B0000] transition-colors duration-200"
