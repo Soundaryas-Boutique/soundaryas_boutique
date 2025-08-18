@@ -6,14 +6,11 @@ export async function GET(request, { params }) {
   await connectDB();
 
   try {
-    const { id } = await params; // ✅ must await
-    const saree = await Saree.findById(id);
+    const { category, slug } = await params;
+    const saree = await Saree.findOne({ category, slug });
 
     if (!saree) {
-      return NextResponse.json(
-        { error: "Saree not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Saree not found" }, { status: 404 });
     }
 
     return NextResponse.json(saree);

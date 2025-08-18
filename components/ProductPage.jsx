@@ -1,23 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
-const ProductPage = ({ productId }) => {
-  const [product, setProduct] = useState(null);
+const ProductPage = ({ product }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  useEffect(() => {
-    async function fetchProduct() {
-      try {
-        const res = await fetch(`/api/sarees/${productId}`);
-        const data = await res.json();
-        setProduct(data);
-      } catch (err) {
-        console.error("Failed to fetch product:", err);
-      }
-    }
-    fetchProduct();
-  }, [productId]);
 
   if (!product) return <p className="p-8">Loading...</p>;
 
@@ -38,7 +24,10 @@ const ProductPage = ({ productId }) => {
         {/* Left Side - Thumbnails + Main Image */}
         <div className="w-1/2 p-6 flex gap-4 sticky top-10 h-fit">
           <div className="flex flex-col items-center gap-2">
-            <button onClick={() => changeImage("up")} className="text-gray-500 hover:text-[#B22222] transition">
+            <button
+              onClick={() => changeImage("up")}
+              className="text-gray-500 hover:text-[#B22222] transition"
+            >
               <ChevronUp size={24} />
             </button>
 
@@ -49,14 +38,19 @@ const ProductPage = ({ productId }) => {
                   src={img}
                   alt={`Thumbnail ${idx + 1}`}
                   className={`w-[120px] h-[170px] object-contain rounded cursor-pointer border-2 ${
-                    selectedIndex === idx ? "border-[#B22222]" : "border-transparent"
+                    selectedIndex === idx
+                      ? "border-[#B22222]"
+                      : "border-transparent"
                   }`}
                   onClick={() => setSelectedIndex(idx)}
                 />
               ))}
             </div>
 
-            <button onClick={() => changeImage("down")} className="text-gray-500 hover:text-[#B22222] transition">
+            <button
+              onClick={() => changeImage("down")}
+              className="text-gray-500 hover:text-[#B22222] transition"
+            >
               <ChevronDown size={24} />
             </button>
           </div>
@@ -77,7 +71,9 @@ const ProductPage = ({ productId }) => {
               {product.productName}
             </h1>
             <p className="text-gray-700 text-lg">{product.description}</p>
-            <p className="text-2xl font-semibold text-[#B22222]">₹{product.price}</p>
+            <p className="text-2xl font-semibold text-[#B22222]">
+              ₹{product.price}
+            </p>
 
             <button className="bg-[#B22222] text-white px-6 py-2 rounded hover:bg-[#a11d1d] transition">
               Add to Cart

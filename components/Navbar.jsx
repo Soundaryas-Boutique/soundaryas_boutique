@@ -32,10 +32,10 @@ const Navbar = () => {
   const popupRef = useRef(null);
 
   const categories = [
-    { name: "Silk Sarees", subcategories: ["Designer Silk", "Traditional Silk", "Printed Silk"] },
-    { name: "Cotton Sarees", subcategories: ["Casual Cotton", "Fancy Cotton", "Printed Cotton"] },
-    { name: "Kanchipuram", subcategories: ["Traditional Kanchipuram", "Modern Kanchipuram"] },
-    { name: "Banarasi", subcategories: ["Traditional Banarasi", "Contemporary Banarasi"] },
+    { name: "Silk Sarees", subcategories: ["Designer Silk", "Traditional Silk", "Printed Silk"], slug: "cat1" },
+    { name: "Cotton Sarees", subcategories: ["Casual Cotton", "Fancy Cotton", "Printed Cotton"], slug: "cat2" },
+    { name: "Kanchipuram", subcategories: ["Traditional Kanchipuram", "Modern Kanchipuram"], slug: "cat3" },
+    { name: "Banarasi", subcategories: ["Traditional Banarasi", "Contemporary Banarasi"], slug: "cat1" },
   ];
 
   const handleCategoryEnter = (index) => {
@@ -186,9 +186,12 @@ const Navbar = () => {
                 onMouseEnter={() => handleCategoryEnter(index)}
                 onMouseLeave={handleCategoryLeave}
               >
-                <a href="#" className="flex items-center py-2 hover:text-[#8B0000] transition-colors duration-200">
-                  {category.name}
-                </a>
+          <Link
+            href={`/collections/${category.slug}`} 
+            className="flex items-center py-2 hover:text-[#8B0000] transition-colors duration-200"
+          >
+            {category.name}
+          </Link>
                 
                 <div
                   className={`absolute bottom-1 left-0 w-full h-0.5 bg-[#8B0000] transition-transform duration-300 origin-left ${

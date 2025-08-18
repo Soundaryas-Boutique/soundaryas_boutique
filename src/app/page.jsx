@@ -33,9 +33,9 @@ export default function HomePage() {
       };
 
       try {
-        const response = await fetch('/api/site-reviews', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("/api/site-reviews", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reviewData),
         });
 
@@ -50,7 +50,6 @@ export default function HomePage() {
         console.error("Failed to submit site review:", error);
         alert("An error occurred while submitting your feedback.");
       }
-
     } else {
       alert("Please fill in all fields and select a rating.");
     }
@@ -78,7 +77,9 @@ export default function HomePage() {
           {sarees.map((saree) => (
             <Link
               key={saree._id}
-              href={`/product/${saree._id}`}
+              href={`/collections/${saree.category}/${encodeURIComponent(
+                saree.productName.toLowerCase().replace(/\s+/g, "-")
+              )}`}
               className="bg-white hover:shadow-md transition overflow-hidden block"
             >
               {saree.imgSrc && (
@@ -105,7 +106,9 @@ export default function HomePage() {
           {sarees.map((saree) => (
             <Link
               key={saree._id}
-              href={`/product/${saree._id}`}
+              href={`/collections/${saree.category}/${encodeURIComponent(
+                saree.productName.toLowerCase().replace(/\s+/g, "-")
+              )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden block"
             >
               {saree.imgSrc && (
@@ -129,14 +132,15 @@ export default function HomePage() {
 
         {/* View All button */}
         <div className="text-center mt-6">
-          <button
+          <Link
+            href="/collections/new-arrivals"
             className="px-4 py-2 font-medium text-gray-500 rounded 
                       ring-1 ring-gray-500 
                       hover:ring-2 
                       transition-all duration-300 ease-in-out"
           >
             View All
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -151,7 +155,9 @@ export default function HomePage() {
           {sarees.map((saree) => (
             <Link
               key={saree._id}
-              href={`/product/${saree._id}`}
+              href={`/collections/${saree.category}/${encodeURIComponent(
+                saree.productName.toLowerCase().replace(/\s+/g, "-")
+              )}`}
               className="bg-white hover:shadow-md transition overflow-hidden relative block"
             >
               {saree.imgSrc && (
@@ -182,7 +188,9 @@ export default function HomePage() {
           {sarees.map((saree) => (
             <Link
               key={saree._id}
-              href={`/product/${saree._id}`}
+              href={`/collections/${saree.category}/${encodeURIComponent(
+                saree.productName.toLowerCase().replace(/\s+/g, "-")
+              )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative block"
             >
               {saree.imgSrc && (
@@ -209,32 +217,34 @@ export default function HomePage() {
 
         {/* View All button */}
         <div className="text-center mt-6">
-          <button
+          <Link
+            href="/collections/new-arrivals"
             className="px-4 py-2 font-medium text-gray-500 rounded 
                       ring-1 ring-gray-500 
                       hover:ring-2 
                       transition-all duration-300 ease-in-out"
           >
             View All
-          </button>
+          </Link>
         </div>
       </section>
 
       {/* Site Review Section */}
       <section className="bg-white py-12">
         <div className="text-center">
-             <h2 className="text-3xl font-bold text-[#B22222] mb-4">
-                Share Your Experience
-            </h2>
-            <p className="text-gray-600 mb-6 max-w-xl mx-auto">
-                Loved your experience with Soundarya's Boutique? We'd love to hear from you! Your feedback helps us grow.
-            </p>
-            <button
-              onClick={openModal}
-              className="bg-[#A52A2A] text-white font-medium py-3 px-8 rounded-md hover:bg-[#8B0000] transition-colors duration-200"
-            >
-              Leave a Review
-            </button>
+          <h2 className="text-3xl font-bold text-[#B22222] mb-4">
+            Share Your Experience
+          </h2>
+          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+            Loved your experience with Soundarya's Boutique? We'd love to hear
+            from you! Your feedback helps us grow.
+          </p>
+          <button
+            onClick={openModal}
+            className="bg-[#A52A2A] text-white font-medium py-3 px-8 rounded-md hover:bg-[#8B0000] transition-colors duration-200"
+          >
+            Leave a Review
+          </button>
         </div>
       </section>
 
