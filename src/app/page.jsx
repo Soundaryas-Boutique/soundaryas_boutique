@@ -68,12 +68,12 @@ export default function HomePage() {
 
       {/* Best Sellers */}
       <section className="max-w-[1440px] mx-auto pt-16 pb-8 px-4 md:px-8">
-        <h2 className="text-3xl font-bold text-center text-[#B22222]">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-[#B22222]">
           BEST SELLERS
         </h2>
 
         {/* Desktop grid */}
-        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-10">
+        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
           {sarees.map((saree) => (
             <Link
               key={saree._id}
@@ -102,7 +102,7 @@ export default function HomePage() {
         </div>
 
         {/* Mobile horizontal scroll */}
-        <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
+        <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
           {sarees.map((saree) => (
             <Link
               key={saree._id}
@@ -134,24 +134,27 @@ export default function HomePage() {
         <div className="text-center mt-6">
           <Link
             href="/collections/new-arrivals"
-            className="px-4 py-2 font-medium text-gray-500 rounded 
+            className="font-secondary 
+                      px-2 py-1 text-sm
+                      sm:px-4 sm:py-1 sm:text-base 
+                      text-gray-500 rounded 
                       ring-1 ring-gray-500 
                       hover:ring-2 
                       transition-all duration-300 ease-in-out"
           >
-            View All
+            VIEW ALL
           </Link>
         </div>
       </section>
 
       {/* New Arrivals */}
       <section className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
-        <h2 className="text-3xl font-bold text-center text-[#B22222]">
+        <h2 className="text-2xl md:text-3xl font-bold text-center text-[#B22222]">
           NEW ARRIVALS
         </h2>
 
         {/* Desktop grid */}
-        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-10">
+        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
           {sarees.map((saree) => (
             <Link
               key={saree._id}
@@ -184,7 +187,7 @@ export default function HomePage() {
         </div>
 
         {/* Mobile horizontal scroll */}
-        <div className="flex overflow-x-auto md:hidden gap-2 pt-10">
+        <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
           {sarees.map((saree) => (
             <Link
               key={saree._id}
@@ -219,12 +222,15 @@ export default function HomePage() {
         <div className="text-center mt-6">
           <Link
             href="/collections/new-arrivals"
-            className="px-4 py-2 font-medium text-gray-500 rounded 
+            className="font-secondary 
+                      px-2 py-1 text-sm
+                      sm:px-4 sm:py-1 sm:text-base 
+                      text-gray-500 rounded 
                       ring-1 ring-gray-500 
                       hover:ring-2 
                       transition-all duration-300 ease-in-out"
           >
-            View All
+            VIEW ALL
           </Link>
         </div>
       </section>
