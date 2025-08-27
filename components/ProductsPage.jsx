@@ -6,28 +6,38 @@ import { Dialog, Transition } from "@headlessui/react";
 import { FunnelIcon, XMarkIcon } from "@heroicons/react/24/outline"; // filter + close
 import { ChevronDownIcon } from "@heroicons/react/20/solid"; // sort dropdown
 
-const MAX_PRICE = 10000;
-
 export default function ProductsPage() {
   const { category } = useParams();
   const [sarees, setSarees] = useState([]);
   const [filteredSarees, setFilteredSarees] = useState([]);
 
   // Filters
-  const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(10000);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [sortBy, setSortBy] = useState("relevance");
 
-  // Mobile sidebar state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     if (!category) return;
+
     const fetchSarees = async () => {
       const res = await fetch(`/api/sarees/category/${category}`);
       const data = await res.json();
       setSarees(data);
       setFilteredSarees(data);
+
+      if (data.length > 0) {
+        const prices = data.map((s) => s.price);
+        const minP = Math.min(...prices);
+        const maxP = Math.max(...prices);
+        setMinPrice(minP);
+        setMaxPrice(maxP);
+        setPriceRange([minP, maxP]);
+      }
     };
+
     fetchSarees();
   }, [category]);
 
@@ -69,8 +79,9 @@ export default function ProductsPage() {
       }
 
       const rect = e.target.parentNode.getBoundingClientRect();
-      let value = ((clientX - rect.left) / rect.width) * MAX_PRICE;
-      value = Math.max(0, Math.min(value, MAX_PRICE));
+      let value =
+        ((clientX - rect.left) / rect.width) * (maxPrice - minPrice) + minPrice;
+      value = Math.max(minPrice, Math.min(value, maxPrice));
 
       if (type === "min")
         setPriceRange([
@@ -100,16 +111,18 @@ export default function ProductsPage() {
   const renderPriceFilter = () => (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-lg text-gray-800">Price</h3>
+        <h3 className="font-bold text-lg text-gray-800 font-secondary">
+          Price
+        </h3>
         <button
           onClick={clearFilters}
-          className="text-sm font-medium text-gray-500 hover:text-gray-900 transition"
+          className="font-secondary text-sm font-medium text-gray-500 hover:text-gray-900 transition"
         >
           Clear
         </button>
       </div>
 
-      <p className="text-center font-bold text-gray-700">
+      <p className="text-center font-bold text-gray-700 font-secondary">
         ₹{priceRange[0].toFixed(0)} - ₹{priceRange[1].toFixed(0)}
       </p>
 
@@ -121,14 +134,23 @@ export default function ProductsPage() {
         <div
           className="absolute top-1/2 -translate-y-1/2 h-1 bg-[#B22222] rounded"
           style={{
-            left: `${(priceRange[0] / MAX_PRICE) * 100}%`,
-            right: `${100 - (priceRange[1] / MAX_PRICE) * 100}%`,
+            left: `${
+              ((priceRange[0] - minPrice) / (maxPrice - minPrice)) * 100
+            }%`,
+            right: `${
+              100 - ((priceRange[1] - minPrice) / (maxPrice - minPrice)) * 100
+            }%`,
           }}
         />
+
         {/* Min thumb */}
         <div
           className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-[#B22222] rounded-full cursor-pointer"
-          style={{ left: `calc(${(priceRange[0] / MAX_PRICE) * 100}% - 10px)` }}
+          style={{
+            left: `calc(${
+              ((priceRange[0] - minPrice) / (maxPrice - minPrice)) * 100
+            }% - 10px)`,
+          }}
           onMouseDown={(e) => initDrag(e, "min")}
           onTouchStart={(e) => initDrag(e, "min")}
         />
@@ -136,7 +158,11 @@ export default function ProductsPage() {
         {/* Max thumb */}
         <div
           className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-[#B22222] rounded-full cursor-pointer"
-          style={{ left: `calc(${(priceRange[1] / MAX_PRICE) * 100}% - 10px)` }}
+          style={{
+            left: `calc(${
+              ((priceRange[1] - minPrice) / (maxPrice - minPrice)) * 100
+            }% - 10px)`,
+          }}
           onMouseDown={(e) => initDrag(e, "max")}
           onTouchStart={(e) => initDrag(e, "max")}
         />
@@ -148,14 +174,14 @@ export default function ProductsPage() {
           type="number"
           value={priceRange[0]}
           onChange={handleMinPriceChange}
-          className="w-24 border rounded p-2 text-center"
+          className="w-24 border rounded p-2 text-center font-secondary [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [appearance:textfield]"
         />
         <span>-</span>
         <input
           type="number"
           value={priceRange[1]}
           onChange={handleMaxPriceChange}
-          className="w-24 border rounded p-2 text-center"
+          className="w-24 border rounded p-2 text-center font-secondary [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [appearance:textfield]"
         />
       </div>
     </div>
