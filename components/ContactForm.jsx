@@ -15,27 +15,36 @@ export default function ContactForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus("Sending...");
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+  try {
+    const res = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData), // ✅ use state directly
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert("Form submitted successfully!");
+      // reset form
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        subject: "",
+        message: "",
       });
-
-      if (res.ok) {
-        setStatus("Message sent successfully ✅");
-        setFormData({ name: "", phone: "", email: "", subject: "", message: "" });
-      } else {
-        setStatus("Something went wrong ❌");
-      }
-    } catch (error) {
-      setStatus("Error sending message ❌");
+    } else {
+      alert(data.error || "Something went wrong.");
     }
-  };
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    alert("Failed to submit form.");
+  }
+};
+
 
   return (
     <form
