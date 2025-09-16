@@ -1,28 +1,11 @@
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from "mongoose";
 
 const siteReviewSchema = new Schema({
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
-  },
-  comment: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  author: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, trim: true }, // optional
+  service: { type: String, trim: true },
+  recommend: { type: String, trim: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
-const SiteReview = mongoose.models.SiteReview || mongoose.model('SiteReview', siteReviewSchema);
-
-export default SiteReview;
+export default siteReviewSchema;
