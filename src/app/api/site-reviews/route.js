@@ -1,34 +1,26 @@
-import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose2"; // Make sure this path is correct
-import SiteReview from "@/app/(models)/SiteReview";
+import { connectReviewDB } from "../../lib/mongoose_review";
+import siteReviewSchema from "../../(models)/SiteReview";
+
+
+export async function GET() {
+  const db = await connectReviewDB();
+  const SiteReview = db.model("SiteReview", siteReviewSchema);
+
+  console.log("📡 Fetching all reviews...");
+  const reviews = await SiteReview.find().sort({ createdAt: -1 });
+  return Response.json(reviews);
+}
 
 export async function POST(req) {
-  await connectDB();
+  const db = await connectReviewDB();
+  const SiteReview = db.model("SiteReview", siteReviewSchema);
 
-  try {
-    const body = await req.json();
-    const { rating, comment, author } = body;
+  const body = await req.json();
+  console.log("📝 New review incoming:", body);
 
-    if (!rating || !comment || !author) {
-      return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+  const newReview = new SiteReview(body);
+  await newReview.save();
 
-    const newReview = new SiteReview({ rating, comment, author });
-    await newReview.save();
-
-    return NextResponse.json(
-        { success: true, message: "Feedback submitted successfully!" },
-        { status: 201 }
-    );
-
-  } catch (error) {
-    console.error("❌ Site review submission error:", error);
-    return NextResponse.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    );
-  }
+  console.log("✅ Review saved:", newReview);
+  return Response.json(newReview, { status: 201 });
 }

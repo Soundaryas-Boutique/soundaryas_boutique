@@ -4,32 +4,49 @@ import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
 import { Star, X } from "lucide-react";
 
+
 export default function HomePage() {
   const [sarees, setSarees] = useState([]);
 
-  // State and functions for the review modal
+  // State for the review modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [reviewerName, setReviewerName] = useState("");
   const [hoverRating, setHoverRating] = useState(0);
 
+  // Poll fields
+  const [service, setService] = useState("");
+  const [recommend, setRecommend] = useState("");
+
   const openModal = () => setIsModalOpen(true);
+
   const closeModal = () => {
     setIsModalOpen(false);
     setRating(0);
     setComment("");
     setReviewerName("");
     setHoverRating(0);
+    setService("");
+    setRecommend("");
   };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (rating > 0 && comment.trim() !== "" && reviewerName.trim() !== "") {
+
+    if (
+      rating > 0 &&
+      comment.trim() !== "" &&
+      reviewerName.trim() !== "" &&
+      service.trim() !== "" &&
+      recommend.trim() !== ""
+    ) {
       const reviewData = {
+        author: reviewerName,
         rating,
         comment,
-        author: reviewerName,
+        service,
+        recommend,
       };
 
       try {
@@ -235,119 +252,193 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Site Review Section */}
-      <section className="bg-white py-12">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-[#B22222] mb-4">
-            Share Your Experience
-          </h2>
-          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
-            Loved your experience with Soundarya's Boutique? We'd love to hear
-            from you! Your feedback helps us grow.
-          </p>
-          <button
-            onClick={openModal}
-            className="bg-[#A52A2A] text-white font-medium py-3 px-8 rounded-md hover:bg-[#8B0000] transition-colors duration-200"
-          >
-            Leave a Review
-          </button>
-        </div>
+      {/* Leave a Review button */}
+      <section className="bg-white py-12 text-center">
+        <h2 className="text-2xl font-bold text-[#B22222] mb-4">
+          Share Your Experience
+        </h2>
+        <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+          Loved your experience with Soundarya&apos;s Boutique? We&apos;d love
+          to hear from you! Your feedback helps us grow.
+        </p>
+        <button
+          onClick={openModal}
+          className="bg-[#A52A2A] text-white font-medium py-3 px-8 rounded-md hover:bg-[#8B0000] transition-colors duration-200"
+        >
+          Leave a Review
+        </button>
+          {/* New button */}
+        <Link
+          href="/my-reviews"
+          className="ml-4 bg-[#A52A2A] text-white font-medium py-3 px-8 rounded-md hover:bg-[#8B0000] transition-colors duration-200"
+        >
+        View My Reviews
+        </Link>
       </section>
 
+
       {/* Review Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-          <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4">
-            <div className="flex justify-between items-center border-b pb-3 mb-4">
-              <h3 className="text-xl font-semibold text-[#A52A2A]">
-                How was your experience?
-              </h3>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 hover:text-[#8B0000]"
-                aria-label="Close modal"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="reviewerName"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Your Name
-                </label>
-                <input
-                  type="text"
-                  id="reviewerName"
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000]"
-                  placeholder="Enter your name"
-                  required
-                />
-              </div>
+{isModalOpen && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div className="relative w-full max-w-lg mx-4 p-8 rounded-2xl
+      bg-white/90 backdrop-blur-xl border border-[#A52A2A]/20 
+      shadow-2xl shadow-[#A52A2A]/40 
+      transform transition-all duration-300 scale-95 animate-fadeIn">
+      
+      {/* Close button */}
+      <button
+        onClick={closeModal}
+        className="absolute top-4 right-4 text-gray-500 hover:text-[#8B0000] transition"
+        aria-label="Close modal"
+      >
+        <X className="w-6 h-6" />
+      </button>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Overall Rating
-                </label>
-                <div className="flex items-center space-x-1">
-                  {[...Array(5)].map((_, index) => {
-                    const ratingValue = index + 1;
-                    return (
-                      <Star
-                        key={ratingValue}
-                        size={28}
-                        className="cursor-pointer transition-colors"
-                        onMouseEnter={() => setHoverRating(ratingValue)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(ratingValue)}
-                        fill={
-                          ratingValue <= (hoverRating || rating)
-                            ? "#FFC107"
-                            : "#e4e5e9"
-                        }
-                        stroke={
-                          ratingValue <= (hoverRating || rating)
-                            ? "#FFC107"
-                            : "#e4e5e9"
-                        }
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+      {/* Header */}
+      <h3 className="text-2xl font-semibold text-center text-[#A52A2A] mb-6">
+        Feedback Poll
+      </h3>
 
-              <div>
-                <label
-                  htmlFor="comment"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Comment
-                </label>
-                <textarea
-                  id="comment"
-                  rows="4"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000]"
-                  placeholder="Tell us about your experience..."
-                  required
-                ></textarea>
-              </div>
+      {/* Form */}
+      <form onSubmit={handleReviewSubmit} className="space-y-6">
+        {/* Name */}
+        <div>
+          <label
+            htmlFor="reviewerName"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Your Name
+          </label>
+          <input
+            type="text"
+            id="reviewerName"
+            value={reviewerName}
+            onChange={(e) => setReviewerName(e.target.value)}
+            className="w-full p-3 border border-gray-200 rounded-lg 
+              focus:outline-none focus:ring-2 focus:ring-[#A52A2A] 
+              focus:border-transparent transition"
+            placeholder="Enter your name"
+            required
+          />
+        </div>
 
-              <button
-                type="submit"
-                className="w-full py-3 px-4 bg-[#A52A2A] text-white font-medium rounded-md hover:bg-[#8B0000] transition-colors"
-              >
-                Submit Feedback
-              </button>
-            </form>
+        {/* Service */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Which service did you use?
+          </label>
+          <select
+            value={service}
+            onChange={(e) => setService(e.target.value)}
+            className="w-full p-3 border border-gray-200 rounded-lg 
+              focus:outline-none focus:ring-2 focus:ring-[#A52A2A] transition"
+            required
+          >
+            <option value="">Select one</option>
+            <option value="Sarees">Sarees</option>
+            <option value="Blouse Stitching">Blouse Stitching</option>
+            <option value="Lehengas">Lehengas</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        {/* Recommend */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Would you recommend us to others?
+          </label>
+          <div className="flex space-x-6 justify-center">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                name="recommend"
+                value="Yes"
+                checked={recommend === "Yes"}
+                onChange={() => setRecommend("Yes")}
+                className="accent-[#A52A2A]"
+                required
+              />
+              <span>Yes</span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="radio"
+                name="recommend"
+                value="No"
+                checked={recommend === "No"}
+                onChange={() => setRecommend("No")}
+                className="accent-[#A52A2A]"
+              />
+              <span>No</span>
+            </label>
           </div>
         </div>
-      )}
+
+        {/* Rating */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Overall Rating
+          </label>
+          <div className="flex justify-center space-x-2">
+            {[...Array(5)].map((_, index) => {
+              const ratingValue = index + 1;
+              return (
+                <Star
+                  key={ratingValue}
+                  size={32}
+                  className="cursor-pointer transition-transform hover:scale-110"
+                  onMouseEnter={() => setHoverRating(ratingValue)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => setRating(ratingValue)}
+                  fill={
+                    ratingValue <= (hoverRating || rating)
+                      ? "#FFC107"
+                      : "#8b8c92ff"
+                  }
+                  stroke={
+                    ratingValue <= (hoverRating || rating)
+                      ? "#FFC107"
+                      : "#e4e5e9"
+                  }
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Comment */}
+        <div>
+          <label
+            htmlFor="comment"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Comment
+          </label>
+          <textarea
+            id="comment"
+            rows="4"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            className="w-full p-3 border border-gray-200 rounded-lg 
+              focus:outline-none focus:ring-2 focus:ring-[#A52A2A] transition"
+            placeholder="Tell us about your experience..."
+            required
+          ></textarea>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full py-3 px-4 bg-gradient-to-r from-[#A52A2A] to-[#8B0000] 
+            text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition"
+        >
+          Submit Feedback
+        </button>
+      </form>
+    </div>
+  </div>
+)}
+
     </main>
   );
 }
