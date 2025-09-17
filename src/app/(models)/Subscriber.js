@@ -11,6 +11,6 @@ const SubscriberSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ Explicitly tell Mongoose to use 'subb' collection
+// Explicitly tell Mongoose to use 'subb' collection
 export default mongoose.models.Subscriber ||
   mongoose.model("Subscriber", SubscriberSchema, "subb");
