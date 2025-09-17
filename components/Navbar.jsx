@@ -1,16 +1,16 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import { 
   FiUser, 
   FiHeart, 
   FiShoppingCart, 
   FiMenu, 
-  FiX, 
   FiMail 
-} from 'react-icons/fi';
-import Link from 'next/link';
+} from "react-icons/fi";
+import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { redirect } from "next/navigation";
+import Newsletter from "./Newsletter";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -19,21 +19,10 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
 
-  // Newsletter popup state
+  // Newsletter states
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-  // Subscriptions popup state
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
-
-  // Newsletter form states
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [exclusive, setExclusive] = useState(false);
-
-  // Store subscriptions
   const [subscriptions, setSubscriptions] = useState([]);
-  const [editingIndex, setEditingIndex] = useState(null);
 
   const timeoutRef = useRef(null);
 
@@ -74,76 +63,6 @@ const Navbar = () => {
     setActiveMobileCategory(activeMobileCategory === index ? null : index);
   };
 
-  const openPopup = () => {
-    setIsPopupOpen(true);
-    document.body.classList.add("overflow-hidden");
-    // Reset form
-    setName('');
-    setEmail('');
-    setPhone('');
-    setExclusive(false);
-    setEditingIndex(null);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    document.body.classList.remove("overflow-hidden");
-    setName('');
-    setEmail('');
-    setPhone('');
-    setExclusive(false);
-    setEditingIndex(null);
-  };
-
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault();
-
-    // Prevent duplicate email (except current editing)
-    const duplicate = subscriptions.some(
-      (sub, idx) => sub.email === email && idx !== editingIndex
-    );
-
-    if (duplicate) {
-      alert("This email is already subscribed.");
-      return;
-    }
-
-    const formData = { name, email, phone, exclusive };
-
-    if (editingIndex !== null) {
-      // Edit existing subscription
-      const updated = [...subscriptions];
-      updated[editingIndex] = formData;
-      setSubscriptions(updated);
-      setEditingIndex(null);
-      alert("Subscription updated successfully!");
-    } else {
-      // Add new subscription
-      setSubscriptions([...subscriptions, formData]);
-      alert("Subscribed successfully!");
-    }
-
-    closePopup();
-  };
-
-  const handleEdit = (index) => {
-    const sub = subscriptions[index];
-    setName(sub.name);
-    setEmail(sub.email);
-    setPhone(sub.phone);
-    setExclusive(sub.exclusive);
-    setEditingIndex(index);
-    setIsPopupOpen(true);
-
-    setIsSubscriptionOpen(false);
-
-  };
-
-  const handleDelete = (index) => {
-    const updated = subscriptions.filter((_, i) => i !== index);
-    setSubscriptions(updated);
-  };
-
   return (
     <>
       {/* Top Bar */}
@@ -151,12 +70,12 @@ const Navbar = () => {
         <div className="max-w-[1440px] mx-auto px-4 py-4 flex items-center">
           {/* Hamburger Menu */}
           <div className="lg:hidden">
-            <FiMenu 
-              className="w-6 h-6 cursor-pointer text-[#8B0000]" 
+            <FiMenu
+              className="w-6 h-6 cursor-pointer text-[#8B0000]"
               onClick={toggleMobileMenu}
             />
           </div>
-          
+
           {/* Logo */}
           <div className="flex-1 flex justify-center lg:justify-start">
             <div className="text-[#8B0000] text-xl tracking-wide font-semibold">
@@ -165,7 +84,7 @@ const Navbar = () => {
               </Link>
             </div>
           </div>
-          
+
           {/* Icons */}
           <div className="flex gap-6 items-center text-[#8B0000]">
             <Link href="/Profile" className="relative">
@@ -173,12 +92,15 @@ const Navbar = () => {
             </Link>
 
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
-            
-            <button onClick={openPopup} className="hidden lg:block">
+
+            <button onClick={() => setIsPopupOpen(true)} className="hidden lg:block">
               <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
             </button>
-            
-            <Link href={status === "authenticated"?"/Cart":"/Denied"} className="relative">
+
+            <Link
+              href={status === "authenticated" ? "/Cart" : "/Denied"}
+              className="relative"
+            >
               <FiShoppingCart className="w-5 h-5 cursor-pointer" />
             </Link>
 
@@ -205,15 +127,17 @@ const Navbar = () => {
                 onMouseLeave={handleCategoryLeave}
               >
                 <Link
-                  href={`/collections/${category.slug}`} 
+                  href={`/collections/${category.slug}`}
                   className="flex items-center py-2 hover:text-[#8B0000]"
                 >
                   {category.name}
                 </Link>
-                
+
                 <div
                   className={`absolute bottom-1 left-0 w-full h-0.5 bg-[#8B0000] transition-transform duration-300 origin-left ${
-                    activeDropdown === index ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    activeDropdown === index
+                      ? "scale-x-100"
+                      : "scale-x-0 group-hover:scale-x-100"
                   }`}
                 />
               </div>
@@ -222,120 +146,15 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Newsletter Popup */}
-      {isPopupOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
-          <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4">
-            <div className="flex justify-between items-center border-b pb-3 mb-4">
-              <h3 className="text-xl font-semibold text-[#A52A2A]">
-                {editingIndex !== null ? "Edit Subscription" : "Subscribe to our Newsletter"}
-              </h3>
-              <button onClick={closePopup}>
-                <FiX className="w-6 h-6 text-gray-500 hover:text-[#8B0000]" />
-              </button>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleNewsletterSubmit}>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-                className="w-full p-3 border rounded-md"
-                required
-              />
-
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full p-3 border rounded-md"
-                required
-              />
-
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone"
-                className="w-full p-3 border rounded-md"
-              />
-
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={exclusive}
-                  onChange={(e) => setExclusive(e.target.checked)}
-                  className="h-4 w-4"
-                />
-                <label className="ml-2 text-gray-700">Send me exclusive offers</label>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-[#A52A2A] text-white rounded-md"
-              >
-                {editingIndex !== null ? "Update Subscription" : "Subscribe"}
-              </button>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => { closePopup(); setIsSubscriptionOpen(true); }}
-                className="text-[#8B0000] hover:underline"
-              >
-                View My Subscriptions
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Subscriptions Popup */}
-      {isSubscriptionOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
-          <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg mx-4">
-            <div className="flex justify-between items-center border-b pb-3 mb-4">
-              <h3 className="text-xl font-semibold text-[#A52A2A]">My Subscriptions</h3>
-              <button onClick={() => setIsSubscriptionOpen(false)}>
-                <FiX className="w-6 h-6 text-gray-600 hover:text-[#8B0000]" />
-              </button>
-            </div>
-
-            {subscriptions.length > 0 ? (
-              <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                {subscriptions.map((sub, idx) => (
-                  <div key={idx} className="p-3 border rounded-md bg-gray-50 flex justify-between items-start">
-                    <div>
-                      <p><strong>Name:</strong> {sub.name}</p>
-                      <p><strong>Email:</strong> {sub.email}</p>
-                      <p><strong>Phone:</strong> {sub.phone || "N/A"}</p>
-                      <p><strong>Exclusive Offers:</strong> {sub.exclusive ? "Yes ✅" : "No ❌"}</p>
-                    </div>
-                    <div className="flex flex-col gap-2 ml-4">
-                      <button
-                        onClick={() => handleEdit(idx)}
-                        className="text-[#8B0000] hover:underline"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(idx)}
-                        className="text-red-600 hover:underline"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-600">No subscriptions found.</p>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Newsletter Component */}
+      <Newsletter
+        isPopupOpen={isPopupOpen}
+        setIsPopupOpen={setIsPopupOpen}
+        isSubscriptionOpen={isSubscriptionOpen}
+        setIsSubscriptionOpen={setIsSubscriptionOpen}
+        subscriptions={subscriptions}
+        setSubscriptions={setSubscriptions}
+      />
     </>
   );
 };
