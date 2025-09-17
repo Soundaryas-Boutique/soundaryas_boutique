@@ -6,9 +6,14 @@ let isConnected = false;
 const dbConnect = async () => {
   if (isConnected) return;
 
+  if (mongoose.connection.readyState >= 1) {
+    isConnected = true;
+    return;
+  }
+
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "subscribe",   // ✅ use 'subscribe' instead of 'AppDB'
+      dbName: "subscribe",
     });
     isConnected = conn.connections[0].readyState;
     console.log("✅ MongoDB connected");
