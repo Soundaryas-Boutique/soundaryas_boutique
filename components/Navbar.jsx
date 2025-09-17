@@ -6,8 +6,6 @@ import {
   FiShoppingCart, 
   FiMenu, 
   FiX, 
-  FiChevronDown, 
-  FiChevronUp, 
   FiMail 
 } from 'react-icons/fi';
 import Link from 'next/link';
@@ -20,7 +18,12 @@ const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+
+  // Newsletter popup state
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  // Subscription popup state
+  const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
 
   // Newsletter form states
   const [name, setName] = useState('');
@@ -28,8 +31,10 @@ const Navbar = () => {
   const [phone, setPhone] = useState('');
   const [exclusive, setExclusive] = useState(false);
 
+  // Store subscription details
+  const [subscriptionData, setSubscriptionData] = useState(null);
+
   const timeoutRef = useRef(null);
-  const popupRef = useRef(null);
 
   const categories = [
     { name: "Silk Sarees", subcategories: ["Designer Silk", "Traditional Silk", "Printed Silk"], slug: "cat1" },
@@ -44,16 +49,6 @@ const Navbar = () => {
   };
 
   const handleCategoryLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setActiveDropdown(null);
-    }, 300);
-  };
-
-  const handleDropdownEnter = () => {
-    clearTimeout(timeoutRef.current);
-  };
-
-  const handleDropdownLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setActiveDropdown(null);
     }, 300);
@@ -92,7 +87,6 @@ const Navbar = () => {
     setExclusive(false);
   };
 
-  // Fixed newsletter submission
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
 
@@ -101,16 +95,13 @@ const Navbar = () => {
     try {
       const res = await fetch("/api/subscribe", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
-      console.log("API Response:", data);
-
       if (res.ok) {
+        setSubscriptionData(formData); // ✅ Save subscription details
         alert("Subscribed successfully!");
         closePopup();
       } else {
@@ -127,7 +118,7 @@ const Navbar = () => {
       {/* Top Bar */}
       <div className="w-full shadow-sm border-b border-gray-200 sticky top-0 z-50 lg:static bg-white">
         <div className="max-w-[1440px] mx-auto px-4 py-4 flex items-center">
-          {/* Hamburger Menu (Left side - mobile only) */}
+          {/* Hamburger Menu */}
           <div className="lg:hidden">
             <FiMenu 
               className="w-6 h-6 cursor-pointer text-[#8B0000]" 
@@ -152,11 +143,7 @@ const Navbar = () => {
 
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
             
-            <button
-              onClick={openPopup}
-              className="hidden lg:block"
-              aria-label="Subscribe to newsletter"
-            >
+            <button onClick={openPopup} className="hidden lg:block">
               <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
             </button>
             
@@ -186,12 +173,12 @@ const Navbar = () => {
                 onMouseEnter={() => handleCategoryEnter(index)}
                 onMouseLeave={handleCategoryLeave}
               >
-          <Link
-            href={`/collections/${category.slug}`} 
-            className="flex items-center py-2 hover:text-[#8B0000] transition-colors duration-200"
-          >
-            {category.name}
-          </Link>
+                <Link
+                  href={`/collections/${category.slug}`} 
+                  className="flex items-center py-2 hover:text-[#8B0000]"
+                >
+                  {category.name}
+                </Link>
                 
                 <div
                   className={`absolute bottom-1 left-0 w-full h-0.5 bg-[#8B0000] transition-transform duration-300 origin-left ${
@@ -204,135 +191,106 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
-      <div className={`fixed inset-0 z-50 bg-white overflow-y-auto transition-all duration-300 ease-in-out transform ${
-        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="p-4">
-          <div className="flex justify-between items-center pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
-            <FiX 
-              className="w-6 h-6 cursor-pointer text-[#8B0000]" 
-              onClick={toggleMobileMenu}
-            />
-            <div className="w-6"></div>
-          </div>
-          
-          <nav className="mt-4">
-            {categories.map((category, index) => (
-              <div key={index} className="">
-                <div 
-                  className="flex justify-between items-center py-3 px-2 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
-                  onClick={() => toggleMobileCategory(index)}
-                >
-                  <span className="text-[#A52A2A] font-medium">
-                    {category.name}
-                  </span>
-                  {activeMobileCategory === index ? (
-                    <FiChevronUp className="text-[#8B0000]" />
-                  ) : (
-                    <FiChevronDown className="text-[#8B0000]" />
-                  )}
-                </div>
-                
-                <div className={`overflow-hidden transition-all duration-300 ${
-                  activeMobileCategory === index ? 'max-h-[500px]' : 'max-h-0'
-                }`}>
-                  {category.subcategories.map((sub, subIndex) => (
-                    <a 
-                      key={subIndex} 
-                      href="#"
-                      className="block py-3 px-6 text-[#A52A2A] hover:text-[#8B0000] hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    >
-                      {sub}
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </nav>
-        </div>
-      </div>
-
-      {/* Newsletter Subscription Popup Modal */}
+      {/* Newsletter Popup */}
       {isPopupOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
-          <div ref={popupRef} className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4 transform transition-transform duration-300 ease-in-out scale-100">
+          <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4">
             <div className="flex justify-between items-center border-b pb-3 mb-4">
               <h3 className="text-xl font-semibold text-[#A52A2A]">Subscribe to our Newsletter</h3>
-              <button 
-                onClick={closePopup}
-                className="text-gray-500 hover:text-[#8B0000] transition-colors duration-200"
-                aria-label="Close popup"
-              >
-                <FiX className="w-6 h-6" />
+              <button onClick={closePopup}>
+                <FiX className="w-6 h-6 text-gray-500 hover:text-[#8B0000]" />
               </button>
             </div>
+
             <form className="space-y-4" onSubmit={handleNewsletterSubmit}>
               <p className="text-gray-600">Get the latest updates on new arrivals and special offers directly in your inbox.</p>
               
-              {/* Name */}
-              <div>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                className="w-full p-3 border rounded-md"
+                required
+              />
 
-              {/* Email */}
-              <div>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full p-3 border rounded-md"
+                required
+              />
 
-              {/* Phone */}
-              <div>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-transparent transition-all duration-200"
-                />
-              </div>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter your phone"
+                className="w-full p-3 border rounded-md"
+              />
 
-              {/* Checkbox */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  id="exclusive"
                   checked={exclusive}
                   onChange={(e) => setExclusive(e.target.checked)}
-                  className="h-4 w-4 text-[#8B0000] focus:ring-[#A52A2A] border-gray-300 rounded"
+                  className="h-4 w-4"
                 />
-                <label htmlFor="exclusive" className="ml-2 text-gray-700">
-                  Send me exclusive offers and updates
+                <label className="ml-2 text-gray-700">
+                  Send me exclusive offers
                 </label>
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-[#A52A2A] text-white font-medium rounded-md hover:bg-[#8B0000] transition-colors duration-200"
+                className="w-full py-3 bg-[#A52A2A] text-white rounded-md"
               >
                 Subscribe
               </button>
             </form>
+
+            {/* View Subscription button */}
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => {
+                  closePopup();
+                  setIsSubscriptionOpen(true);
+                }}
+                className="text-[#8B0000] hover:underline"
+              >
+                View My Subscription
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subscription Popup */}
+      {isSubscriptionOpen && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
+          <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg mx-4">
+            <div className="flex justify-between items-center border-b pb-3 mb-4">
+              <h3 className="text-xl font-semibold text-[#A52A2A]">My Subscription</h3>
+              <button onClick={() => setIsSubscriptionOpen(false)}>
+                <FiX className="w-6 h-6 text-gray-600 hover:text-[#8B0000]" />
+              </button>
+            </div>
+
+            {subscriptionData ? (
+              <div className="space-y-3">
+                <p><strong>Name:</strong> {subscriptionData.name}</p>
+                <p><strong>Email:</strong> {subscriptionData.email}</p>
+                <p><strong>Phone:</strong> {subscriptionData.phone || "N/A"}</p>
+                <p>
+                  <strong>Exclusive Offers:</strong>{" "}
+                  {subscriptionData.exclusive ? "Yes ✅" : "No ❌"}
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-600">No subscription found.</p>
+            )}
           </div>
         </div>
       )}
