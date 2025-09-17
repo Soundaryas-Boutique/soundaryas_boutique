@@ -6,9 +6,7 @@ import {
   FiShoppingCart, 
   FiMenu, 
   FiX, 
-  FiMail, 
-  FiEdit, 
-  FiTrash2 
+  FiMail 
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { useSession, signIn } from "next-auth/react";
@@ -24,7 +22,7 @@ const Navbar = () => {
   // Newsletter popup state
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // Subscription popup state
+  // Subscriptions popup state
   const [isSubscriptionOpen, setIsSubscriptionOpen] = useState(false);
 
   // Newsletter form states
@@ -33,7 +31,7 @@ const Navbar = () => {
   const [phone, setPhone] = useState('');
   const [exclusive, setExclusive] = useState(false);
 
-  // Store multiple subscriptions
+  // Store subscriptions
   const [subscriptions, setSubscriptions] = useState([]);
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -79,6 +77,12 @@ const Navbar = () => {
   const openPopup = () => {
     setIsPopupOpen(true);
     document.body.classList.add("overflow-hidden");
+    // Reset form
+    setName('');
+    setEmail('');
+    setPhone('');
+    setExclusive(false);
+    setEditingIndex(null);
   };
 
   const closePopup = () => {
@@ -91,49 +95,35 @@ const Navbar = () => {
     setEditingIndex(null);
   };
 
-  const handleNewsletterSubmit = async (e) => {
+  const handleNewsletterSubmit = (e) => {
     e.preventDefault();
 
-    const formData = { name, email, phone, exclusive };
-
-    // Prevent duplicate by email
+    // Prevent duplicate email (except current editing)
     const duplicate = subscriptions.some(
       (sub, idx) => sub.email === email && idx !== editingIndex
     );
+
     if (duplicate) {
-      alert("Subscription already exists!");
+      alert("This email is already subscribed.");
       return;
     }
 
-    try {
-      const res = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+    const formData = { name, email, phone, exclusive };
 
-      const data = await res.json();
-      if (res.ok) {
-        if (editingIndex !== null) {
-          // update existing subscription
-          const updated = [...subscriptions];
-          updated[editingIndex] = formData;
-          setSubscriptions(updated);
-          setEditingIndex(null);
-        } else {
-          // add new subscription
-          setSubscriptions([...subscriptions, formData]);
-        }
-
-        alert("Subscribed successfully!");
-        closePopup();
-      } else {
-        alert("Error: " + data.message);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong.");
+    if (editingIndex !== null) {
+      // Edit existing subscription
+      const updated = [...subscriptions];
+      updated[editingIndex] = formData;
+      setSubscriptions(updated);
+      setEditingIndex(null);
+      alert("Subscription updated successfully!");
+    } else {
+      // Add new subscription
+      setSubscriptions([...subscriptions, formData]);
+      alert("Subscribed successfully!");
     }
+
+    closePopup();
   };
 
   const handleEdit = (index) => {
@@ -143,15 +133,15 @@ const Navbar = () => {
     setPhone(sub.phone);
     setExclusive(sub.exclusive);
     setEditingIndex(index);
-    setIsSubscriptionOpen(false);
     setIsPopupOpen(true);
+
+    setIsSubscriptionOpen(false);
+
   };
 
   const handleDelete = (index) => {
-    if (confirm("Are you sure you want to delete this subscription?")) {
-      const updated = subscriptions.filter((_, i) => i !== index);
-      setSubscriptions(updated);
-    }
+    const updated = subscriptions.filter((_, i) => i !== index);
+    setSubscriptions(updated);
   };
 
   return (
@@ -246,8 +236,6 @@ const Navbar = () => {
             </div>
 
             <form className="space-y-4" onSubmit={handleNewsletterSubmit}>
-              <p className="text-gray-600">Get the latest updates on new arrivals and special offers directly in your inbox.</p>
-              
               <input
                 type="text"
                 value={name}
@@ -264,7 +252,6 @@ const Navbar = () => {
                 placeholder="Enter your email"
                 className="w-full p-3 border rounded-md"
                 required
-                disabled={editingIndex !== null} // email locked when editing
               />
 
               <input
@@ -282,26 +269,20 @@ const Navbar = () => {
                   onChange={(e) => setExclusive(e.target.checked)}
                   className="h-4 w-4"
                 />
-                <label className="ml-2 text-gray-700">
-                  Send me exclusive offers
-                </label>
+                <label className="ml-2 text-gray-700">Send me exclusive offers</label>
               </div>
 
               <button
                 type="submit"
                 className="w-full py-3 bg-[#A52A2A] text-white rounded-md"
               >
-                {editingIndex !== null ? "Update" : "Subscribe"}
+                {editingIndex !== null ? "Update Subscription" : "Subscribe"}
               </button>
             </form>
 
-            {/* View Subscription button */}
             <div className="mt-4 text-center">
               <button
-                onClick={() => {
-                  closePopup();
-                  setIsSubscriptionOpen(true);
-                }}
+                onClick={() => { closePopup(); setIsSubscriptionOpen(true); }}
                 className="text-[#8B0000] hover:underline"
               >
                 View My Subscriptions
@@ -311,7 +292,7 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Subscription Popup */}
+      {/* Subscriptions Popup */}
       {isSubscriptionOpen && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
           <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg mx-4">
@@ -323,28 +304,27 @@ const Navbar = () => {
             </div>
 
             {subscriptions.length > 0 ? (
-              <div className="space-y-4">
-                {subscriptions.map((sub, index) => (
-                  <div key={index} className="border p-4 rounded-md shadow-sm">
-                    <p><strong>Name:</strong> {sub.name}</p>
-                    <p><strong>Email:</strong> {sub.email}</p>
-                    <p><strong>Phone:</strong> {sub.phone || "N/A"}</p>
-                    <p>
-                      <strong>Exclusive Offers:</strong>{" "}
-                      {sub.exclusive ? "Yes ✅" : "No ❌"}
-                    </p>
-                    <div className="flex gap-3 mt-3">
+              <div className="space-y-4 max-h-[400px] overflow-y-auto">
+                {subscriptions.map((sub, idx) => (
+                  <div key={idx} className="p-3 border rounded-md bg-gray-50 flex justify-between items-start">
+                    <div>
+                      <p><strong>Name:</strong> {sub.name}</p>
+                      <p><strong>Email:</strong> {sub.email}</p>
+                      <p><strong>Phone:</strong> {sub.phone || "N/A"}</p>
+                      <p><strong>Exclusive Offers:</strong> {sub.exclusive ? "Yes ✅" : "No ❌"}</p>
+                    </div>
+                    <div className="flex flex-col gap-2 ml-4">
                       <button
-                        onClick={() => handleEdit(index)}
-                        className="flex items-center gap-1 text-blue-600 hover:underline"
+                        onClick={() => handleEdit(idx)}
+                        className="text-[#8B0000] hover:underline"
                       >
-                        <FiEdit /> Edit
+                        Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(index)}
-                        className="flex items-center gap-1 text-red-600 hover:underline"
+                        onClick={() => handleDelete(idx)}
+                        className="text-red-600 hover:underline"
                       >
-                        <FiTrash2 /> Delete
+                        Delete
                       </button>
                     </div>
                   </div>
