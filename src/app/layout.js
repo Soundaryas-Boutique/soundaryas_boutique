@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Cinzel, Noto_Sans } from 'next/font/google';
-import Navbar from "../../components/Navbar";
+import NavbarWrapper from "../../components/NavbarWrapper";
 import AuthProvider from "../../components/AuthProvider";
 
 const cinzel = Cinzel({
@@ -22,11 +22,12 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
       <AuthProvider>
       <body className={`${cinzel.variable} ${noto.variable} min-h-screen bg-white text-black font-main`}>
-        <Navbar />
+        <NavbarWrapper /> 
         {children}
       </body>
       </AuthProvider>
