@@ -6,9 +6,18 @@ export default withAuth(
     console.log("Path:", req.nextUrl.pathname);
     console.log("Token:", req.nextauth?.token);
 
+    // Protect /admin routes for Admins only
     if (
-      req.nextUrl.pathname.startsWith("/Cart") &&
+      req.nextUrl.pathname.startsWith("/admin") &&
       req.nextauth?.token?.role !== "Admin"
+    ) {
+      return NextResponse.redirect(new URL("/Denied", req.url));
+    }
+
+    // Protect /cart routes for Users only
+    if (
+      req.nextUrl.pathname.startsWith("/cart") &&
+      req.nextauth?.token?.role !== "User"
     ) {
       return NextResponse.redirect(new URL("/Denied", req.url));
     }
@@ -17,11 +26,11 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token }) => !!token, 
     },
   }
 );
 
 export const config = {
-  matcher: ["/Cart"],
+  matcher: ["/admin/:path*", "/cart/:path*"], 
 };
