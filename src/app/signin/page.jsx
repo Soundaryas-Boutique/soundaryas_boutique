@@ -24,40 +24,26 @@ export default function Signin() {
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-white text-2xl">Loading session...</p>
+        <p className="text-gray-700 text-2xl">Loading session...</p>
       </div>
     );
   }
 
-  // If already signed in, redirect or show message
+  // If already signed in, redirect based on role
   if (status === "authenticated" && session?.user) {
-    router.push("/"); // Change to your dashboard/home
+    if (session.user.role === "Admin") {
+      router.push("/admin/dashboard");
+    } else {
+      router.push("/");
+    }
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-green-500 text-2xl">
-          You are already signed in as {session.user.email}
+          Redirecting you, {session.user.email}...
         </p>
       </div>
     );
   }
-
-  const getButtonConfig = (providerId) => {
-    switch (providerId) {
-
-      case "credentials":
-        return {
-          label: "Sign in with Email",
-          bg: "bg-blue-600 text-white hover:bg-blue-700",
-          icon: "/email.png",
-        };
-      default:
-        return {
-          label: `Sign in with ${providerId}`,
-          bg: "bg-gray-500 text-white hover:bg-gray-600",
-          icon: "/default.png",
-        };
-    }
-  };
 
   const handleCredentialsLogin = async (e) => {
     e.preventDefault();
@@ -73,16 +59,19 @@ export default function Signin() {
     if (res?.error) {
       setError("Invalid email or password");
     } else {
-      router.push("/");
+      // ✅ after login, redirect by role
+      if (session?.user?.role === "Admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-20 ">
+    <div className="flex flex-col items-center justify-center gap-6 py-20">
       {status === "unauthenticated" && providers ? (
         Object.values(providers).map((provider, index) => {
-          const config = getButtonConfig(provider.id);
-
           if (provider.id === "credentials") {
             return (
               <form
@@ -94,7 +83,7 @@ export default function Signin() {
                 style={{ transitionDelay: `${800 + index * 200}ms` }}
               >
                 <h2 className="text-2xl font-semibold text-center mb-4">
-                  {config.label}
+                  Sign in with Email
                 </h2>
                 {error && (
                   <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
@@ -116,55 +105,35 @@ export default function Signin() {
                   className="w-full mb-4 px-4 mt-3 py-2 border rounded-lg focus:outline-none"
                 />
 
-                
                 <button
                   type="submit"
-                  className={`w-full py-2 rounded-lg mt-3 font-semibold ${config.bg}`}
+                  className="w-full py-2 rounded-lg mt-3 font-semibold bg-blue-600 text-white hover:bg-blue-700"
                 >
                   Login
                 </button>
-                <div className="mt-10">
-                  New User ? <span>
-                    <Link href="/CreateUser" className="text-blue-500 hover:underline mt-20">
-                      Create Account
-                    </Link>
-                  </span>
+
+                <div className="mt-10 text-center">
+                  New User?{" "}
+                  <Link
+                    href="/CreateUser"
+                    className="text-blue-500 hover:underline"
+                  >
+                    Create Account
+                  </Link>
                 </div>
-                <div className="mt-4">
-        <Link href="/forgot-password" className="text-blue-500 hover:underline">
-          Forgot your password?
-        </Link>
-      </div>
+
+                <div className="mt-4 text-center">
+                  <Link
+                    href="/forgot-password"
+                    className="text-blue-500 hover:underline"
+                  >
+                    Forgot your password?
+                  </Link>
+                </div>
               </form>
             );
           }
-
-          return (
-            <div
-              key={provider.id}
-              className={`transition-all duration-1000 ease-out ${
-                loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-              }`}
-              style={{ transitionDelay: `${800 + index * 200}ms` }}
-            >
-              <button
-                onClick={() =>
-                  signIn(provider.id, {
-                    callbackUrl: "/",
-                    prompt: "select_account",
-                  })
-                }
-                className={`flex items-center gap-4 px-6 py-3 rounded-full font-semibold text-lg shadow hover:scale-105 transition-all duration-300 ${config.bg}`}
-              >
-                <img
-                  src={config.icon}
-                  alt={provider.name}
-                  className="h-8 w-8 rounded-full"
-                />
-                {config.label}
-              </button>
-            </div>
-          );
+          return null; // keep it clean, ignore other providers for now
         })
       ) : (
         <p className="text-black">Loading sign-in options...</p>
