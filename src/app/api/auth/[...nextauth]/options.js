@@ -12,7 +12,7 @@ export const options = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        await connectDB(); // ensure connection
+        await connectDB();
 
         const user = await User.findOne({ email: credentials.email });
         if (!user) {
@@ -24,11 +24,28 @@ export const options = {
           throw new Error("Invalid email or password");
         }
 
-        return { id: user._id, email: user.email, name: user.name };
+        // ✅ include role in returned object
+        return { id: user._id, email: user.email, name: user.name, role: user.role };
       }
     })
   ],
+
   pages: {
     signIn: "/signin"
+  },
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role; // add role to JWT
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.role = token.role; // add role to session
+      }
+      return session;
+    }
   }
 };
