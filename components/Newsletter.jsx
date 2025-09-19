@@ -10,6 +10,8 @@ class Newsletter extends Component {
       email: "",
       phone: "",
       exclusive: false,
+      subscriptionType: "", // dropdown
+      gender: "", // NEW radio
       editingIndex: null,
     };
   }
@@ -20,6 +22,8 @@ class Newsletter extends Component {
       email: "",
       phone: "",
       exclusive: false,
+      subscriptionType: "",
+      gender: "", // RESET
       editingIndex: null,
     });
   };
@@ -32,8 +36,29 @@ class Newsletter extends Component {
 
   handleNewsletterSubmit = (e) => {
     e.preventDefault();
-    const { name, email, phone, exclusive, editingIndex } = this.state;
+    const {
+      name,
+      email,
+      phone,
+      exclusive,
+      subscriptionType,
+      gender,
+      editingIndex,
+    } = this.state;
     const { subscriptions, setSubscriptions } = this.props;
+
+    // ✅ Email validation
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // ✅ Phone validation (10 digits only, optional field)
+    if (phone && !/^\d{10}$/.test(phone)) {
+      alert("Phone number must be exactly 10 digits.");
+      return;
+    }
 
     const duplicate = subscriptions.some(
       (sub, idx) => sub.email === email && idx !== editingIndex
@@ -44,7 +69,7 @@ class Newsletter extends Component {
       return;
     }
 
-    const formData = { name, email, phone, exclusive };
+    const formData = { name, email, phone, exclusive, subscriptionType, gender };
 
     if (editingIndex !== null) {
       const updated = [...subscriptions];
@@ -66,6 +91,8 @@ class Newsletter extends Component {
       email: sub.email,
       phone: sub.phone,
       exclusive: sub.exclusive,
+      subscriptionType: sub.subscriptionType || "",
+      gender: sub.gender || "",
       editingIndex: index,
     });
     this.props.setIsPopupOpen(true);
@@ -86,7 +113,15 @@ class Newsletter extends Component {
       subscriptions,
     } = this.props;
 
-    const { name, email, phone, exclusive, editingIndex } = this.state;
+    const {
+      name,
+      email,
+      phone,
+      exclusive,
+      subscriptionType,
+      gender,
+      editingIndex,
+    } = this.state;
 
     return (
       <>
@@ -134,6 +169,68 @@ class Newsletter extends Component {
                   placeholder="Enter your phone"
                   className="w-full p-3 border rounded-md"
                 />
+
+                {/* Dropdown for subscription type */}
+                <select
+                  value={subscriptionType}
+                  onChange={(e) =>
+                    this.setState({ subscriptionType: e.target.value })
+                  }
+                  className="w-full p-3 border rounded-md"
+                  required
+                >
+                  <option value="" disabled>
+                    Select subscription type
+                  </option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+
+                {/* Radio buttons for gender */}
+                <div className="flex flex-col">
+                  <label className="text-gray-700 font-medium mb-1">
+                    Gender:
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        checked={gender === "male"}
+                        onChange={(e) =>
+                          this.setState({ gender: e.target.value })
+                        }
+                      />
+                      Male
+                    </label>
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        checked={gender === "female"}
+                        onChange={(e) =>
+                          this.setState({ gender: e.target.value })
+                        }
+                      />
+                      Female
+                    </label>
+                    <label className="flex items-center gap-1">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="other"
+                        checked={gender === "other"}
+                        onChange={(e) =>
+                          this.setState({ gender: e.target.value })
+                        }
+                      />
+                      Other
+                    </label>
+                  </div>
+                </div>
 
                 <div className="flex items-center">
                   <input
@@ -203,6 +300,12 @@ class Newsletter extends Component {
                         </p>
                         <p>
                           <strong>Phone:</strong> {sub.phone || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Type:</strong> {sub.subscriptionType}
+                        </p>
+                        <p>
+                          <strong>Gender:</strong> {sub.gender || "N/A"}
                         </p>
                         <p>
                           <strong>Exclusive Offers:</strong>{" "}
