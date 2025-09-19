@@ -2,20 +2,31 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
-    name: String,
-    email: String,
-    password: String,
-    phone: Number,
-    address: String,
-    resetToken: String,
-    resetTokenExpiry: Date,
-    state:String,
-    country:String,
-    pincode: String,
-    city: String,
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    phone: { type: String },
+
+    // 🔹 Role-based access
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
+    // 🔹 Address info
+    address: { type: String },
+    city: { type: String },
+    state: { type: String },
+    country: { type: String },
+    pincode: { type: String },
+
+    // 🔹 Password reset
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
   },
   {
-    timestamps: true,
+    timestamps: true, 
   }
 );
 
