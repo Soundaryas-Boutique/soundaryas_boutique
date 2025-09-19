@@ -80,7 +80,7 @@ const Navbar = () => {
           <div className="flex-1 flex justify-center lg:justify-start">
             <div className="text-[#8B0000] text-xl tracking-wide font-semibold">
               <Link href="/" className="flex items-center">
-                Soundaryas
+                Soundaryas Boutique
               </Link>
             </div>
           </div>

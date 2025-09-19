@@ -12,8 +12,9 @@ class Newsletter extends Component {
       exclusive: false,
       subscriptionType: "", // dropdown
       gender: "", // radio
-      comments: "", // NEW textarea
+      comments: "", // textarea
       editingIndex: null,
+      searchQuery: "", // ✅ search
     };
   }
 
@@ -25,8 +26,9 @@ class Newsletter extends Component {
       exclusive: false,
       subscriptionType: "",
       gender: "",
-      comments: "", // RESET
+      comments: "",
       editingIndex: null,
+      searchQuery: "",
     });
   };
 
@@ -79,7 +81,7 @@ class Newsletter extends Component {
       exclusive,
       subscriptionType,
       gender,
-      comments, // NEW
+      comments,
     };
 
     if (editingIndex !== null) {
@@ -104,7 +106,7 @@ class Newsletter extends Component {
       exclusive: sub.exclusive,
       subscriptionType: sub.subscriptionType || "",
       gender: sub.gender || "",
-      comments: sub.comments || "", // EDIT LOAD
+      comments: sub.comments || "",
       editingIndex: index,
     });
     this.props.setIsPopupOpen(true);
@@ -112,8 +114,11 @@ class Newsletter extends Component {
   };
 
   handleDelete = (index) => {
-    const updated = this.props.subscriptions.filter((_, i) => i !== index);
-    this.props.setSubscriptions(updated);
+    // ✅ Confirmation before delete
+    if (window.confirm("Are you sure you want to delete this subscription?")) {
+      const updated = this.props.subscriptions.filter((_, i) => i !== index);
+      this.props.setSubscriptions(updated);
+    }
   };
 
   render() {
@@ -134,6 +139,7 @@ class Newsletter extends Component {
       gender,
       comments,
       editingIndex,
+      searchQuery,
     } = this.state;
 
     return (
@@ -145,8 +151,8 @@ class Newsletter extends Component {
               <div className="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 className="text-xl font-semibold text-[#A52A2A]">
                   {editingIndex !== null
-                    ? "Edit Subscription"
-                    : "Subscribe to our Newsletter"}
+                    ? "✏️ Edit Subscription Details"
+                    : "📩 Subscribe to our Newsletter"}
                 </h3>
                 <button onClick={this.closePopup}>
                   <FiX className="w-6 h-6 text-gray-500 hover:text-[#8B0000]" />
@@ -311,54 +317,69 @@ class Newsletter extends Component {
                 </button>
               </div>
 
+              {/* ✅ Search Box */}
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                className="w-full p-2 mb-4 border rounded-md"
+              />
+
               {subscriptions.length > 0 ? (
                 <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                  {subscriptions.map((sub, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 border rounded-md bg-gray-50 flex justify-between items-start"
-                    >
-                      <div>
-                        <p>
-                          <strong>Name:</strong> {sub.name}
-                        </p>
-                        <p>
-                          <strong>Email:</strong> {sub.email}
-                        </p>
-                        <p>
-                          <strong>Phone:</strong> {sub.phone || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Type:</strong> {sub.subscriptionType}
-                        </p>
-                        <p>
-                          <strong>Gender:</strong> {sub.gender || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Comments:</strong>{" "}
-                          {sub.comments || "N/A"}
-                        </p>
-                        <p>
-                          <strong>Exclusive Offers:</strong>{" "}
-                          {sub.exclusive ? "Yes ✅" : "No ❌"}
-                        </p>
+                  {subscriptions
+                    .filter((sub) =>
+                      sub.name
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())
+                    )
+                    .map((sub, idx) => (
+                      <div
+                        key={idx}
+                        className="p-3 border rounded-md bg-gray-50 flex justify-between items-start"
+                      >
+                        <div>
+                          <p>
+                            <strong>Name:</strong> {sub.name}
+                          </p>
+                          <p>
+                            <strong>Email:</strong> {sub.email}
+                          </p>
+                          <p>
+                            <strong>Phone:</strong> {sub.phone || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Type:</strong> {sub.subscriptionType}
+                          </p>
+                          <p>
+                            <strong>Gender:</strong> {sub.gender || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Comments:</strong>{" "}
+                            {sub.comments || "N/A"}
+                          </p>
+                          <p>
+                            <strong>Exclusive Offers:</strong>{" "}
+                            {sub.exclusive ? "Yes ✅" : "No ❌"}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-2 ml-4">
+                          <button
+                            onClick={() => this.handleEdit(idx)}
+                            className="text-[#8B0000] hover:underline"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => this.handleDelete(idx)}
+                            className="text-red-600 hover:underline"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-2 ml-4">
-                        <button
-                          onClick={() => this.handleEdit(idx)}
-                          className="text-[#8B0000] hover:underline"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => this.handleDelete(idx)}
-                          className="text-red-600 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <p className="text-gray-600">No subscriptions found.</p>
