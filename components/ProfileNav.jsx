@@ -11,10 +11,13 @@ const ProfileNav = () => {
           <Link href="/Profile">Profile</Link>
         </li>
         <li className="hover:bg-gray-100 p-2 rounded">
-          <Link href="/profile/settings">Settings</Link>
+          <Link href="/Profile/settings">Settings</Link>
         </li>
         <li className="hover:bg-gray-100 p-2 rounded">
-          <Link href="Profile/Orders">Orders</Link>
+          <Link href="/Profile/Orders">Orders</Link>
+        </li>
+        <li className="hover:bg-gray-100 p-2 rounded">
+          <Link href="/Profile/Saved-Cards">Saved Cards</Link>
         </li>
       </ul>
     </div>
