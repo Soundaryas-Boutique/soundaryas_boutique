@@ -11,7 +11,8 @@ class Newsletter extends Component {
       phone: "",
       exclusive: false,
       subscriptionType: "", // dropdown
-      gender: "", // NEW radio
+      gender: "", // radio
+      comments: "", // NEW textarea
       editingIndex: null,
     };
   }
@@ -23,7 +24,8 @@ class Newsletter extends Component {
       phone: "",
       exclusive: false,
       subscriptionType: "",
-      gender: "", // RESET
+      gender: "",
+      comments: "", // RESET
       editingIndex: null,
     });
   };
@@ -43,6 +45,7 @@ class Newsletter extends Component {
       exclusive,
       subscriptionType,
       gender,
+      comments,
       editingIndex,
     } = this.state;
     const { subscriptions, setSubscriptions } = this.props;
@@ -69,7 +72,15 @@ class Newsletter extends Component {
       return;
     }
 
-    const formData = { name, email, phone, exclusive, subscriptionType, gender };
+    const formData = {
+      name,
+      email,
+      phone,
+      exclusive,
+      subscriptionType,
+      gender,
+      comments, // NEW
+    };
 
     if (editingIndex !== null) {
       const updated = [...subscriptions];
@@ -93,6 +104,7 @@ class Newsletter extends Component {
       exclusive: sub.exclusive,
       subscriptionType: sub.subscriptionType || "",
       gender: sub.gender || "",
+      comments: sub.comments || "", // EDIT LOAD
       editingIndex: index,
     });
     this.props.setIsPopupOpen(true);
@@ -120,6 +132,7 @@ class Newsletter extends Component {
       exclusive,
       subscriptionType,
       gender,
+      comments,
       editingIndex,
     } = this.state;
 
@@ -232,6 +245,20 @@ class Newsletter extends Component {
                   </div>
                 </div>
 
+                {/* Textarea for comments */}
+                <div>
+                  <label className="text-gray-700 font-medium mb-1">
+                    Comments:
+                  </label>
+                  <textarea
+                    value={comments}
+                    onChange={(e) => this.setState({ comments: e.target.value })}
+                    placeholder="Anything you'd like to share with us?"
+                    className="w-full p-3 border rounded-md"
+                    rows="3"
+                  />
+                </div>
+
                 <div className="flex items-center">
                   <input
                     type="checkbox"
@@ -306,6 +333,10 @@ class Newsletter extends Component {
                         </p>
                         <p>
                           <strong>Gender:</strong> {sub.gender || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Comments:</strong>{" "}
+                          {sub.comments || "N/A"}
                         </p>
                         <p>
                           <strong>Exclusive Offers:</strong>{" "}
