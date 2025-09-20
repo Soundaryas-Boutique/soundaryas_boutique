@@ -4,24 +4,6 @@ import Saree from "@/app/(models)/Saree";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/lib/auth";
 
-// GET: fetch single saree by id (public)
-export async function GET(request, { params }) {
-  await connectDB();
-
-  try {
-    const { id } = await params;
-    const saree = await Saree.findById(id);
-
-    if (!saree) {
-      return NextResponse.json({ error: "Saree not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(saree);
-  } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch saree" }, { status: 500 });
-  }
-}
-
 // DELETE: remove saree by id (admin only)
 export async function DELETE(request, { params }) {
   const session = await getServerSession(authOptions);
