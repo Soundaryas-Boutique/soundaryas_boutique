@@ -4,17 +4,6 @@ import Saree from "@/app/(models)/Saree";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/lib/auth";
 
-// GET: fetch all sarees (public)
-export async function GET() {
-  await connectDB();
-  try {
-    const sarees = await Saree.find({});
-    return NextResponse.json(sarees);
-  } catch (err) {
-    return NextResponse.json({ error: "Failed to fetch sarees" }, { status: 500 });
-  }
-}
-
 // POST: add new saree (admin only)
 export async function POST(request) {
   const session = await getServerSession(authOptions);
