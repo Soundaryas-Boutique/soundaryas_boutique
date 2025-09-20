@@ -1,27 +1,26 @@
-"use client";
-import { useEffect, useState } from "react";
-import ProductPage from "../../../../../components/ProductPage";
+import ProductPageClient from "../../../../../components/ProductPageClient.jsx";
+import { notFound } from "next/navigation";
+import { connectDB } from "@/app/lib/mongoose2";
+import Saree from "@/app/(models)/Saree";
 
-export default function ProductSlugPage({ params }) {
-  const { category, slug } = params;
-  const [product, setProduct] = useState(null);
+export default async function ProductSlugPage({ params }) {
+  const { category, slug } = await params;
 
-  useEffect(() => {
-    async function fetchProduct() {
-      try {
-        const res = await fetch(`/api/sarees/category/${category}/${slug}`);
-        if (res.ok) {
-          const data = await res.json();
-          setProduct(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch product:", err);
-      }
-    }
-    fetchProduct();
-  }, [category, slug]);
+  try {
+    await connectDB();
 
-  if (!product) return <p className="p-8">Loading...</p>;
+    // Fetch product from DB
+    let product = await Saree.findOne({
+      category: category.trim(),
+      slug: slug.trim(),
+    }).lean();
 
-  return <ProductPage product={product} />;
+    // Convert _id to string for client-safe props
+    product._id = product._id.toString();
+
+    return <ProductPageClient product={product} />;
+  } catch (err) {
+    console.error("Error fetching product:", err);
+    return <p className="p-8">Failed to load product.</p>;
+  }
 }

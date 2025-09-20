@@ -95,7 +95,7 @@ export default function HomePage() {
             <Link
               key={saree._id}
               href={`/collections/${saree.category}/${encodeURIComponent(
-                saree.productName.toLowerCase().replace(/\s+/g, "-")
+                saree.slug.toLowerCase().replace(/\s+/g, "-")
               )}`}
               className="bg-white hover:shadow-md transition overflow-hidden block"
             >
@@ -124,7 +124,7 @@ export default function HomePage() {
             <Link
               key={saree._id}
               href={`/collections/${saree.category}/${encodeURIComponent(
-                saree.productName.toLowerCase().replace(/\s+/g, "-")
+                saree.slug.toLowerCase().replace(/\s+/g, "-")
               )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden block"
             >
@@ -176,7 +176,7 @@ export default function HomePage() {
             <Link
               key={saree._id}
               href={`/collections/${saree.category}/${encodeURIComponent(
-                saree.productName.toLowerCase().replace(/\s+/g, "-")
+                saree.slug.toLowerCase().replace(/\s+/g, "-")
               )}`}
               className="bg-white hover:shadow-md transition overflow-hidden relative block"
             >
@@ -209,7 +209,7 @@ export default function HomePage() {
             <Link
               key={saree._id}
               href={`/collections/${saree.category}/${encodeURIComponent(
-                saree.productName.toLowerCase().replace(/\s+/g, "-")
+                saree.slug.toLowerCase().replace(/\s+/g, "-")
               )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative block"
             >
