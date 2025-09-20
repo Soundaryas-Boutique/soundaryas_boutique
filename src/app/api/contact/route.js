@@ -2,7 +2,22 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/mongoose2";
 import Contact from "@/app/(models)/Contact";
 
-// POST handler for contact form submissions
+// GET → fetch all messages
+export async function GET() {
+  try {
+    await connectDB();
+    const messages = await Contact.find().sort({ createdAt: -1 });
+    return NextResponse.json(messages);
+  } catch (err) {
+    console.error("Error fetching contact messages:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch contact messages." },
+      { status: 500 }
+    );
+  }
+}
+
+// POST → save new contact form submission
 export async function POST(request) {
   try {
     await connectDB();
