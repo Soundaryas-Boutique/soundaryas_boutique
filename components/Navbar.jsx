@@ -5,7 +5,10 @@ import {
   FiHeart, 
   FiShoppingCart, 
   FiMenu, 
-  FiMail 
+  FiMail,
+  FiX,
+  FiChevronDown, 
+  FiChevronUp 
 } from "react-icons/fi";
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
@@ -143,6 +146,55 @@ const Navbar = () => {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`fixed inset-0 z-50 bg-white overflow-y-auto transition-all duration-300 ease-in-out transform ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-4">
+          <div className="flex justify-between items-center pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <FiX 
+              className="w-6 h-6 cursor-pointer text-[#8B0000]" 
+              onClick={toggleMobileMenu}
+            />
+            <div className="w-6"></div>
+          </div>
+          
+          <nav className="mt-4">
+            {categories.map((category, index) => (
+              <div key={index} className="">
+                <div 
+                  className="flex justify-between items-center py-3 px-2 hover:bg-gray-50 transition-colors duration-200 cursor-pointer"
+                  onClick={() => toggleMobileCategory(index)}
+                >
+                  <span className="text-[#A52A2A] font-medium">
+                    {category.name}
+                  </span>
+                  {activeMobileCategory === index ? (
+                    <FiChevronUp className="text-[#8B0000]" />
+                  ) : (
+                    <FiChevronDown className="text-[#8B0000]" />
+                  )}
+                </div>
+                
+                <div className={`overflow-hidden transition-all duration-300 ${
+                  activeMobileCategory === index ? 'max-h-[500px]' : 'max-h-0'
+                }`}>
+                  {category.subcategories.map((sub, subIndex) => (
+                    <a 
+                      key={subIndex} 
+                      href="#"
+                      className="block py-3 px-6 text-[#A52A2A] hover:text-[#8B0000] hover:bg-gray-50 rounded-md transition-colors duration-200"
+                    >
+                      {sub}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </nav>
         </div>
       </div>
 
