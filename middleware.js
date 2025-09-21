@@ -3,22 +3,21 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    console.log("Path:", req.nextUrl.pathname);
-    console.log("Token:", req.nextauth?.token);
+    const { pathname } = req.nextUrl;
+    const role = req.nextauth?.token?.role;
 
-    // Protect /admin routes for Admins only
-    if (
-      req.nextUrl.pathname.startsWith("/admin") &&
-      req.nextauth?.token?.role !== "Admin"
-    ) {
-      return NextResponse.redirect(new URL("/Denied", req.url));
+    if (process.env.NODE_ENV === "development") {
+      console.log("Path:", pathname, "Role:", role);
     }
 
-    // Protect /cart routes for Users only
-    if (
-      req.nextUrl.pathname.startsWith("/cart") &&
-      req.nextauth?.token?.role !== "User"
-    ) {
+    // Protect /admin routes → Admins only
+    if (pathname.startsWith("/admin") && role !== "Admin") {
+      return NextResponse.redirect(new URL("/Denied", req.url));
+      // Or: return NextResponse.redirect(new URL("/login?callbackUrl=" + pathname, req.url));
+    }
+
+    // Protect /cart routes → Users only
+    if (pathname.startsWith("/cart") && role !== "user") {
       return NextResponse.redirect(new URL("/Denied", req.url));
     }
 
@@ -26,11 +25,11 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, 
+      authorized: ({ token }) => !!token, // only run middleware if logged in
     },
   }
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/cart/:path*"], 
+  matcher: ["/admin/:path*", "/cart/:path*"],
 };
