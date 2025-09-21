@@ -1,10 +1,11 @@
 // src/app/admin/products/edit/[id]/page.jsx
-"use client";
 
 import ProductForm from "../../../../../../components/admin/ProductForm";
 
-export default function EditProductPage({ params }) {
-  const { id } = params; // product id from the route
+export default async function EditProductPage({ params }) {
+  // Await params to unwrap them
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
 
   return <ProductForm productId={id} />;
 }

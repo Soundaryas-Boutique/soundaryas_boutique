@@ -1,9 +1,12 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function ProductForm({ productId }) {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const isEdit = Boolean(productId);
 
   const [product, setProduct] = useState({
@@ -24,17 +27,37 @@ export default function ProductForm({ productId }) {
 
   const [loading, setLoading] = useState(false);
 
+  // Redirect non-admins
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session || session.user.role !== "Admin") {
+      router.push("/"); // redirect non-admins
+    }
+  }, [session, status, router]);
+
   // Fetch existing product if editing
   useEffect(() => {
     if (isEdit) {
       fetch(`/api/sarees/${productId}`)
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) throw new Error("Failed to fetch product");
+          return res.json();
+        })
         .then((data) => {
           setProduct({
-            ...data,
-            tags: data.tags.join(", "),
-            colors: data.colors.join(", "),
-            sizes: data.sizes.join(", "),
+            productName: data.productName || "",
+            description: data.description || "",
+            price: data.price ?? "",
+            discountPrice: data.discountPrice ?? "",
+            stock: data.stock ?? "",
+            category: data.category || "Silk",
+            tags: data.tags ? data.tags.join(", ") : "",
+            colors: data.colors ? data.colors.join(", ") : "",
+            sizes: data.sizes ? data.sizes.join(", ") : "",
+            material: data.material || "",
+            slug: data.slug || "",
+            isFeatured: data.isFeatured || false,
+            status: data.status || "active",
           });
         })
         .catch((err) => console.error("Failed to fetch product:", err));
@@ -79,6 +102,9 @@ export default function ProductForm({ productId }) {
     }
   };
 
+  // Show loading until session is verified
+  if (status === "loading") return <p className="p-10 text-center">Loading...</p>;
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{isEdit ? "Edit Product" : "Add Product"}</h1>
@@ -86,7 +112,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="productName"
-          value={product.productName}
+          value={product.productName || ""}
           onChange={handleChange}
           placeholder="Product Name"
           required
@@ -94,7 +120,7 @@ export default function ProductForm({ productId }) {
         />
         <textarea
           name="description"
-          value={product.description}
+          value={product.description || ""}
           onChange={handleChange}
           placeholder="Description"
           rows={4}
@@ -104,7 +130,7 @@ export default function ProductForm({ productId }) {
         <input
           type="number"
           name="price"
-          value={product.price}
+          value={product.price || ""}
           onChange={handleChange}
           placeholder="Price"
           required
@@ -113,7 +139,7 @@ export default function ProductForm({ productId }) {
         <input
           type="number"
           name="discountPrice"
-          value={product.discountPrice}
+          value={product.discountPrice || ""}
           onChange={handleChange}
           placeholder="Discount Price (optional)"
           className="w-full border p-2 rounded"
@@ -121,16 +147,15 @@ export default function ProductForm({ productId }) {
         <input
           type="number"
           name="stock"
-          value={product.stock}
+          value={product.stock || ""}
           onChange={handleChange}
           placeholder="Stock Quantity"
           required
           className="w-full border p-2 rounded"
         />
-        {/* Category select */}
         <select
           name="category"
-          value={product.category}
+          value={product.category || "Silk"}
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
@@ -145,7 +170,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="tags"
-          value={product.tags}
+          value={product.tags || ""}
           onChange={handleChange}
           placeholder="Tags (comma separated)"
           className="w-full border p-2 rounded"
@@ -153,7 +178,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="colors"
-          value={product.colors}
+          value={product.colors || ""}
           onChange={handleChange}
           placeholder="Colors (comma separated)"
           className="w-full border p-2 rounded"
@@ -161,7 +186,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="sizes"
-          value={product.sizes}
+          value={product.sizes || ""}
           onChange={handleChange}
           placeholder="Sizes (comma separated)"
           className="w-full border p-2 rounded"
@@ -169,7 +194,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="material"
-          value={product.material}
+          value={product.material || ""}
           onChange={handleChange}
           placeholder="Material"
           className="w-full border p-2 rounded"
@@ -177,7 +202,7 @@ export default function ProductForm({ productId }) {
         <input
           type="text"
           name="slug"
-          value={product.slug}
+          value={product.slug || ""}
           onChange={handleChange}
           placeholder="Slug (unique)"
           required
@@ -195,7 +220,7 @@ export default function ProductForm({ productId }) {
           </label>
           <select
             name="status"
-            value={product.status}
+            value={product.status || "active"}
             onChange={handleChange}
             className="border p-1 rounded"
           >
