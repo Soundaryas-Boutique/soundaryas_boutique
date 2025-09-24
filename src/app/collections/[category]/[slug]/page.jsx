@@ -4,7 +4,7 @@ import ProductDetailsClient from "./ProductDetailsClient"; // A new client compo
 
 // This is a server component to fetch data
 export default async function ProductDetailsPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   await connectDB();
   const saree = await Saree.findOne({ slug: slug }).lean();
@@ -15,10 +15,7 @@ export default async function ProductDetailsPage({ params }) {
     );
   }
 
-  const serializedSaree = {
-    ...saree,
-    _id: saree._id.toString(),
-  };
+  const serializedSaree = JSON.parse(JSON.stringify(saree));
 
   return <ProductDetailsClient saree={serializedSaree} />;
 }
