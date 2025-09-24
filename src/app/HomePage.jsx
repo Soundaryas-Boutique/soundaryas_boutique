@@ -90,12 +90,14 @@ export default function HomePage({ sarees }) {
               )}`}
               className="bg-white hover:shadow-md transition overflow-hidden block"
             >
-              {saree.imgSrc && (
+              {saree.images && saree.images[0] ? (
                 <img
-                  src={saree.imgSrc}
-                  alt={saree.productName}
+                  src={saree.images[0].url}
+                  alt={saree.images[0].alt || saree.productName}
                   className="w-full object-contain"
                 />
+              ) : (
+                "No Image"
               )}
               <div className="p-4">
                 <h3 className="text-sm text-center font-bold font-secondary text-gray-700">
@@ -119,12 +121,14 @@ export default function HomePage({ sarees }) {
               )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden block"
             >
-              {saree.imgSrc && (
+              {saree.images && saree.images[0] ? (
                 <img
-                  src={saree.imgSrc}
-                  alt={saree.productName}
+                  src={saree.images[0].url}
+                  alt={saree.images[0].alt || saree.productName}
                   className="w-full object-contain"
                 />
+              ) : (
+                "No Image"
               )}
               <div className="p-2">
                 <h3 className="text-xs text-center font-bold font-secondary text-gray-700">
@@ -170,12 +174,14 @@ export default function HomePage({ sarees }) {
               )}`}
               className="bg-white hover:shadow-md transition overflow-hidden relative block"
             >
-              {saree.imgSrc && (
+              {saree.images && saree.images[0] ? (
                 <img
-                  src={saree.imgSrc}
-                  alt={saree.productName}
+                  src={saree.images[0].url}
+                  alt={saree.images[0].alt || saree.productName}
                   className="w-full object-contain"
                 />
+              ) : (
+                "No Image"
               )}
               {/* New Tag */}
               <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-secondary font-bold px-2 py-1">
@@ -203,12 +209,14 @@ export default function HomePage({ sarees }) {
               )}`}
               className="bg-white hover:shadow-md transition min-w-[130px] overflow-hidden relative block"
             >
-              {saree.imgSrc && (
+              {saree.images && saree.images[0] ? (
                 <img
-                  src={saree.imgSrc}
-                  alt={saree.productName}
+                  src={saree.images[0].url}
+                  alt={saree.images[0].alt || saree.productName}
                   className="w-full object-contain"
                 />
+              ) : (
+                "No Image"
               )}
               <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-secondary font-bold px-2 py-1">
                 New
@@ -268,11 +276,12 @@ export default function HomePage({ sarees }) {
       {/* Review Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg mx-4 p-8 rounded-2xl
+          <div
+            className="relative w-full max-w-lg mx-4 p-8 rounded-2xl
             bg-white/90 backdrop-blur-xl border border-[#A52A2A]/20 
             shadow-2xl shadow-[#A52A2A]/40 
-            transform transition-all duration-300 scale-95 animate-fadeIn">
-            
+            transform transition-all duration-300 scale-95 animate-fadeIn"
+          >
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-[#8B0000] transition"
@@ -287,7 +296,10 @@ export default function HomePage({ sarees }) {
 
             <form onSubmit={handleReviewSubmit} className="space-y-6">
               <div>
-                <label htmlFor="reviewerName" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="reviewerName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Your Name
                 </label>
                 <input
@@ -365,8 +377,16 @@ export default function HomePage({ sarees }) {
                         onMouseEnter={() => setHoverRating(ratingValue)}
                         onMouseLeave={() => setHoverRating(0)}
                         onClick={() => setRating(ratingValue)}
-                        fill={ratingValue <= (hoverRating || rating) ? "#FFC107" : "#8b8c92ff"}
-                        stroke={ratingValue <= (hoverRating || rating) ? "#FFC107" : "#e4e5e9"}
+                        fill={
+                          ratingValue <= (hoverRating || rating)
+                            ? "#FFC107"
+                            : "#8b8c92ff"
+                        }
+                        stroke={
+                          ratingValue <= (hoverRating || rating)
+                            ? "#FFC107"
+                            : "#e4e5e9"
+                        }
                       />
                     );
                   })}
@@ -374,7 +394,10 @@ export default function HomePage({ sarees }) {
               </div>
 
               <div>
-                <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="comment"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
                   Comment
                 </label>
                 <textarea
