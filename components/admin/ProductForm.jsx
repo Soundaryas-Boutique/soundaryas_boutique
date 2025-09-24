@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import ImageUpload from "./ImageUpload"; // 👈 Import the new component
+import ImageUpload from "./ImageUpload";
 
 export default function ProductForm({ productId }) {
   const router = useRouter();
@@ -11,7 +11,6 @@ export default function ProductForm({ productId }) {
   const isEdit = Boolean(productId);
 
   const [product, setProduct] = useState({
-    // ... other product fields
     productName: "",
     description: "",
     price: "",
@@ -25,7 +24,7 @@ export default function ProductForm({ productId }) {
     slug: "",
     isFeatured: false,
     status: "active",
-    images: [], // 👈 New state for images
+    images: [],
   });
 
   const [loading, setLoading] = useState(false);
@@ -49,6 +48,7 @@ export default function ProductForm({ productId }) {
         .then((data) => {
           setProduct({
             ...data,
+            images: data.images || [],
             tags: data.tags ? data.tags.join(", ") : "",
             colors: data.colors ? data.colors.join(", ") : "",
             sizes: data.sizes ? data.sizes.join(", ") : "",
@@ -109,7 +109,6 @@ export default function ProductForm({ productId }) {
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{isEdit ? "Edit Product" : "Add Product"}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* ... (existing form fields) */}
         <input
           type="text"
           name="productName"
@@ -202,7 +201,7 @@ export default function ProductForm({ productId }) {
         />
         <ImageUpload
           onImageUpload={handleImageUpload}
-          initialImages={product.images} // Pass initial images for editing
+          initialImages={product.images}
         />
         <input
           type="text"

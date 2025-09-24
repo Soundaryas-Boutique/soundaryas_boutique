@@ -17,10 +17,11 @@ export default function ImageUpload({ onImageUpload, initialImages }) {
       const uploadPromises = files.map((file) => {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "your_cloudinary_preset"); // 👈 Replace with your preset
+        // ✅ FIX: Use the exact name of your unsigned upload preset
+        formData.append("upload_preset","my-uploads");
 
         return fetch(
-          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+          `https://api.cloudinary.com/v1_1/dz2x5ge2n/image/upload`,
           {
             method: "POST",
             body: formData,
@@ -36,7 +37,7 @@ export default function ImageUpload({ onImageUpload, initialImages }) {
       const newImages = await Promise.all(uploadPromises);
       const updatedImages = [...images, ...newImages];
       setImages(updatedImages);
-      onImageUpload(updatedImages); // Pass the updated array to the parent form
+      onImageUpload(updatedImages);
     } catch (err) {
       console.error("Error uploading images:", err);
       alert("Image upload failed.");
@@ -48,31 +49,34 @@ export default function ImageUpload({ onImageUpload, initialImages }) {
   const removeImage = (indexToRemove) => {
     const updatedImages = images.filter((_, index) => index !== indexToRemove);
     setImages(updatedImages);
-    onImageUpload(updatedImages); // Pass the updated array to the parent form
+    onImageUpload(updatedImages);
   };
 
   return (
     <div className="border p-4 rounded-lg">
       <h3 className="font-semibold mb-2">Product Images</h3>
       <div className="flex flex-wrap gap-4 mb-4">
-        {images.map((img, index) => (
-          <div key={index} className="relative w-24 h-24 rounded overflow-hidden">
-            <Image
-              src={img.url}
-              alt={img.alt}
-              layout="fill"
-              objectFit="cover"
-              className="rounded"
-            />
-            <button
-              type="button"
-              onClick={() => removeImage(index)}
-              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
-            >
-              <FaTrash size={10} />
-            </button>
-          </div>
-        ))}
+        {images.map((img, index) => {
+          if (!img.url) return null;
+          return (
+            <div key={index} className="relative w-24 h-24 rounded overflow-hidden">
+              <Image
+                src={img.url}
+                alt={img.alt || "Product image"}
+                layout="fill"
+                objectFit="cover"
+                className="rounded"
+              />
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
+              >
+                <FaTrash size={10} />
+              </button>
+            </div>
+          );
+        })}
         <label className="w-24 h-24 flex items-center justify-center border border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
           <input
             type="file"
