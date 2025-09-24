@@ -12,13 +12,10 @@ export default async function ProductsPage({ params }) {
     // Fetch all sarees in this category
     let sarees = await Saree.find({ category }).lean();
 
-    // Convert _id to string for client-safe props
-    sarees = sarees.map((s) => ({
-      ...s,
-      _id: s._id.toString(),
-    }));
+    // Serialize everything to plain JSON-safe objects
+    const serializedSarees = JSON.parse(JSON.stringify(sarees));
 
-    if (!sarees || sarees.length === 0) {
+    if (!serializedSarees || serializedSarees.length === 0) {
       return (
         <p className="text-center text-gray-600 py-20">
           No sarees found in this category.
@@ -33,7 +30,7 @@ export default async function ProductsPage({ params }) {
         </h2>
 
         {/* Client component handles sorting, filtering, and price sliders */}
-        <ProductsListClient initialSarees={sarees} category={category} />
+        <ProductsListClient initialSarees={serializedSarees} category={category} />
       </main>
     );
   } catch (err) {
