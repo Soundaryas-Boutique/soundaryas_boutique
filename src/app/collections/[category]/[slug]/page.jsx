@@ -1,26 +1,24 @@
-import ProductPageClient from "../../../../../components/ProductPageClient.jsx";
-import { notFound } from "next/navigation";
 import { connectDB } from "@/app/lib/mongoose2";
 import Saree from "@/app/(models)/Saree";
+import ProductDetailsClient from "./ProductDetailsClient"; // A new client component
 
-export default async function ProductSlugPage({ params }) {
-  const { category, slug } = await params;
+// This is a server component to fetch data
+export default async function ProductDetailsPage({ params }) {
+  const { slug } = params;
 
-  try {
-    await connectDB();
+  await connectDB();
+  const saree = await Saree.findOne({ slug: slug }).lean();
 
-    // Fetch product from DB
-    let product = await Saree.findOne({
-      category: category.trim(),
-      slug: slug.trim(),
-    }).lean();
-
-    // Convert _id to string for client-safe props
-    product._id = product._id.toString();
-
-    return <ProductPageClient product={product} />;
-  } catch (err) {
-    console.error("Error fetching product:", err);
-    return <p className="p-8">Failed to load product.</p>;
+  if (!saree) {
+    return (
+      <p className="text-center text-gray-600 py-20">Product not found.</p>
+    );
   }
+
+  const serializedSaree = {
+    ...saree,
+    _id: saree._id.toString(),
+  };
+
+  return <ProductDetailsClient saree={serializedSaree} />;
 }
