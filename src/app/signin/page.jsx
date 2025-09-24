@@ -20,27 +20,22 @@ export default function Signin() {
     setLoaded(true);
   }, []);
 
+  // 🐛 FIX: Moved redirection logic into useEffect to avoid updating state during render
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      if (session.user.role === "Admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
+    }
+  }, [status, session, router]);
+
   // Session loading state
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-gray-700 text-2xl">Loading session...</p>
-      </div>
-    );
-  }
-
-  // If already signed in, redirect based on role
-  if (status === "authenticated" && session?.user) {
-    if (session.user.role === "Admin") {
-      router.push("/admin/dashboard");
-    } else {
-      router.push("/");
-    }
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-green-500 text-2xl">
-          Redirecting you, {session.user.email}...
-        </p>
       </div>
     );
   }
@@ -53,18 +48,13 @@ export default function Signin() {
       redirect: false,
       email,
       password,
-      callbackUrl: "/",
     });
 
     if (res?.error) {
       setError("Invalid email or password");
     } else {
-      // ✅ after login, redirect by role
-      if (session?.user?.role === "Admin") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/");
-      }
+      // The useEffect hook above will handle the redirection automatically
+      // after a successful sign-in
     }
   };
 
@@ -133,7 +123,7 @@ export default function Signin() {
               </form>
             );
           }
-          return null; // keep it clean, ignore other providers for now
+          return null;
         })
       ) : (
         <p className="text-black">Loading sign-in options...</p>

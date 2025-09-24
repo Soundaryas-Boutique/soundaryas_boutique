@@ -2,6 +2,7 @@ import "./globals.css";
 import { Cinzel, Noto_Sans } from 'next/font/google';
 import NavbarWrapper from "../../components/NavbarWrapper";
 import AuthProvider from "../../components/AuthProvider";
+import { CartProvider } from "./context/CartContext";
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -11,8 +12,8 @@ const cinzel = Cinzel({
 
 const noto = Noto_Sans({
   subsets: ['latin'],
-  weight: ['100','200','300','400','500','600','700'], 
-  variable: '--font-noto', 
+  weight: ['100','200','300','400','500','600','700'],
+  variable: '--font-noto',
   display: 'swap',
 })
 
@@ -22,14 +23,15 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en">
       <AuthProvider>
+      <CartProvider>
       <body className={`${cinzel.variable} ${noto.variable} min-h-screen bg-white text-black font-main`}>
-        <NavbarWrapper /> 
-        {children}
+        <NavbarWrapper />
+        <div className="min-h-screen">{children}</div>
       </body>
+      </CartProvider>
       </AuthProvider>
     </html>
   );
