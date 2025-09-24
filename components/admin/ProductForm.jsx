@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import ImageUpload from "./ImageUpload"; // 👈 Import the new component
 
 export default function ProductForm({ productId }) {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function ProductForm({ productId }) {
   const isEdit = Boolean(productId);
 
   const [product, setProduct] = useState({
+    // ... other product fields
     productName: "",
     description: "",
     price: "",
@@ -23,6 +25,7 @@ export default function ProductForm({ productId }) {
     slug: "",
     isFeatured: false,
     status: "active",
+    images: [], // 👈 New state for images
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +34,7 @@ export default function ProductForm({ productId }) {
   useEffect(() => {
     if (status === "loading") return;
     if (!session || session.user.role !== "Admin") {
-      router.push("/"); // redirect non-admins
+      router.push("/");
     }
   }, [session, status, router]);
 
@@ -45,19 +48,10 @@ export default function ProductForm({ productId }) {
         })
         .then((data) => {
           setProduct({
-            productName: data.productName || "",
-            description: data.description || "",
-            price: data.price ?? "",
-            discountPrice: data.discountPrice ?? "",
-            stock: data.stock ?? "",
-            category: data.category || "Silk",
+            ...data,
             tags: data.tags ? data.tags.join(", ") : "",
             colors: data.colors ? data.colors.join(", ") : "",
             sizes: data.sizes ? data.sizes.join(", ") : "",
-            material: data.material || "",
-            slug: data.slug || "",
-            isFeatured: data.isFeatured || false,
-            status: data.status || "active",
           });
         })
         .catch((err) => console.error("Failed to fetch product:", err));
@@ -69,6 +63,13 @@ export default function ProductForm({ productId }) {
     setProduct((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleImageUpload = (uploadedImages) => {
+    setProduct((prev) => ({
+      ...prev,
+      images: uploadedImages,
     }));
   };
 
@@ -102,13 +103,13 @@ export default function ProductForm({ productId }) {
     }
   };
 
-  // Show loading until session is verified
   if (status === "loading") return <p className="p-10 text-center">Loading...</p>;
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">{isEdit ? "Edit Product" : "Add Product"}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ... (existing form fields) */}
         <input
           type="text"
           name="productName"
@@ -198,6 +199,10 @@ export default function ProductForm({ productId }) {
           onChange={handleChange}
           placeholder="Material"
           className="w-full border p-2 rounded"
+        />
+        <ImageUpload
+          onImageUpload={handleImageUpload}
+          initialImages={product.images} // Pass initial images for editing
         />
         <input
           type="text"
