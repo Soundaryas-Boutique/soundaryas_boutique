@@ -18,7 +18,7 @@ const sareeSchema = new mongoose.Schema(
     },
     discountPrice: {
       type: Number,
-      default: null, // optional discount price
+      default: null,
     },
     stock: {
       type: Number,
@@ -28,20 +28,24 @@ const sareeSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Silk", "Cotton", "Designer", "Banarasi", "Casual", "Other"], // example
+      enum: ["Silk", "Cotton", "Designer", "Banarasi", "Casual", "Other"],
     },
-    tags: [String], // e.g., ["wedding", "red", "handloom"]
-    colors: [String], // e.g., ["Red", "Blue", "Green"]
-    sizes: [String], // e.g., ["5.5m", "6m with blouse"]
+    tags: [String],
+    colors: [String],
+    sizes: [String],
     material: {
-      type: String, // e.g., "Pure Silk", "Cotton Blend"
+      type: String,
     },
-    images: [
-      {
-        url: { type: String, required: true },
-        alt: { type: String },
-      },
-    ],
+    // ✅ FIX: The 'images' array is now optional by adding a default empty array.
+    images: {
+      type: [
+        {
+          url: { type: String, required: true },
+          alt: { type: String },
+        },
+      ],
+      default: [],
+    },
     slug: {
       type: String,
       required: true,
