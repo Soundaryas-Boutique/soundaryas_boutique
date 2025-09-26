@@ -6,7 +6,7 @@ export default async function ProductDetailsPage({ params }) {
   const { slug } = params;
 
   await connectDB();
-  const saree = await Saree.findOne({ slug: slug }).lean();
+  const saree = await Saree.findOne({ slug }).lean();
 
   if (!saree) {
     return (
@@ -14,7 +14,7 @@ export default async function ProductDetailsPage({ params }) {
     );
   }
 
-  // ✅ FIX: Convert the Mongoose object to a plain JavaScript object
+  // ✅ Convert the Mongoose object to a plain JavaScript object
   const serializedSaree = JSON.parse(JSON.stringify(saree));
 
   return <ProductDetailsClient saree={serializedSaree} />;
