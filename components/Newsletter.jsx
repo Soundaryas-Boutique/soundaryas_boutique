@@ -10,11 +10,11 @@ class Newsletter extends Component {
       email: "",
       phone: "",
       exclusive: false,
-      subscriptionType: "", // dropdown
-      gender: "", // radio
-      comments: "", // textarea
+      subscriptionType: "",
+      gender: "",
+      comments: "",
       editingIndex: null,
-      searchQuery: "", // ✅ search
+      searchQuery: "",
     };
   }
 
@@ -52,14 +52,12 @@ class Newsletter extends Component {
     } = this.state;
     const { subscriptions, setSubscriptions } = this.props;
 
-    // ✅ Email validation
     const emailRegex = /^\S+@\S+\.\S+$/;
     if (!emailRegex.test(email)) {
       alert("Please enter a valid email address.");
       return;
     }
 
-    // ✅ Phone validation (10 digits only, optional field)
     if (phone && !/^\d{10}$/.test(phone)) {
       alert("Phone number must be exactly 10 digits.");
       return;
@@ -74,15 +72,7 @@ class Newsletter extends Component {
       return;
     }
 
-    const formData = {
-      name,
-      email,
-      phone,
-      exclusive,
-      subscriptionType,
-      gender,
-      comments,
-    };
+    const formData = { name, email, phone, exclusive, subscriptionType, gender, comments };
 
     if (editingIndex !== null) {
       const updated = [...subscriptions];
@@ -114,7 +104,6 @@ class Newsletter extends Component {
   };
 
   handleDelete = (index) => {
-    // ✅ Confirmation before delete
     if (window.confirm("Are you sure you want to delete this subscription?")) {
       const updated = this.props.subscriptions.filter((_, i) => i !== index);
       this.props.setSubscriptions(updated);
@@ -130,17 +119,7 @@ class Newsletter extends Component {
       subscriptions,
     } = this.props;
 
-    const {
-      name,
-      email,
-      phone,
-      exclusive,
-      subscriptionType,
-      gender,
-      comments,
-      editingIndex,
-      searchQuery,
-    } = this.state;
+    const { name, email, phone, exclusive, subscriptionType, gender, comments, editingIndex, searchQuery } = this.state;
 
     return (
       <>
@@ -150,19 +129,14 @@ class Newsletter extends Component {
             <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-md mx-4">
               <div className="flex justify-between items-center border-b pb-3 mb-4">
                 <h3 className="text-xl font-semibold text-[#A52A2A]">
-                  {editingIndex !== null
-                    ? "✏️ Edit Subscription Details"
-                    : "📩 Subscribe to our Newsletter"}
+                  {editingIndex !== null ? "✏️ Edit Subscription Details" : "📩 Subscribe to our Newsletter"}
                 </h3>
                 <button onClick={this.closePopup}>
                   <FiX className="w-6 h-6 text-gray-500 hover:text-[#8B0000]" />
                 </button>
               </div>
 
-              <form
-                className="space-y-4"
-                onSubmit={this.handleNewsletterSubmit}
-              >
+              <form className="space-y-4" onSubmit={this.handleNewsletterSubmit}>
                 <input
                   type="text"
                   value={name}
@@ -171,7 +145,6 @@ class Newsletter extends Component {
                   className="w-full p-3 border rounded-md"
                   required
                 />
-
                 <input
                   type="email"
                   value={email}
@@ -180,7 +153,6 @@ class Newsletter extends Component {
                   className="w-full p-3 border rounded-md"
                   required
                 />
-
                 <input
                   type="tel"
                   value={phone}
@@ -189,73 +161,35 @@ class Newsletter extends Component {
                   className="w-full p-3 border rounded-md"
                 />
 
-                {/* Dropdown for subscription type */}
                 <select
                   value={subscriptionType}
-                  onChange={(e) =>
-                    this.setState({ subscriptionType: e.target.value })
-                  }
+                  onChange={(e) => this.setState({ subscriptionType: e.target.value })}
                   className="w-full p-3 border rounded-md"
                   required
                 >
-                  <option value="" disabled>
-                    Select subscription type
-                  </option>
+                  <option value="" disabled>Select subscription type</option>
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="yearly">Yearly</option>
                 </select>
 
-                {/* Radio buttons for gender */}
                 <div className="flex flex-col">
-                  <label className="text-gray-700 font-medium mb-1">
-                    Gender:
-                  </label>
+                  <label className="text-gray-700 font-medium mb-1">Gender:</label>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="male"
-                        checked={gender === "male"}
-                        onChange={(e) =>
-                          this.setState({ gender: e.target.value })
-                        }
-                      />
-                      Male
+                      <input type="radio" name="gender" value="male" checked={gender === "male"} onChange={(e) => this.setState({ gender: e.target.value })} /> Male
                     </label>
                     <label className="flex items-center gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="female"
-                        checked={gender === "female"}
-                        onChange={(e) =>
-                          this.setState({ gender: e.target.value })
-                        }
-                      />
-                      Female
+                      <input type="radio" name="gender" value="female" checked={gender === "female"} onChange={(e) => this.setState({ gender: e.target.value })} /> Female
                     </label>
                     <label className="flex items-center gap-1">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="other"
-                        checked={gender === "other"}
-                        onChange={(e) =>
-                          this.setState({ gender: e.target.value })
-                        }
-                      />
-                      Other
+                      <input type="radio" name="gender" value="other" checked={gender === "other"} onChange={(e) => this.setState({ gender: e.target.value })} /> Other
                     </label>
                   </div>
                 </div>
 
-                {/* Textarea for comments */}
                 <div>
-                  <label className="text-gray-700 font-medium mb-1">
-                    Comments:
-                  </label>
+                  <label className="text-gray-700 font-medium mb-1">Comments:</label>
                   <textarea
                     value={comments}
                     onChange={(e) => this.setState({ comments: e.target.value })}
@@ -266,39 +200,17 @@ class Newsletter extends Component {
                 </div>
 
                 <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={exclusive}
-                    onChange={(e) =>
-                      this.setState({ exclusive: e.target.checked })
-                    }
-                    className="h-4 w-4"
-                  />
-                  <label className="ml-2 text-gray-700">
-                    Send me exclusive offers
-                  </label>
+                  <input type="checkbox" checked={exclusive} onChange={(e) => this.setState({ exclusive: e.target.checked })} className="h-4 w-4" />
+                  <label className="ml-2 text-gray-700">Send me exclusive offers</label>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-[#A52A2A] text-white rounded-md"
-                >
-                  {editingIndex !== null
-                    ? "Update Subscription"
-                    : "Subscribe"}
+                <button type="submit" className="w-full py-3 bg-[#A52A2A] text-white rounded-md">
+                  {editingIndex !== null ? "Update Subscription" : "Subscribe"}
                 </button>
               </form>
 
               <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    this.closePopup();
-                    setIsSubscriptionOpen(true);
-                  }}
-                  className="text-[#8B0000] hover:underline"
-                >
-                  View My Subscriptions
-                </button>
+                <button onClick={() => { this.closePopup(); setIsSubscriptionOpen(true); }} className="text-[#8B0000] hover:underline">View My Subscriptions</button>
               </div>
             </div>
           </div>
@@ -309,74 +221,41 @@ class Newsletter extends Component {
           <div className="fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-[2px] bg-transparent">
             <div className="bg-white p-6 rounded-lg shadow-2xl w-full max-w-lg mx-4">
               <div className="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 className="text-xl font-semibold text-[#A52A2A]">
-                  My Subscriptions
-                </h3>
+                <h3 className="text-xl font-semibold text-[#A52A2A]">My Subscriptions</h3>
                 <button onClick={() => setIsSubscriptionOpen(false)}>
                   <FiX className="w-6 h-6 text-gray-600 hover:text-[#8B0000]" />
                 </button>
               </div>
 
-              {/* ✅ Search Box */}
-              <input
-                type="text"
-                placeholder="Search by name..."
-                value={searchQuery}
-                onChange={(e) => this.setState({ searchQuery: e.target.value })}
-                className="w-full p-2 mb-4 border rounded-md"
-              />
+              <div className="flex justify-between items-center mb-4">
+                <input
+                  type="text"
+                  placeholder="Search by name..."
+                  value={searchQuery}
+                  onChange={(e) => this.setState({ searchQuery: e.target.value })}
+                  className="w-full p-2 border rounded-md mr-2"
+                />
+                <button onClick={() => setIsSubscriptionOpen(false)} className="px-3 py-2 bg-[#A52A2A] text-white rounded-md hover:bg-[#8B0000]">Exit</button>
+              </div>
 
               {subscriptions.length > 0 ? (
                 <div className="space-y-4 max-h-[400px] overflow-y-auto">
                   {subscriptions
-                    .filter((sub) =>
-                      sub.name
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                    )
+                    .filter((sub) => sub.name.toLowerCase().includes(searchQuery.toLowerCase()))
                     .map((sub, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 border rounded-md bg-gray-50 flex justify-between items-start"
-                      >
+                      <div key={idx} className="p-3 border rounded-md bg-gray-50 flex justify-between items-start">
                         <div>
-                          <p>
-                            <strong>Name:</strong> {sub.name}
-                          </p>
-                          <p>
-                            <strong>Email:</strong> {sub.email}
-                          </p>
-                          <p>
-                            <strong>Phone:</strong> {sub.phone || "N/A"}
-                          </p>
-                          <p>
-                            <strong>Type:</strong> {sub.subscriptionType}
-                          </p>
-                          <p>
-                            <strong>Gender:</strong> {sub.gender || "N/A"}
-                          </p>
-                          <p>
-                            <strong>Comments:</strong>{" "}
-                            {sub.comments || "N/A"}
-                          </p>
-                          <p>
-                            <strong>Exclusive Offers:</strong>{" "}
-                            {sub.exclusive ? "Yes ✅" : "No ❌"}
-                          </p>
+                          <p><strong>Name:</strong> {sub.name}</p>
+                          <p><strong>Email:</strong> {sub.email}</p>
+                          <p><strong>Phone:</strong> {sub.phone || "N/A"}</p>
+                          <p><strong>Type:</strong> {sub.subscriptionType}</p>
+                          <p><strong>Gender:</strong> {sub.gender || "N/A"}</p>
+                          <p><strong>Comments:</strong> {sub.comments || "N/A"}</p>
+                          <p><strong>Exclusive Offers:</strong> {sub.exclusive ? "Yes ✅" : "No ❌"}</p>
                         </div>
                         <div className="flex flex-col gap-2 ml-4">
-                          <button
-                            onClick={() => this.handleEdit(idx)}
-                            className="text-[#8B0000] hover:underline"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => this.handleDelete(idx)}
-                            className="text-red-600 hover:underline"
-                          >
-                            Delete
-                          </button>
+                          <button onClick={() => this.handleEdit(idx)} className="text-[#8B0000] hover:underline">Edit</button>
+                          <button onClick={() => this.handleDelete(idx)} className="text-red-600 hover:underline">Delete</button>
                         </div>
                       </div>
                     ))}

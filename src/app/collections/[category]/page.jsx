@@ -10,10 +10,10 @@ export default async function ProductsPage({ params }) {
 
     let sarees = await Saree.find({ category }).lean();
 
-    // ✅ FIX: Serialize the entire array of Mongoose objects
-    sarees = JSON.parse(JSON.stringify(sarees));
+    // ✅ Serialize everything to plain JSON-safe objects
+    const serializedSarees = JSON.parse(JSON.stringify(sarees));
 
-    if (!sarees || sarees.length === 0) {
+    if (!serializedSarees || serializedSarees.length === 0) {
       return (
         <p className="text-center text-gray-600 py-20">
           No sarees found in this category.
@@ -26,7 +26,9 @@ export default async function ProductsPage({ params }) {
         <h2 className="text-3xl font-bold text-[#B22222] uppercase mb-6">
           {category.replace("-", " ")}
         </h2>
-        <ProductsListClient initialSarees={sarees} category={category} />
+
+        {/* Client component handles sorting, filtering, and price sliders */}
+        <ProductsListClient initialSarees={serializedSarees} category={category} />
       </main>
     );
   } catch (err) {
