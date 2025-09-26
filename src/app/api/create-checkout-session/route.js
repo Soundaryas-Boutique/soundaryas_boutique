@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getServerSession } from "next-auth";
-import { options } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/lib/auth"; // ✅ Correct import
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   const { items } = await req.json();
 
-  const session = await getServerSession(options);
+  const session = await getServerSession(authOptions); // ✅ Use authOptions
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -16,7 +16,7 @@ export async function POST(req) {
   try {
     const lineItems = items.map((item) => ({
       price_data: {
-        currency: "inr", // Use 'inr' for Indian Rupees
+        currency: "inr",
         product_data: {
           name: item.productName,
           images: item.images.map((img) => img.url),
@@ -30,8 +30,8 @@ export async function POST(req) {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.NEXTAUTH_URL}/success`, // Redirect on successful payment
-      cancel_url: `${process.env.NEXTAUTH_URL}/Cart`, // Redirect on cancellation
+      success_url: `${process.env.NEXTAUTH_URL}/success`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/Cart`,
       customer_email: session.user.email,
     });
 
