@@ -1,22 +1,17 @@
-// src/app/collections/[category]/page.jsx
 import { connectDB } from "@/app/lib/mongoose2";
 import Saree from "@/app/(models)/Saree";
-import ProductsListClient from "../../../../components/ProductsListClient"; // Client component for filtering/sorting
+import ProductsListClient from "../../../../components/ProductsListClient";
 
 export default async function ProductsPage({ params }) {
-  const { category } = await params;
+  const { category } = params;
 
   try {
     await connectDB();
 
-    // Fetch all sarees in this category
     let sarees = await Saree.find({ category }).lean();
 
-    // Convert _id to string for client-safe props
-    sarees = sarees.map((s) => ({
-      ...s,
-      _id: s._id.toString(),
-    }));
+    // ✅ FIX: Serialize the entire array of Mongoose objects
+    sarees = JSON.parse(JSON.stringify(sarees));
 
     if (!sarees || sarees.length === 0) {
       return (
@@ -31,8 +26,6 @@ export default async function ProductsPage({ params }) {
         <h2 className="text-3xl font-bold text-[#B22222] uppercase mb-6">
           {category.replace("-", " ")}
         </h2>
-
-        {/* Client component handles sorting, filtering, and price sliders */}
         <ProductsListClient initialSarees={sarees} category={category} />
       </main>
     );
