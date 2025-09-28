@@ -2,18 +2,20 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { connectDB } from "@/app/lib/mongoose2";
 import Order from "@/app/(models)/Order";
-import Saree from "@/app/(models)/Saree";
+import User from "@/app/(models)/User";
+import { headers } from "next/headers";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
-  const rawBody = await req.text();
-  const signature = req.headers.get("stripe-signature");
+  const body = await req.text();
+  const signature = headers().get("Stripe-Signature");
 
   let event;
+
   try {
     event = stripe.webhooks.constructEvent(
-      rawBody,
+      body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -29,27 +31,28 @@ export async function POST(req) {
 
     try {
       await connectDB();
-      // Retrieve the user from your database using the email or customer ID
+      
       const user = await User.findOne({ email: session.customer_email });
       if (!user) {
         console.error("User not found for this email:", session.customer_email);
         return NextResponse.json({ received: true });
       }
 
-      // Retrieve the session with line items
+      // Fetch line items from the session
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
         limit: 100,
       });
 
       // Map line items to your Order model format
       const products = lineItems.data.map((item) => ({
-        // You'll need to fetch the original product ID from your database
-        // based on the product name or another identifier.
-        // For simplicity, we'll use a placeholder here.
-        productId: new mongoose.Types.ObjectId(), // You should map this to your Saree._id
+        // Note: Stripe line items don't store your product's internal ID
+        // You would need to store the `productId` in the metadata of the
+        // checkout session to get it back here. For now, we'll use the description.
+        // For a full solution, you would pass `productId` in the checkout session's metadata.
+        // This is a simplified approach.
         productName: item.description,
         quantity: item.quantity,
-        price: item.price.unit_amount / 100,
+        price: item.price.unit_amount / 100, // Convert from cents to dollars/rupees
       }));
 
       // Create a new order in your database
@@ -60,7 +63,6 @@ export async function POST(req) {
         stripeSessionId: session.id,
         paymentStatus: "paid",
         orderStatus: "processing",
-        // You can also get shipping details from the session
         shippingDetails: {
           name: session.shipping_details?.name,
           address: session.shipping_details?.address?.line1,
@@ -71,10 +73,6 @@ export async function POST(req) {
 
       await order.save();
       console.log("Order saved successfully:", order);
-      
-      // OPTIONAL: Clear the user's cart in your database if you have one
-      // If you're using localStorage, you would handle this on the client side after redirection.
-
     } catch (dbError) {
       console.error("Database error in webhook handler:", dbError);
       return NextResponse.json({ message: "Database Error" }, { status: 500 });
