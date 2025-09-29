@@ -23,7 +23,6 @@ const orderSchema = new Schema(
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
-    // Optional shipping/billing details if you collect them
     shippingDetails: {
       name: { type: String },
       address: { type: String },

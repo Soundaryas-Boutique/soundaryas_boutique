@@ -1,7 +1,6 @@
 import NextAuth from "next-auth";
-import { options } from "./options";
+import { authOptions } from "@/app/lib/auth";
 
-const handler = NextAuth(options);
-export {handler as GET, handler as POST};
-// This code sets up NextAuth.js for authentication in a Next.js application.
+const handler = NextAuth(authOptions);
 
+export { handler as GET, handler as POST };

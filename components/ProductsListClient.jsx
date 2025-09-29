@@ -14,6 +14,8 @@ const priceFilters = [
 ];
 
 export default function ProductsListClient({ initialSarees, category }) {
+  console.log("Initial Sarees:", initialSarees);
+  
   const [sarees, setSarees] = useState(initialSarees);
   const [filteredSarees, setFilteredSarees] = useState(initialSarees);
   const [priceRange, setPriceRange] = useState(priceFilters[0].value);

@@ -6,22 +6,20 @@ import { authOptions } from "@/app/lib/auth";
 
 export async function GET(req) {
   const session = await getServerSession(authOptions);
-  if (!session) {
+
+  if (!session) { // ✅ CRITICAL FIX: Only check if a session exists
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
     await connectDB();
-    
-    // Use the user ID from the session (must be available if user is authenticated)
     const userId = session.user.id;
-    
-    // Find all orders for the current user, sort by latest
+
+    console.log("Fetching orders for userId:", userId);
     const orders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
-
-    // Important: Serialize data before sending to client component
+    console.log("Database query result:", orders);
+    
     const serializedOrders = JSON.parse(JSON.stringify(orders));
-
     return NextResponse.json(serializedOrders);
   } catch (err) {
     console.error("Error fetching user orders:", err);

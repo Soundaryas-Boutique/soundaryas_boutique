@@ -1,5 +1,4 @@
 "use client";
-
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,7 +18,8 @@ export default function CartPage() {
 
     try {
       const stripePromise = loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+        { locale: 'en' }
       );
       const stripe = await stripePromise;
 
@@ -65,7 +65,6 @@ export default function CartPage() {
         Your Shopping Cart
       </h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart Items List */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
             <div
@@ -113,7 +112,6 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Cart Summary */}
         <div className="lg:col-span-1 border rounded-lg p-6 shadow-md bg-gray-50 h-fit">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Cart Summary

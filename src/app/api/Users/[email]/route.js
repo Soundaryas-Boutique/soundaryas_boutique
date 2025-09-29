@@ -1,43 +1,39 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
+import { connectDB } from "@/app/lib/mongoose2";
 import User from "@/app/(models)/User";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 
-// GET /api/Users/:email
-export async function GET(req, { params }) {
+export async function GET(req) {
   try {
-    await connectDB();
-    const email = params.email;
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "Admin") {
+      // ✅ Add a check for unauthorized access
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const user = await User.findOne({ email }).lean();
+    // Get the email from the URL's search parameters
+    const email = req.nextUrl.searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json({ error: "Email parameter is missing" }, { status: 400 });
+    }
+
+    await connectDB();
+    
+    const user = await User.findOne({ email: email }).lean();
+
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user, { status: 200 });
+    // ✅ Fix: Serialize the Mongoose object before returning
+    const serializedUser = JSON.parse(JSON.stringify(user));
+
+    return NextResponse.json(serializedUser, { status: 200 });
+
   } catch (error) {
-    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
-  }
-}
-
-// PATCH /api/Users/:email
-export async function PATCH(req, { params }) {
-  try {
-    await connectDB();
-    const email = params.email;
-    const body = await req.json();
-
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { $set: body },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(updatedUser, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ message: "Server error", error: error.message }, { status: 500 });
+    console.error("API Error fetching user:", error);
+    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 }

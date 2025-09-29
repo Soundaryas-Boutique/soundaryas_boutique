@@ -1,31 +1,38 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function OrderDetails() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchOrders = async () => {
-      try {
-        const res = await fetch("/api/orders");
-        if (!res.ok) {
-          throw new Error("Failed to fetch orders");
+      // ✅ FIX: Only fetch if the session is authenticated
+      if (session?.user?.id) {
+        try {
+          const res = await fetch("/api/orders");
+          if (!res.ok) {
+            throw new Error("Failed to fetch orders");
+          }
+          const data = await res.json();
+          setOrders(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
         }
-        const data = await res.json();
-        console.log("Orders API response: ",data)
-        // The data is already serialized by the API route
-        setOrders(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
+      } else if (session === null) {
+        // If unauthenticated, stop loading and show no orders
         setLoading(false);
+        setOrders([]);
       }
     };
     fetchOrders();
-  }, []);
+  }, [session]); // ✅ The useEffect now depends on the session state
 
   const getStatusColor = (status) => {
     switch (status) {

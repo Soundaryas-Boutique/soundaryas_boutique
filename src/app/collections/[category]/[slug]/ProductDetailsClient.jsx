@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 
 export default function ProductDetailsClient({ saree }) {
+  console.log("Received Saree:", saree);
   const { addToCart } = useCart();
   const [showToast, setShowToast] = useState(false); // State for 'Added to Cart' message
   const [showBuyToast, setShowBuyToast] = useState(false); // State for 'Buy Now' message

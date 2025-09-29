@@ -29,7 +29,6 @@ export default function ProductForm({ productId }) {
 
   const [loading, setLoading] = useState(false);
 
-  // Redirect non-admins
   useEffect(() => {
     if (status === "loading") return;
     if (!session || session.user.role !== "Admin") {
@@ -37,7 +36,6 @@ export default function ProductForm({ productId }) {
     }
   }, [session, status, router]);
 
-  // Fetch existing product if editing
   useEffect(() => {
     if (isEdit) {
       fetch(`/api/sarees/${productId}`)

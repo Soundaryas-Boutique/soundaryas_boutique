@@ -10,10 +10,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load cart from localStorage or database (for persistence)
   useEffect(() => {
-    // For now, we will use localStorage as a simple solution
-    // For a more robust solution, you would fetch the user's cart from your database here
     try {
       const storedCart = localStorage.getItem("cartItems");
       if (storedCart) {
@@ -26,39 +23,31 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (!loading) {
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }
   }, [cartItems, loading]);
 
-  // Function to add a product to the cart
   const addToCart = (product) => {
     setCartItems((prevItems) => {
-      // Check if the item already exists in the cart
       const existingItem = prevItems.find((item) => item._id === product._id);
-
       if (existingItem) {
-        // If it exists, increase the quantity
         return prevItems.map((item) =>
           item._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        // If not, add the new item with quantity 1
         return [...prevItems, { ...product, quantity: 1 }];
       }
     });
   };
 
-  // Function to remove an item from the cart
   const removeFromCart = (id) => {
     setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
   };
 
-  // Function to clear the entire cart
   const clearCart = () => {
     setCartItems([]);
   };

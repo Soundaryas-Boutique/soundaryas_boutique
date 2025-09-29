@@ -3,7 +3,7 @@ import Saree from "@/app/(models)/Saree";
 import ProductDetailsClient from "./ProductDetailsClient";
 
 export default async function ProductDetailsPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   await connectDB();
   const saree = await Saree.findOne({ slug }).lean();

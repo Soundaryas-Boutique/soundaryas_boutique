@@ -17,11 +17,10 @@ export default function ImageUpload({ onImageUpload, initialImages }) {
       const uploadPromises = files.map((file) => {
         const formData = new FormData();
         formData.append("file", file);
-        // ✅ FIX: Use the exact name of your unsigned upload preset
-        formData.append("upload_preset","my-uploads");
+        formData.append("upload_preset", "your_upload_preset_name"); // ✅ Replace this with your actual preset name
 
         return fetch(
-          `https://api.cloudinary.com/v1_1/dz2x5ge2n/image/upload`,
+          `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
           {
             method: "POST",
             body: formData,

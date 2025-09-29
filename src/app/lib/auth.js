@@ -1,7 +1,9 @@
+// This file is crucial for passing authOptions to other API routes
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import Users from "@/app/(models)/User"; // Your User model
-import { connectDB } from "./mongoose2";
+import { connectDB } from "@/app/lib/mongoose";
+import User from "@/app/(models)/User";
+import bcrypt from "bcrypt";
 
 export const authOptions = {
   providers: [
@@ -13,26 +15,35 @@ export const authOptions = {
       },
       async authorize(credentials) {
         await connectDB();
-        const user = await Users.findOne({ email: credentials.email });
-        if (user && user.password === credentials.password) {
-          return { id: user._id, email: user.email, role: user.role };
+        const user = await User.findOne({ email: credentials.email });
+        if (!user) {
+          throw new Error("Invalid email or password");
         }
-        return null;
+        const isMatch = await bcrypt.compare(credentials.password, user.password);
+        if (!isMatch) {
+          throw new Error("Invalid email or password");
+        }
+        return { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
       },
     }),
   ],
-  session: { strategy: "jwt" },
+  pages: {
+    signIn: "/signin",
+  },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.role = user.role;
+      if (user) {
+        token.role = user.role;
+        token.id = user.id;
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token) session.user.role = token.role;
+      if (token) {
+        session.user.role = token.role;
+        session.user.id = token.id;
+      }
       return session;
     },
   },
 };
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };

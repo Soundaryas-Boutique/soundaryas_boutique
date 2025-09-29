@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react"; // ✅ Import useRef
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 
 export default function SuccessPage() {
   const { clearCart } = useCart();
-  const cartCleared = useRef(false); // ✅ Use a ref to track if cart has been cleared
+  const cartCleared = useRef(false);
 
   useEffect(() => {
-    // ✅ Only clear the cart if it hasn't been cleared already
     if (!cartCleared.current) {
       clearCart();
       cartCleared.current = true;
