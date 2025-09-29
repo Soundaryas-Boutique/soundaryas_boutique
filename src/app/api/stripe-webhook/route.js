@@ -4,7 +4,9 @@ import { connectDB } from "@/app/lib/mongoose2";
 import Order from "@/app/(models)/Order";
 import User from "@/app/(models)/User";
 import { headers } from "next/headers";
+import mongoose from "mongoose";
 
+// Ensure your Stripe Secret Key is set in .env.local
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
@@ -17,7 +19,7 @@ export async function POST(req) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_WEBHOOK_SECRET // 👈 Your webhook secret must be set
     );
   } catch (err) {
     console.error(`Webhook signature verification failed: ${err.message}`);
@@ -32,30 +34,29 @@ export async function POST(req) {
     try {
       await connectDB();
       
+      // 1. Find the user based on the email provided to Stripe Checkout
       const user = await User.findOne({ email: session.customer_email });
       if (!user) {
         console.error("User not found for this email:", session.customer_email);
-        return NextResponse.json({ received: true });
+        return NextResponse.json({ received: true }); // Still return 200 to Stripe
       }
 
-      // Fetch line items from the session
+      // 2. Fetch line items from the session
       const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
         limit: 100,
       });
 
-      // Map line items to your Order model format
+      // 3. Map line items to your Order model format
       const products = lineItems.data.map((item) => ({
-        // Note: Stripe line items don't store your product's internal ID
-        // You would need to store the `productId` in the metadata of the
-        // checkout session to get it back here. For now, we'll use the description.
-        // For a full solution, you would pass `productId` in the checkout session's metadata.
-        // This is a simplified approach.
+        // Note: For a complete solution, you must pass productId in the checkout metadata. 
+        // For simplicity, we create a temporary ObjectId and rely on productName here.
+        productId: new mongoose.Types.ObjectId(), 
         productName: item.description,
         quantity: item.quantity,
-        price: item.price.unit_amount / 100, // Convert from cents to dollars/rupees
+        price: item.price.unit_amount / 100, // Convert from cents to rupees
       }));
 
-      // Create a new order in your database
+      // 4. Create the new order document
       const order = new Order({
         userId: user._id,
         products: products,

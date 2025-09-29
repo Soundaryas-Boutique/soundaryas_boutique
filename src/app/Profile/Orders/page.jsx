@@ -1,42 +1,19 @@
 "use client";
-import { useSession } from "next-auth/react";
-import useUserInfo from "@/app/hooks/useUserInfo";
-import Link from "next/link";
-import ProfileNav from "../../../../components/ProfileNav";
+import React, { useState, useEffect } from "react";
+import OrderDetails from "../../../../components/OrderDetails"; // Correct path to the client component
+import ProfileNav from "../../../../components/ProfileNav"; // Correct path to ProfileNav
 
-export default function ProfilePage() {
-  const { data: session, status } = useSession();
-  const email = session?.user?.email;
-
-  const { userInfo, loading, error } = useUserInfo(email);
-
- 
-  console.log(userInfo);
-
-  if (status === "unauthenticated") {
-    return (
-      <div className="relative items-center justify-center flex flex-col h-screen -top-20">
-        <p>Please Login to continue.</p>
-        <Link href="/signin">
-          <button className="text-blue-500">Sign In</button>
-        </Link>
-      </div>
-    );
-  }
-  
-  if (error) return <p>{error.message}</p>;
-
+export default function OrdersPage() {
   return (
-    <div className="flex flex-col md:flex-row  p-4">
+    <div className="flex flex-col md:flex-row p-4">
       {/*Left side*/}
-      <ProfileNav/>
-
+      <ProfileNav />
 
       {/*Right side*/}
       <div className="ml-9">
-        <h1 className="text-2xl font-bold mb-4">Order Details..</h1>
-     
-    </div>
+        <h1 className="text-2xl font-bold mb-4">My Orders</h1>
+        <OrderDetails />
+      </div>
     </div>
   );
 }
