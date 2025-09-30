@@ -7,7 +7,9 @@ import { authOptions } from "@/app/lib/auth";
 export async function GET(req) {
   const session = await getServerSession(authOptions);
 
-  if (!session) { // ✅ CRITICAL FIX: Only check if a session exists
+  // ✅ CRITICAL FIX: Only check if a session exists.
+  // This allows any logged-in user to view their own orders.
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
