@@ -1,15 +1,17 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import OrderStatus from './OrderStatus'; // Import the new component
-import { Trash2 } from 'lucide-react';
+import OrderStatus from './OrderStatus';
+import { Trash2, FiEye } from 'lucide-react'; // ✅ Import FiEye icon
+import CustomerDetailsModal from './CustomerDetailsModal'; // ✅ Import the new modal
 
 export default function OrdersDashboard() {
   const { data: session, status } = useSession();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // ✅ New state for the modal
+  const [selectedCustomer, setSelectedCustomer] = useState(null); // ✅ State for customer data
 
   const fetchOrders = async () => {
     if (status !== 'authenticated' || session.user.role !== 'Admin') {
@@ -46,7 +48,6 @@ export default function OrdersDashboard() {
         throw new Error('Failed to delete order.');
       }
       
-      // Update the local state to remove the deleted order
       setOrders(orders.filter(order => order._id !== orderId));
     } catch (err) {
       alert(`Error deleting order: ${err.message}`);
@@ -54,9 +55,19 @@ export default function OrdersDashboard() {
   };
 
   const handleStatusUpdate = (orderId, newStatus) => {
-    // Optionally update local state if the OrderStatus component doesn't handle the full set
     console.log(`Order ${orderId} updated to ${newStatus}`);
-    // Re-fetch data for simplicity if necessary, but component state handles it
+  };
+
+  // ✅ New function to open the modal
+  const openCustomerModal = (customer) => {
+    setSelectedCustomer(customer);
+    setIsModalOpen(true);
+  };
+
+  // ✅ New function to close the modal
+  const closeCustomerModal = () => {
+    setIsModalOpen(false);
+    setSelectedCustomer(null);
   };
 
 
@@ -93,7 +104,12 @@ export default function OrdersDashboard() {
                     <div className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{order.userId?.name || 'User Deleted'}</div>
+                    <button 
+                      onClick={() => openCustomerModal(order.userId)} // ✅ Open modal on click
+                      className="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
+                    >
+                      {order.userId?.name || 'User Deleted'}
+                    </button>
                     <div className="text-sm text-gray-500">{order.userId?.email}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -125,6 +141,14 @@ export default function OrdersDashboard() {
           </tbody>
         </table>
       </div>
+      
+      {/* ✅ Conditionally render the modal */}
+      {isModalOpen && selectedCustomer && (
+        <CustomerDetailsModal
+          customer={selectedCustomer}
+          onClose={closeCustomerModal}
+        />
+      )}
     </div>
   );
 }

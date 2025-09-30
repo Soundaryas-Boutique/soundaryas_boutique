@@ -5,7 +5,6 @@ import User from "@/app/(models)/User";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 
-// Helper function to check admin status
 const isAdmin = async (session) => {
   return session && session.user.role === "Admin";
 };
@@ -13,16 +12,16 @@ const isAdmin = async (session) => {
 // GET: Fetch ALL orders for Admin Dashboard
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (! await isAdmin(session)) {
+  if (!await isAdmin(session)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 
   await connectDB();
   try {
-    // Fetch all orders and populate the user details for context
+    // ✅ FIX: Populate ALL user details, including address, for the modal
     const orders = await Order.find({})
       .sort({ createdAt: -1 })
-      .populate('userId', 'name email'); // Fetch only name and email from User model
+      .populate('userId', 'name email phone address city state country pincode');
 
     const serializedOrders = JSON.parse(JSON.stringify(orders));
     return NextResponse.json(serializedOrders);
