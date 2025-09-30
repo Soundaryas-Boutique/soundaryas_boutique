@@ -19,6 +19,7 @@ export default function AdminLayout({ children }) {
               <li><a href="/admin/orders">Orders</a></li>
               <li><a href="/admin/messages">Messages</a></li>
               <li><a href="/admin/subscribers">Subscribers</a></li>
+              <li><a href="/admin/email-marketing">Email</a></li>
             </ul>
           </nav>
         </div>
