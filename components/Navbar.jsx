@@ -11,16 +11,18 @@ import {
   FiChevronUp 
 } from "react-icons/fi";
 import Link from "next/link";
-import { useSession, signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation"; // ✅ Import the useRouter hook
 import Newsletter from "./Newsletter";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
+  const router = useRouter(); // ✅ Initialize the router hook
 
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   // Newsletter states
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -90,9 +92,37 @@ const Navbar = () => {
 
           {/* Icons */}
           <div className="flex gap-6 items-center text-[#8B0000]">
-            <Link href="/Profile" className="relative">
-              <FiUser className="w-5 h-5 cursor-pointer hidden lg:block" />
-            </Link>
+            {/* ✅ Conditional rendering for profile icon or login button */}
+            {status === "authenticated" ? (
+              <div className="relative hidden lg:block">
+                <button
+                  className="flex items-center"
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                >
+                  <FiUser className="w-5 h-5 cursor-pointer" />
+                </button>
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <Link href="/Profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      View Profile
+                    </Link>
+                    <button
+                      onClick={() => signOut()} // ✅ signOut function
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => signIn()}
+                className="hidden lg:block text-[#8B0000] font-medium hover:text-[#A52A2A]"
+              >
+                Login
+              </button>
+            )}
 
             <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
 
@@ -106,14 +136,6 @@ const Navbar = () => {
             >
               <FiShoppingCart className="w-5 h-5 cursor-pointer" />
             </Link>
-
-            {status === "authenticated" ? (
-              <button onClick={() => redirect("/logoutsecurity")}>
-                Logout
-              </button>
-            ) : (
-              <button onClick={() => signIn()}>Login</button>
-            )}
           </div>
         </div>
       </div>
@@ -202,10 +224,6 @@ const Navbar = () => {
       <Newsletter
         isPopupOpen={isPopupOpen}
         setIsPopupOpen={setIsPopupOpen}
-        isSubscriptionOpen={isSubscriptionOpen}
-        setIsSubscriptionOpen={setIsSubscriptionOpen}
-        subscriptions={subscriptions}
-        setSubscriptions={setSubscriptions}
       />
     </>
   );

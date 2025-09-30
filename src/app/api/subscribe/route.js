@@ -1,32 +1,25 @@
-import dbConnect from "@/app/lib/mongoose_subb";
+import { NextResponse } from "next/server";
+import { connectDB } from "@/app/lib/mongoose2";
 import Subscriber from "@/app/(models)/Subscriber";
 
 export async function POST(req) {
   try {
-    await dbConnect();
-
-    const body = await req.json();
-    const { name, email, phone, exclusive } = body;
+    await connectDB();
+    const { email } = await req.json();
 
     if (!email) {
-      return new Response(
-        JSON.stringify({ success: false, message: "Email is required" }),
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Email is required" }, { status: 400 });
     }
 
-    const subscriber = new Subscriber({ name, email, phone, exclusive });
+    const subscriber = new Subscriber({ email });
     await subscriber.save();
 
-    return new Response(
-      JSON.stringify({ success: true, message: "Subscribed successfully!" }),
-      { status: 201 }
-    );
+    return NextResponse.json({ message: "Subscribed successfully!" }, { status: 201 });
   } catch (error) {
+    if (error.code === 11000) { // Check for duplicate key error (MongoDB)
+      return NextResponse.json({ message: "This email is already subscribed." }, { status: 409 });
+    }
     console.error("❌ Subscription error:", error);
-    return new Response(
-      JSON.stringify({ success: false, message: error.message }),
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Server error", details: error.message }, { status: 500 });
   }
 }
