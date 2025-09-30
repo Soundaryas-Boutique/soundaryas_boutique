@@ -5,24 +5,21 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import nodemailer from "nodemailer";
 
-// Helper to check admin status
 const isAdmin = async (session) => {
   return session && session.user.role === "Admin";
 };
 
-// Nodemailer transporter setup
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: false, // Use TLS (true for 465, false for 587)
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
 
-// Function to generate email content based on category
-const generateContent = (category) => {
+const generateContent = (category, productName) => {
   switch (category) {
     case 'special_offer':
       return {
@@ -31,13 +28,13 @@ const generateContent = (category) => {
       };
     case 'new_product':
       return {
-        subject: "✨ New Arrivals! Fresh Cotton Sarees Just Dropped!",
-        body: "Hello Subscriber,\n\nWe've just updated our collection with beautiful, lightweight Cotton Sarees perfect for any occasion. Be the first to see them!\n\nView Collection: [Link to your new products page]",
+        subject: `✨ New Product: ${productName} Just Dropped!`,
+        body: `Hello Subscriber,\n\nWe've just updated our collection with the beautiful new product: ${productName}. Be the first to see it!\n\nView Collection: [Link to your new products page]`,
       };
     case 'restocked':
       return {
-        subject: "🛍️ Back in Stock! Your Favorites Are Here!",
-        body: "Hello Subscriber,\n\nGreat news! The highly requested 'Banarasi Crimson' is back in stock. Quantities are limited, so grab yours before it sells out again!\n\nCheck availability: [Link to product page]",
+        subject: `🛍️ Back in Stock! Your Favorite, ${productName}, Is Here!`,
+        body: `Hello Subscriber,\n\nGreat news! The highly requested item, ${productName}, is back in stock. Quantities are limited, so grab yours before it sells out again!\n\nCheck availability: [Link to product page]`,
       };
     case 'random_buy':
       return {
@@ -58,27 +55,24 @@ export async function POST(req) {
 
   try {
     await connectDB();
-    const { category } = await req.json();
+    const { category, productName } = await req.json();
 
     if (!category) {
       return NextResponse.json({ message: "Missing email category" }, { status: 400 });
     }
     
-    // 1. Get all subscriber emails
     const subscribers = await Subscriber.find({}, 'email');
-    const subscriberEmails = subscribers.map(sub => sub.email).join(', '); // Comma-separated string for Nodemailer BCC
+    const subscriberEmails = subscribers.map(sub => sub.email).join(', ');
 
     if (subscriberEmails.length === 0) {
         return NextResponse.json({ message: "No subscribers found to send email." }, { status: 200 });
     }
 
-    // 2. Generate content
-    const { subject, body } = generateContent(category);
+    const { subject, body } = generateContent(category, productName);
 
-    // 3. Send email using BCC (Blind Carbon Copy)
     const mailOptions = {
       from: process.env.SMTP_USER,
-      bcc: subscriberEmails, // Send to all subscribers via BCC
+      bcc: subscriberEmails,
       subject: subject,
       text: body,
       html: `<p>${body.replace(/\n/g, '<br>')}</p><p style="margin-top: 20px;">Thank you for subscribing to Soundarya's Boutique!</p>`,

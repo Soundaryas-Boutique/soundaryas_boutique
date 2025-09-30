@@ -11,6 +11,7 @@ const emailCategories = [
 
 export default function EmailSenderForm() {
   const [category, setCategory] = useState('');
+  const [productName, setProductName] = useState('');
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [success, setSuccess] = useState(null);
@@ -19,6 +20,12 @@ export default function EmailSenderForm() {
     e.preventDefault();
     if (!category) {
       setStatusMessage('Please select an email category.');
+      setSuccess(false);
+      return;
+    }
+    
+    if ((category === 'new_product' || category === 'restocked') && !productName) {
+      setStatusMessage('Product name is required for this campaign.');
       setSuccess(false);
       return;
     }
@@ -31,7 +38,7 @@ export default function EmailSenderForm() {
       const res = await fetch('/api/admin/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category }),
+        body: JSON.stringify({ category, productName }),
       });
 
       const data = await res.json();
@@ -43,6 +50,7 @@ export default function EmailSenderForm() {
         setStatusMessage(data.message);
         setSuccess(true);
         setCategory('');
+        setProductName('');
       }
 
     } catch (error) {
@@ -56,7 +64,7 @@ export default function EmailSenderForm() {
   return (
     <div className="p-8 max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-3">Email Marketing Hub</h1>
-      <p className="text-gray-600 mb-6">Select a category to send a pre-defined email template to **all current subscribers**.</p>
+      <p className="text-gray-600 mb-6">Create a dynamic email to send to all current subscribers.</p>
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -66,7 +74,10 @@ export default function EmailSenderForm() {
           <select
             id="category"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setProductName(''); // Clear product name when category changes
+            }}
             className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
             required
           >
@@ -78,6 +89,32 @@ export default function EmailSenderForm() {
             ))}
           </select>
         </div>
+
+        {/* Dynamic input for product name */}
+        {(category === 'new_product' || category === 'restocked') && (
+          <div>
+            <label htmlFor="productName" className="block text-lg font-medium text-gray-700 mb-2">
+              Product Name:
+            </label>
+            <input
+              type="text"
+              name="productName"
+              id="productName"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              placeholder="Enter product name"
+              className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
+              required
+            />
+          </div>
+        )}
+
+        {/* Simple "send" button for other categories */}
+        {category && category !== 'new_product' && category !== 'restocked' && (
+          <div>
+            <p className="text-gray-600 mb-4">A general email will be sent to subscribers.</p>
+          </div>
+        )}
 
         <button
           type="submit"
