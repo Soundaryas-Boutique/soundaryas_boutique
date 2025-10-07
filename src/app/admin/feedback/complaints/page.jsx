@@ -23,7 +23,7 @@ export default function ComplaintPage() {
     "Others",
   ];
 
-  const [complaints, setComplaints] = useState([
+  const [complaints] = useState([
     { id: 1, category: "Delivery Delay", message: "Order came late", date: "2025-10-05" },
     { id: 2, category: "Delivery Delay", message: "Package delayed by 2 days", date: "2025-10-06" },
     { id: 3, category: "Product Quality", message: "Fabric was different than shown", date: "2025-10-06" },
@@ -35,19 +35,19 @@ export default function ComplaintPage() {
     { id: 9, category: "Others", message: "Wrong item delivered", date: "2025-10-08" },
   ]);
 
-  const chartData = allCategories.map((category) => {
-    const count = complaints.filter((c) => c.category === category).length;
-    return { category, count };
-  });
+  const chartData = allCategories.map((category) => ({
+    category,
+    count: complaints.filter((c) => c.category === category).length,
+  }));
 
   return (
     <div>
       {/* Back Button */}
       <button
-        onClick={() => router.push("/admin")}
-        className="mb-4 bg-gray-900 text-white py-2 px-4 rounded-md font-semibold hover:bg-gray-700 transition"
+        onClick={() => router.back()} // <- go back to previous page
+        className="mb-6 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition"
       >
-        ← Back to Admin Panel
+        ← Back
       </button>
 
       <h1 className="text-3xl font-bold mb-6">User Complaints Overview</h1>

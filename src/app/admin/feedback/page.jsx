@@ -21,6 +21,12 @@ export default function FeedbackPage() {
       href: "/admin/feedback/suggestions",
       color: "bg-blue-100 text-blue-700",
     },
+    {
+      title: "Newsletter Subscribers",
+      description: "Manage newsletter subscriptions and campaigns.",
+      href: "/admin/feedback/newsletter",
+      color: "bg-yellow-100 text-yellow-700",
+    },
   ];
 
   return (
