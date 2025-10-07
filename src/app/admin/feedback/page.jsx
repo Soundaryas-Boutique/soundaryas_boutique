@@ -25,6 +25,12 @@ export default function FeedbackPage() {
       title: "Newsletter Subscribers",
       description: "Manage newsletter subscriptions and campaigns.",
       href: "/admin/feedback/newsletter",
+      color: "bg-orange-100 text-orange-700",
+    },
+    {
+      title: "Appointmet",
+      description: "Veiw your sppointmets in detail here.",
+      href: "/admin/feedback/appointment",
       color: "bg-yellow-100 text-yellow-700",
     },
   ];
