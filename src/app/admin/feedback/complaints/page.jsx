@@ -10,8 +10,11 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { useRouter } from "next/navigation";
 
 export default function ComplaintPage() {
+  const router = useRouter();
+
   const allCategories = [
     "Delivery Delay",
     "Product Quality",
@@ -20,22 +23,18 @@ export default function ComplaintPage() {
     "Others",
   ];
 
-  // Sample complaints fetched from backend (or hardcoded for now)
-const [complaints, setComplaints] = useState([
-  { id: 1, category: "Delivery Delay", message: "Order came late", date: "2025-10-05" },
-  { id: 2, category: "Delivery Delay", message: "Package delayed by 2 days", date: "2025-10-06" },
-  { id: 3, category: "Product Quality", message: "Fabric was different than shown", date: "2025-10-06" },
-  { id: 4, category: "Product Quality", message: "Color faded after first wash", date: "2025-10-07" },
-  { id: 5, category: "Product Quality", message: "Wrong size delivered", date: "2025-10-07" },
-  { id: 6, category: "Payment Issue", message: "Payment not reflected", date: "2025-10-07" },
-  { id: 7, category: "Customer Service", message: "Support didn't respond", date: "2025-10-08" },
-  { id: 8, category: "Customer Service", message: "Rude staff on call", date: "2025-10-08" },
-  { id: 9, category: "Others", message: "Wrong item delivered", date: "2025-10-08" },
-]);
+  const [complaints, setComplaints] = useState([
+    { id: 1, category: "Delivery Delay", message: "Order came late", date: "2025-10-05" },
+    { id: 2, category: "Delivery Delay", message: "Package delayed by 2 days", date: "2025-10-06" },
+    { id: 3, category: "Product Quality", message: "Fabric was different than shown", date: "2025-10-06" },
+    { id: 4, category: "Product Quality", message: "Color faded after first wash", date: "2025-10-07" },
+    { id: 5, category: "Product Quality", message: "Wrong size delivered", date: "2025-10-07" },
+    { id: 6, category: "Payment Issue", message: "Payment not reflected", date: "2025-10-07" },
+    { id: 7, category: "Customer Service", message: "Support didn't respond", date: "2025-10-08" },
+    { id: 8, category: "Customer Service", message: "Rude staff on call", date: "2025-10-08" },
+    { id: 9, category: "Others", message: "Wrong item delivered", date: "2025-10-08" },
+  ]);
 
-
-
-  // Prepare chart data with all categories
   const chartData = allCategories.map((category) => {
     const count = complaints.filter((c) => c.category === category).length;
     return { category, count };
@@ -43,6 +42,14 @@ const [complaints, setComplaints] = useState([
 
   return (
     <div>
+      {/* Back Button */}
+      <button
+        onClick={() => router.push("/admin")}
+        className="mb-4 bg-gray-900 text-white py-2 px-4 rounded-md font-semibold hover:bg-gray-700 transition"
+      >
+        ← Back to Admin Panel
+      </button>
+
       <h1 className="text-3xl font-bold mb-6">User Complaints Overview</h1>
 
       {/* Visualization */}
