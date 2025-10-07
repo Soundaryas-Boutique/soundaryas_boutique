@@ -3,6 +3,8 @@ import { useSession } from "next-auth/react";
 import useUserInfo from "@/app/hooks/useUserInfo";
 import Link from "next/link";
 import ProfileNav from "../../../components/ProfileNav";
+// ADDITION: Imported the Calendar icon for the new button
+import { Calendar } from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -48,7 +50,7 @@ export default function ProfilePage() {
             {userInfo?.state}, {userInfo?.country}, {userInfo?.pincode}
           </p>
         </div>
-
+        
         {/* Complaint Section */}
         <div className="mt-16">
           <h1 className="text-2xl font-bold mb-4">Need Help?</h1>
@@ -62,6 +64,29 @@ export default function ProfilePage() {
             </button>
           </Link>
         </div>
+
+        {/* --- START OF IMPROVED SECTION --- */}
+
+        {/* New, dedicated section for booking an appointment */}
+        <div className="mt-16 pt-8 border-t">
+          <h1 className="text-2xl font-bold mb-4">Personal Styling Session</h1>
+          
+          {/* The new "catchy" sentence */}
+          <p className="mb-6 text-gray-600 max-w-md">
+            Schedule your personal styling session and let our experts help you find the perfect look for any occasion.
+          </p>
+          
+          {/* The new, improved button */}
+          <Link href="/Profile/AppointmentForm">
+            <button className="inline-flex items-center gap-2 bg-[#B22222] text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-[#8B0000] hover:-translate-y-0.5 transition-all duration-300">
+              <Calendar size={18} />
+              Book a Styling Session
+            </button>
+          </Link>
+        </div>
+
+        {/* --- END OF IMPROVED SECTION --- */}
+
       </div>
     </div>
   );
