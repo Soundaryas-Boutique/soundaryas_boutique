@@ -1,82 +1,40 @@
-import { connectReviewDB } from "../../../lib/mongoose_review";
+// --- FIX: Changed to a default import (no curly braces) ---
+import connectReviewDB from "../../../lib/mongoose_review"; 
 import siteReviewSchema from "../../../(models)/SiteReview";
-import mongoose from "mongoose";
+import { NextResponse } from 'next/server';
 
-const { Types } = mongoose;
 
-export async function GET(req, { params }) {
+export async function PUT(request, { params }) {
+  const { id } = params;
+  const body = await request.json();
   try {
-    const db = await connectReviewDB();
-    const SiteReview = db.model("SiteReview", siteReviewSchema);
-
-    const { id } = params;
-    if (!Types.ObjectId.isValid(id)) {
-      return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
+    await connectReviewDB();
+    const updatedReview = await siteReviewSchema.findByIdAndUpdate(id, body, { new: true });
+    
+    if (!updatedReview) {
+      return NextResponse.json({ message: 'Review not found' }, { status: 404 });
     }
-
-    const review = await SiteReview.findById(id);
-    if (!review) {
-      return new Response(JSON.stringify({ error: "Review not found" }), { status: 404 });
-    }
-
-    return new Response(JSON.stringify(review), { status: 200 });
-  } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+    
+    return NextResponse.json({ message: 'Review updated!', review: updatedReview }, { status: 200 });
+  } catch (error) {
+    console.error("PUT Error:", error);
+    return NextResponse.json({ message: 'Error updating review' }, { status: 500 });
   }
 }
 
-export async function PUT(req, { params }) {
+export async function DELETE(request, { params }) {
+  const { id } = params;
   try {
-    const db = await connectReviewDB();
-    const SiteReview = db.model("SiteReview", siteReviewSchema);
-
-    const { id } = params;
-    if (!Types.ObjectId.isValid(id)) {
-      return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
+    await connectReviewDB();
+    const deletedReview = await siteReviewSchema.findByIdAndDelete(id);
+    
+    if (!deletedReview) {
+      return NextResponse.json({ message: 'Review not found' }, { status: 404 });
     }
-
-    const body = await req.json();
-    const updated = await SiteReview.findByIdAndUpdate(
-      id,
-      {
-        comment: body.comment,
-        service: body.service,
-        recommend: body.recommend,
-        rating: body.rating,
-      },
-      { new: true }
-    );
-
-    if (!updated) {
-      return new Response(JSON.stringify({ error: "Review not found" }), { status: 404 });
-    }
-
-    return new Response(JSON.stringify({ success: true, review: updated }), { status: 200 });
-  } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
-  }
-}
-
-export async function DELETE(req, { params }) {
-  try {
-    const db = await connectReviewDB();
-    const SiteReview = db.model("SiteReview", siteReviewSchema);
-
-    const { id } = params;
-    if (!Types.ObjectId.isValid(id)) {
-      return new Response(JSON.stringify({ error: "Invalid ID" }), { status: 400 });
-    }
-
-    const deleted = await SiteReview.findByIdAndDelete(id);
-    if (!deleted) {
-      return new Response(JSON.stringify({ error: "Review not found" }), { status: 404 });
-    }
-
-    return new Response(JSON.stringify({ success: true, deleted }));
-  } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+    
+    return NextResponse.json({ message: 'Review deleted successfully!' }, { status: 200 });
+  } catch (error) {
+    console.error("DELETE Error:", error);
+    return NextResponse.json({ message: 'Error deleting review' }, { status: 500 });
   }
 }

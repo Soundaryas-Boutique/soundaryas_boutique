@@ -1,19 +1,29 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-let reviewConn = null;
+// --- FIX: Use the standard MONGODB_URI variable ---
+const MONGODB_URI = process.env.MONGODB_URI;
 
-export async function connectReviewDB() {
-  if (reviewConn) return reviewConn;
-
-  try {
-    console.log("Connecting to MongoDB (reviews)...");
-    reviewConn = await mongoose.createConnection(process.env.MONGODB_URI3, {
-      dbName: "boutique",
-    });
-    console.log("✅ Reviews DB connected!");
-    return reviewConn;
-  } catch (err) {
-    console.error("❌ Reviews DB connection error:", err);
-    throw err;
-  }
+if (!MONGODB_URI) {
+  throw new Error(
+    'Please define the MONGODB_URI environment variable inside .env.local'
+  );
 }
+
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+async function connectToDatabase() {
+  if (cached.conn) {
+    return cached.conn;
+  }
+  if (!cached.promise) {
+    const opts = { bufferCommands: false };
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => mongoose);
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
+}
+
+export default connectToDatabase;
