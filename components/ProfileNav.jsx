@@ -31,7 +31,7 @@ const ProfileNav = () => {
         {isAdmin && (
           <div className="mt-6">
             <Link
-              href="/admin/dashboard"
+              href="/admin/products"
               className="block w-full text-center bg-gray-900 text-white py-2 px-4 rounded hover:bg-gray-700 transition"
             >
               Admin Dashboard
