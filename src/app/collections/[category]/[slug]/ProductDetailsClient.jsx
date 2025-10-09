@@ -1,10 +1,11 @@
 "use client";
-import { useCart } from "@/app/context/CartContext";
-import Image from "next/image";
-import { useState } from "react";
-import { Star, X, MessageSquare, Send, Feather } from 'lucide-react';
 
-// --- MOCK DATA FOR REVIEWS ---
+import { useState } from "react";
+import { useCart } from "@/app/context/CartContext";
+import { useWishlist } from "@/app/context/WishlistContext"; // Import the WishlistContext
+import Image from "next/image";
+import { Star, X, MessageSquare, Send, Feather, Heart } from 'lucide-react';
+
 const mockReviews = [
   {
     id: 1,
@@ -22,8 +23,6 @@ const mockReviews = [
   },
 ];
 
-// --- HELPER COMPONENTS FOR THE REVIEW SECTION (UI IMPROVED) ---
-
 const StarRatingDisplay = ({ rating, size = 20 }) => (
   <div className="flex items-center">
     {[...Array(5)].map((_, i) => (
@@ -32,7 +31,6 @@ const StarRatingDisplay = ({ rating, size = 20 }) => (
   </div>
 );
 
-// UI IMPROVEMENT: The form has slightly better spacing and button interaction.
 function ProductReviewForm({ isOpen, onClose, product }) {
   if (!isOpen) return null;
 
@@ -104,7 +102,6 @@ function ProductReviewForm({ isOpen, onClose, product }) {
   );
 }
 
-// UI IMPROVEMENT: This entire section has been redesigned for a cleaner, more modern look.
 function ReviewsSection({ reviews, onWriteReviewClick }) {
   const averageRating = reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) : 0;
 
@@ -160,11 +157,11 @@ function ReviewsSection({ reviews, onWriteReviewClick }) {
   );
 }
 
-
 export default function ProductDetailsClient({ saree }) {
   saree.reviews = mockReviews;
   
   const { addToCart } = useCart();
+  const { addToWishlist } = useWishlist(); // Access Wishlist Context
   const [showToast, setShowToast] = useState(false);
   const [showBuyToast, setShowBuyToast] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false); 
@@ -182,6 +179,11 @@ export default function ProductDetailsClient({ saree }) {
     console.log("Redirecting to checkout with:", saree.productName);
     setShowBuyToast(true);
     setTimeout(() => setShowBuyToast(false), 2000);
+  };
+
+  const handleAddToWishlist = () => {
+    addToWishlist(saree); // Add product to wishlist
+    alert("Added to Wishlist!"); // Confirm addition to wishlist
   };
 
   if (!saree) return null;
@@ -227,6 +229,12 @@ export default function ProductDetailsClient({ saree }) {
             </div>
           </div>
         </div>
+        {/* Add to Wishlist (Heart Icon) */}
+        <div className="flex justify-center mt-4">
+          <button onClick={handleAddToWishlist} className="text-red-500 hover:text-red-700 transition-all duration-200">
+            <Heart size={32} />
+          </button>
+        </div>
         <ReviewsSection 
           reviews={saree.reviews || []} 
           onWriteReviewClick={() => setShowReviewForm(true)}
@@ -237,27 +245,6 @@ export default function ProductDetailsClient({ saree }) {
         onClose={() => setShowReviewForm(false)} 
         product={saree}
       />
-      <style jsx global>{`
-        .form-input {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #d1d5db;
-          border-radius: 0.5rem;
-          transition: all 0.2s;
-        }
-        .form-input:focus {
-          outline: none;
-          box-shadow: 0 0 0 3px rgba(178, 34, 34, 0.3);
-          border-color: #B22222;
-        }
-        @keyframes fadeInOut {
-          0%, 100% { opacity: 0; transform: translateY(-20px); }
-          10%, 90% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInOut {
-          animation: fadeInOut 2s ease-in-out forwards;
-        }
-      `}</style>
     </>
   );
 }

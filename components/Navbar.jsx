@@ -115,7 +115,12 @@ return (
           </button>
         )}
 
-        <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+        <Link
+          href={status === "authenticated" ? "/Wishlist" : "/Denied"}
+          className="relative"
+        >
+          <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+        </Link>
 
         {/* ✅ Newsletter Popup Trigger */}
         <button onClick={() => setIsPopupOpen(true)} className="hidden lg:block">
