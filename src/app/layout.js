@@ -3,6 +3,7 @@ import "./globals.css";
 
 import AuthProvider from "../../components/AuthProvider";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context//WishlistContext";
 import NavbarWrapper from "../../components/NavbarWrapper";
 import IntroAnimation from "../../components/IntroAnimation";
 
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <AuthProvider>
+        <WishlistProvider>
         <CartProvider>
           <body className={` min-h-screen bg-white text-black font-main`}>
             <IntroAnimation />
@@ -24,6 +26,7 @@ export default function RootLayout({ children }) {
             </div>
           </body>
         </CartProvider>
+        </WishlistProvider>
       </AuthProvider>
     </html>
   );
