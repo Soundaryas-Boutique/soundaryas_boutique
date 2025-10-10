@@ -17,6 +17,7 @@ const navItems = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: FiHome },
   { name: 'Products', href: '/admin/products', icon: FiPackage },
   { name: 'Orders', href: '/admin/orders', icon: FiShoppingBag },
+  { name: 'Messages', href: '/admin/messages', icon: FiMessageSquare },
   { name: 'Subscribers', href: '/admin/subscribers', icon: FiMail },
   { name: 'Promotions', href: '/admin/email-marketing', icon: FiBell },
   { name: 'Feedbacks', href: '/admin/feedback', icon: FiMessageSquare },
