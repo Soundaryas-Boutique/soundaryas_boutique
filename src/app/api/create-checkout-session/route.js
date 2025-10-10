@@ -3,10 +3,18 @@ import Stripe from "stripe";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export async function POST(req) {
   const { items } = await req.json();
+
+  // 🐛 FIX: Check for the secret key before instantiating Stripe
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error("Stripe secret key is missing.");
+    return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
+  }
+
+  // ✅ FIX: Instantiate the Stripe client inside the function
+  // This prevents it from being executed during the build process
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const session = await getServerSession(authOptions);
   if (!session) {
