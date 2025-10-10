@@ -24,7 +24,7 @@ export default function Signin() {
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       if (session.user.role === "Admin") {
-        router.push("/admin/dashboard");
+        router.push("/admin/products");
       } else {
         router.push("/");
       }
