@@ -129,7 +129,7 @@ export default function OrdersDashboard() {
               <XAxis dataKey="name" stroke="#8B0000" />
               <YAxis stroke="#8B0000" />
               <Tooltip />
-              <Bar dataKey="quantity" fill="#A52A2A" />
+              <Bar dataKey="quantity" fill="#FFD700" />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -1,4 +1,5 @@
 "use client";
+
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -65,10 +66,11 @@ export default function CartPage() {
         Your Shopping Cart
       </h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Cart Items List */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
             <div
-              key={item._id}
+              key={`${item._id}_${item.selectedColor}`} // Use ID and Color as key
               className="flex items-center border rounded-lg p-4 shadow-sm"
             >
               <Image
@@ -86,6 +88,10 @@ export default function CartPage() {
                 <h2 className="text-xl font-semibold text-gray-800">
                   {item.productName}
                 </h2>
+                {/* ✅ Display the selected color */}
+                {item.selectedColor && (
+                  <p className="text-sm text-gray-500 mt-1">Color: {item.selectedColor}</p>
+                )}
                 <p className="text-gray-600">₹{item.price.toFixed(2)}</p>
               </div>
               <div className="flex items-center gap-4">
@@ -94,7 +100,8 @@ export default function CartPage() {
                   min="1"
                   value={item.quantity}
                   onChange={(e) =>
-                    updateQuantity(item._id, parseInt(e.target.value))
+                    // ✅ Pass the selectedColor to updateQuantity
+                    updateQuantity(item._id, item.selectedColor, parseInt(e.target.value))
                   }
                   className="w-16 text-center border rounded-md p-1"
                 />
@@ -102,7 +109,8 @@ export default function CartPage() {
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </p>
                 <button
-                  onClick={() => removeFromCart(item._id)}
+                  // ✅ Pass the selectedColor to removeFromCart
+                  onClick={() => removeFromCart(item._id, item.selectedColor)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >
                   <FaTrashAlt size={20} />
@@ -112,6 +120,7 @@ export default function CartPage() {
           ))}
         </div>
 
+        {/* Cart Summary */}
         <div className="lg:col-span-1 border rounded-lg p-6 shadow-md bg-gray-50 h-fit">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Cart Summary

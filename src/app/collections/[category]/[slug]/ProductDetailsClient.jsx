@@ -1,10 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
-import { useWishlist } from "@/app/context/WishlistContext"; // Import the WishlistContext
+import { useWishlist } from "@/app/context/WishlistContext";
 import Image from "next/image";
-import { Star, X, MessageSquare, Send, Feather, Heart } from 'lucide-react';
+import { Star, X, MessageSquare, Send, Feather, Heart, Check } from 'lucide-react'; // ✅ Imported FiCheck
 
 const mockReviews = [
   {
@@ -161,16 +160,27 @@ export default function ProductDetailsClient({ saree }) {
   saree.reviews = mockReviews;
   
   const { addToCart } = useCart();
-  const { addToWishlist } = useWishlist(); // Access Wishlist Context
+  const { addToWishlist } = useWishlist(); 
   const [showToast, setShowToast] = useState(false);
   const [showBuyToast, setShowBuyToast] = useState(false);
-  const [showReviewForm, setShowReviewForm] = useState(false); 
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(saree.colors[0] || null); // ✅ New state for color selection
+
 
   const defaultImage = saree.images && saree.images.length > 0 ? saree.images[0]?.url : "/no-image.jpg";
   const [mainImage, setMainImage] = useState(defaultImage);
 
   const handleAddToCart = () => {
-    addToCart(saree);
+    if (!selectedColor) {
+      alert("Please select a color before adding to cart.");
+      return;
+    }
+    const productWithVariant = { 
+      ...saree, 
+      selectedColor: selectedColor 
+    };
+
+    addToCart(productWithVariant);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 2000);
   };
@@ -182,11 +192,25 @@ export default function ProductDetailsClient({ saree }) {
   };
 
   const handleAddToWishlist = () => {
-    addToWishlist(saree); // Add product to wishlist
-    alert("Added to Wishlist!"); // Confirm addition to wishlist
+    addToWishlist(saree);
+    alert("Added to Wishlist!");
   };
 
   if (!saree) return null;
+
+  const getColorClass = (colorName) => {
+    switch (colorName.toLowerCase()) {
+      case 'red': return 'bg-red-500';
+      case 'blue': return 'bg-blue-500';
+      case 'green': return 'bg-green-500';
+      case 'yellow': return 'bg-yellow-500';
+      case 'black': return 'bg-gray-900';
+      case 'white': return 'bg-gray-100 border border-gray-400';
+      case 'pink': return 'bg-pink-400';
+      case 'purple': return 'bg-purple-600';
+      default: return 'bg-gray-300';
+    }
+  };
 
   return (
     <>
@@ -200,7 +224,7 @@ export default function ProductDetailsClient({ saree }) {
               <Image src={mainImage} alt={saree.productName} fill sizes="(max-width: 768px) 100vw, 500px" className="object-cover transition-transform duration-300 hover:scale-105" />
             </div>
             <div className="flex gap-3 overflow-x-auto w-full max-w-[550px] p-2">
-              {saree.images && saree.images.map((img, index) => (
+              {saree.images && saree.images.length > 0 && saree.images.map((img, index) => (
                 <div key={index} className={`relative w-24 h-24 flex-shrink-0 rounded-lg border-2 cursor-pointer transition-all duration-200 ${mainImage === img.url ? 'border-[#B22222] scale-[1.02] shadow-md' : 'border-gray-300 hover:border-gray-500'}`} onClick={() => setMainImage(img.url)}>
                   <Image src={img.url} alt={img.alt || saree.productName} fill sizes="96px" className="object-cover rounded-md" />
                 </div>
@@ -212,20 +236,47 @@ export default function ProductDetailsClient({ saree }) {
             <h1 className="text-5xl font-extrabold text-[#B22222] mb-4 leading-tight">{saree.productName}</h1>
             <p className="text-gray-700 mb-6 text-lg border-b pb-6">{saree.description}</p>
             <div className="flex items-baseline gap-4 mb-8">
-              <span className="text-4xl font-bold text-gray-900">₹{saree.price.toFixed(2)}</span>
-              {saree.discountPrice && <span className="text-2xl text-red-500 line-through opacity-70">₹{saree.discountPrice.toFixed(2)}</span>}
+              <span className="text-4xl font-bold text-gray-900">₹{saree.discountPrice.toFixed(2)}</span>
+              { saree.price && <span className="text-2xl text-red-500 line-through opacity-70">₹{saree.price.toFixed(2)}</span>}
             </div>
-            <div className="space-y-3 mb-8 text-base text-gray-700 p-4 bg-gray-50 rounded-lg">
+            {saree.colors && saree.colors.length > 0 && (
+            <div className="mb-6">
+              <p className="text-lg font-semibold text-gray-800 mb-2">
+                Color: <span className="font-normal text-[#B22222]">{selectedColor || 'Please select'}</span>
+              </p>
+              <div className="flex gap-3">
+                {saree.colors.map((colorName, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedColor(colorName)}
+                    className={`w-10 h-10 rounded-full shadow-md transition-all duration-150 relative 
+                      ${getColorClass(colorName)}
+                      ${selectedColor === colorName ? 'ring-4 ring-offset-2 ring-[#B22222]' : 'hover:ring-2 hover:ring-gray-400'}
+                    `}
+                    title={colorName}
+                  >
+                    {selectedColor === colorName && (
+                      <Check className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${colorName.toLowerCase() === 'white' ? 'text-gray-800' : 'text-white'}`} size={20} />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+            )}
+            <div className="space-y-2 mb-6 text-base text-gray-700 p-4 bg-gray-50 rounded-lg">
+             
+   
               <p><span className="font-semibold text-[#B22222]">Material:</span> {saree.material}</p>
-              {saree.sizes && <p><span className="font-semibold text-[#B22222]">Sizes:</span> {saree.sizes.join(", ")}</p>}
-              {saree.colors && <p><span className="font-semibold text-[#B22222]">Colors:</span> {saree.colors.join(", ")}</p>}
+              {saree.sizes && (
+                <p><span className="font-semibold text-[#B22222]">Sizes:</span>{" "}{saree.sizes.join(", ")}</p>
+              )}
               <p className="pt-2 text-sm text-gray-500 border-t mt-4">
                 <span className="font-medium">Availability:</span> <span className={`font-bold ${saree.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>{saree.stock > 0 ? `${saree.stock} in Stock` : 'Out of Stock'}</span>
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-8">
-              <button onClick={handleAddToCart} disabled={saree.stock === 0} className="flex-1 bg-[#B22222] text-white font-extrabold text-lg py-3 px-8 rounded-full transition-all duration-300 shadow-lg shadow-[#B22222]/50 hover:bg-[#8B0000] disabled:bg-gray-400 disabled:shadow-none">Add to Cart</button>
-              <button onClick={handleBuyNow} disabled={saree.stock === 0} className="flex-1 bg-white text-[#B22222] font-extrabold text-lg py-3 px-8 rounded-full border-2 border-[#B22222] transition-all duration-300 shadow-md hover:bg-[#FEECEB] disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-300 disabled:shadow-none">Buy Now</button>
+              <button onClick={handleAddToCart} disabled={saree.stock === 0 || !selectedColor} className="flex-1 bg-[#B22222] text-white font-extrabold text-lg py-3 px-8 rounded-full transition-all duration-300 shadow-lg shadow-[#B22222]/50 hover:bg-[#8B0000] disabled:bg-gray-400 disabled:shadow-none">Add to Cart</button>
+              <button onClick={handleBuyNow} disabled={saree.stock === 0 || !selectedColor} className="flex-1 bg-white text-[#B22222] font-extrabold text-lg py-3 px-8 rounded-full border-2 border-[#B22222] transition-all duration-300 shadow-md hover:bg-[#FEECEB] disabled:bg-gray-100 disabled:text-gray-500 disabled:border-gray-300 disabled:shadow-none">Buy Now</button>
             </div>
           </div>
         </div>
