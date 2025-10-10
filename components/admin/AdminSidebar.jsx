@@ -14,7 +14,7 @@ import {
 } from 'react-icons/fi';
 
 const navItems = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: FiHome },
+
   { name: 'Products', href: '/admin/products', icon: FiPackage },
   { name: 'Orders', href: '/admin/orders', icon: FiShoppingBag },
   { name: 'Messages', href: '/admin/messages', icon: FiMessageSquare },
