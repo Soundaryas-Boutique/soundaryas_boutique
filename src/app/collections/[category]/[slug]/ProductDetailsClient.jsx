@@ -256,7 +256,7 @@ export default function ProductDetailsClient({ saree }) {
                     title={colorName}
                   >
                     {selectedColor === colorName && (
-                      <Check className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${colorName.toLowerCase() === 'white' ? 'text-gray-800' : 'text-white'}`} size={20} />
+                      <sCheck className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ${colorName.toLowerCase() === 'white' ? 'text-gray-800' : 'text-white'}`} size={20} />
                     )}
                   </button>
                 ))}
@@ -266,10 +266,7 @@ export default function ProductDetailsClient({ saree }) {
             <div className="space-y-2 mb-6 text-base text-gray-700 p-4 bg-gray-50 rounded-lg">
              
    
-              <p><span className="font-semibold text-[#B22222]">Material:</span> {saree.material}</p>
-              {saree.sizes && (
-                <p><span className="font-semibold text-[#B22222]">Sizes:</span>{" "}{saree.sizes.join(", ")}</p>
-              )}
+            
               <p className="pt-2 text-sm text-gray-500 border-t mt-4">
                 <span className="font-medium">Availability:</span> <span className={`font-bold ${saree.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>{saree.stock > 0 ? `${saree.stock} in Stock` : 'Out of Stock'}</span>
               </p>

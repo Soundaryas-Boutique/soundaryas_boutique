@@ -37,7 +37,7 @@ export async function POST(req) {
     await user.save();
 
     // ✅ Step 4: Build reset URL safely
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXTAUTH_URL;
     const resetUrl = `${baseUrl}/reset-password/${token}`;
 
     // ✅ Step 5: Nodemailer setup
