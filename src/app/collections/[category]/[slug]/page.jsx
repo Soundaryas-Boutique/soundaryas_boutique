@@ -1,4 +1,4 @@
-import { connectDB } from "@/app/lib/mongoose2";
+import { connectDB } from "@/app/lib/mongoose";
 import Saree from "@/app/(models)/Saree";
 import ProductDetailsClient from "./ProductDetailsClient";
 

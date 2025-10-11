@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose2";
+import { connectDB } from "@/app/lib/mongoose";
 import Order from "@/app/(models)/Order";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";

@@ -1,5 +1,5 @@
 // --- FIX: Changed to a default import (no curly braces) ---
-import connectReviewDB from "../../lib/mongoose_review"; 
+import connectReviewDB from "../../lib/mongoose"; 
 import siteReviewSchema from "../../(models)/SiteReview";
 import { NextResponse } from 'next/server';
 

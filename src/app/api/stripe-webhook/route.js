@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { connectDB } from "@/app/lib/mongoose2";
+import { connectDB } from "@/app/lib/mongoose";
 import Order from "@/app/(models)/Order";
 import User from "@/app/(models)/User";
 import { headers } from "next/headers";

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose2";
+import { connectDB } from "@/app/lib/mongoose";
 import Contact from "@/app/(models)/Contact";
 
 // GET → fetch all messages
