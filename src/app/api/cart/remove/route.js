@@ -12,39 +12,31 @@ const getUserId = async () => {
     return { userId: session.user.id };
 };
 
-// POST: Update the quantity of a specific item (or remove it if quantity <= 0)
+// POST: Remove a single item from the cart
 export async function POST(req) {
   const { userId, error } = await getUserId();
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
     await connectDB();
-    const { productId, selectedColor, newQuantity } = await req.json();
+    const { productId, selectedColor } = await req.json();
 
     const cart = await Cart.findOne({ userId });
     if (!cart) {
       return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
     }
 
-    const itemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId && item.selectedColor === selectedColor
+    cart.items = cart.items.filter(
+      item => !(item.productId.toString() === productId && item.selectedColor === selectedColor)
     );
 
-    if (itemIndex > -1) {
-      if (newQuantity <= 0) {
-        cart.items.splice(itemIndex, 1);
-      } else {
-        cart.items[itemIndex].quantity = newQuantity;
-      }
-    }
-
     await cart.save();
-    
+
     // Re-fetch and populate the cart to get the latest data
     const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
     return NextResponse.json(JSON.parse(JSON.stringify(updatedCart)), { status: 200 });
   } catch (err) {
-    console.error('Error updating cart quantity:', err);
-    return NextResponse.json({ error: 'Failed to update cart quantity' }, { status: 500 });
+    console.error('Error removing from cart:', err);
+    return NextResponse.json({ error: 'Failed to remove from cart' }, { status: 500 });
   }
 }

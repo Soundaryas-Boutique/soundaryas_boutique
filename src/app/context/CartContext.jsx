@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 const CartContext = createContext();
@@ -9,33 +9,34 @@ export const CartProvider = ({ children }) => {
   const { data: session, status } = useSession();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const debounceTimeoutRef = useRef(null);
 
-  useEffect(() => {
-    const fetchCart = async () => {
-      if (status === 'authenticated') {
-        try {
-          const res = await fetch('/api/cart');
-          if (res.ok) {
-            const data = await res.json();
-            setCartItems(data.items);
-          } else {
-            console.error('Failed to fetch cart:', res.statusText);
-            setCartItems([]);
-          }
-        } catch (error) {
-          console.error('Failed to fetch cart:', error);
+  const fetchCart = useCallback(async () => {
+    if (status === 'authenticated') {
+      try {
+        const res = await fetch('/api/cart');
+        if (res.ok) {
+          const data = await res.json();
+          setCartItems(data.items);
+        } else {
+          console.error('Failed to fetch cart:', res.statusText);
           setCartItems([]);
-        } finally {
-          setLoading(false);
         }
-      } else if (status === 'unauthenticated') {
+      } catch (error) {
+        console.error('Failed to fetch cart:', error);
         setCartItems([]);
+      } finally {
         setLoading(false);
       }
-    };
-
-    fetchCart();
+    } else if (status === 'unauthenticated') {
+      setCartItems([]);
+      setLoading(false);
+    }
   }, [status]);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
 
   const addToCart = async (product) => {
     if (status !== 'authenticated') {
@@ -43,49 +44,86 @@ export const CartProvider = ({ children }) => {
       return false;
     }
 
-    try {
-      const res = await fetch('/api/cart', {
+    // Update locally first for instant feedback
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(
+        item => item.productId === product._id && item.selectedColor === product.selectedColor
+      );
+      if (existingItem) {
+        return prevItems.map(item => 
+          item.productId === product._id && item.selectedColor === product.selectedColor
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...prevItems, { ...product, quantity: 1 }];
+      }
+    });
+
+    // Then, send the update to the server (you would create a separate API for this)
+    await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        productId: product._id,
+        productName: product.productName,
+        price: product.discountPrice || product.price,
+        quantity: 1, // API handles the increment
+        selectedColor: product.selectedColor || null,
+        images: product.images
+      }),
+    });
+    return true; // Assume success for fast UI
+  };
+
+  const updateQuantity = (productId, selectedColor, newQuantity) => {
+    if (status !== 'authenticated') return;
+
+    // Update the state locally for instant UI changes
+    setCartItems(prevItems => {
+      const updatedItems = prevItems.map(item =>
+        item.productId === productId && item.selectedColor === selectedColor
+          ? { ...item, quantity: newQuantity }
+          : item
+      );
+      return updatedItems.filter(item => item.quantity > 0);
+    });
+    
+    // Use debouncing to send the update to the server
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+    debounceTimeoutRef.current = setTimeout(() => {
+      fetch('/api/cart/update-quantity', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId: product._id,
-          productName: product.productName,
-          price: product.discountPrice || product.price,
-          quantity: 1,
-          selectedColor: product.selectedColor || null,
-        }),
+        body: JSON.stringify({ productId, selectedColor, newQuantity }),
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        setCartItems(data.items);
-        return true;
-      } else {
-        console.error('Failed to add to cart:', res.statusText);
-        return false;
-      }
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-      return false;
-    }
+    }, 500); // Wait 500ms before sending the update
   };
+  
+  const removeFromCart = (productId, selectedColor) => {
+    if (status !== 'authenticated') return;
 
-  const removeFromCart = async (productId, selectedColor) => {
-    // This function now needs to be refactored to call an API route
-    // For now, we will leave it as a placeholder to avoid breaking the app
-    console.log('Remove from cart is not yet implemented with API calls.');
-  };
+    setCartItems(prevItems => prevItems.filter(item => !(item.productId === productId && item.selectedColor === selectedColor)));
 
-  const updateQuantity = async (productId, selectedColor, newQuantity) => {
-    // This function now needs to be refactored to call an API route
-    console.log('Update quantity is not yet implemented with API calls.');
+    fetch('/api/cart/remove', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, selectedColor }),
+    });
   };
 
   const clearCart = async () => {
-    // This function now needs to be refactored to call an API route
-    console.log('Clear cart is not yet implemented with API calls.');
+    if (status !== 'authenticated') return;
+    try {
+      await fetch('/api/cart/clear', { method: 'POST' });
+      setCartItems([]);
+    } catch (error) {
+      console.error('Failed to clear cart:', error);
+    }
   };
-
+  
   const cartTotal = cartItems.reduce(
     (total, item) => total + (item.price) * item.quantity,
     0

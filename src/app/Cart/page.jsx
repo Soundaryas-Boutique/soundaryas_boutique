@@ -67,9 +67,6 @@ export default function CartPage() {
       </div>
     );
   }
-  {cartItems.map((item)=>(
-    console.log("from cart:",item)
-  ))}
 
   return (
     <div className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
@@ -77,11 +74,10 @@ export default function CartPage() {
         Your Shopping Cart
       </h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart Items List */}
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
             <div
-              key={`${item._id}_${item.selectedColor}`}
+              key={`${item.productId}_${item.selectedColor}`}
               className="flex items-center border rounded-lg p-4 shadow-sm"
             >
               <div className="flex-shrink-0 w-24 h-24 mr-4 relative">
@@ -114,7 +110,7 @@ export default function CartPage() {
                   min="1"
                   value={item.quantity}
                   onChange={(e) =>
-                    updateQuantity(item._id, item.selectedColor, parseInt(e.target.value))
+                    updateQuantity(item.productId, item.selectedColor, parseInt(e.target.value))
                   }
                   className="w-16 text-center border rounded-md p-1"
                 />
@@ -122,7 +118,7 @@ export default function CartPage() {
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </p>
                 <button
-                  onClick={() => removeFromCart(item._id, item.selectedColor)}
+                  onClick={() => removeFromCart(item.productId, item.selectedColor)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >
                   <FaTrashAlt size={20} />
@@ -132,7 +128,6 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Cart Summary */}
         <div className="lg:col-span-1 border rounded-lg p-6 shadow-md bg-gray-50 h-fit">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Cart Summary
