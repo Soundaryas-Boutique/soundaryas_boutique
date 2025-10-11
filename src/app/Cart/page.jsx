@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 
 export default function CartPage() {
   const { data: session } = useSession();
-  const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, cartTotal, loading } = useCart();
 
   const handleCheckout = async () => {
     if (!session) {
@@ -44,6 +44,14 @@ export default function CartPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
+        <p className="text-2xl text-gray-600 font-semibold mb-4">Loading your cart...</p>
+      </div>
+    );
+  }
+
   if (cartItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
@@ -59,6 +67,9 @@ export default function CartPage() {
       </div>
     );
   }
+  {cartItems.map((item)=>(
+    console.log("from cart:",item)
+  ))}
 
   return (
     <div className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
@@ -70,25 +81,28 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-4">
           {cartItems.map((item) => (
             <div
-              key={`${item._id}_${item.selectedColor}`} // Use ID and Color as key
+              key={`${item._id}_${item.selectedColor}`}
               className="flex items-center border rounded-lg p-4 shadow-sm"
             >
-              <Image
-                src={
-                  item.images && item.images.length > 0
-                    ? item.images[0].url
-                    : "/no-image.jpg"
-                }
-                alt={item.productName}
-                width={120}
-                height={120}
-                className="rounded-lg mr-4"
-              />
+              <div className="flex-shrink-0 w-24 h-24 mr-4 relative">
+                {item.images && item.images.length > 0 ? (
+                  <Image
+                    src={item.images[0].url}
+                    alt={item.productName}
+                    fill
+                    sizes="96px"
+                    className="rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
+                    No Image
+                  </div>
+                )}
+              </div>
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-gray-800">
                   {item.productName}
                 </h2>
-                {/* ✅ Display the selected color */}
                 {item.selectedColor && (
                   <p className="text-sm text-gray-500 mt-1">Color: {item.selectedColor}</p>
                 )}
@@ -100,7 +114,6 @@ export default function CartPage() {
                   min="1"
                   value={item.quantity}
                   onChange={(e) =>
-                    // ✅ Pass the selectedColor to updateQuantity
                     updateQuantity(item._id, item.selectedColor, parseInt(e.target.value))
                   }
                   className="w-16 text-center border rounded-md p-1"
@@ -109,7 +122,6 @@ export default function CartPage() {
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </p>
                 <button
-                  // ✅ Pass the selectedColor to removeFromCart
                   onClick={() => removeFromCart(item._id, item.selectedColor)}
                   className="text-gray-400 hover:text-red-500 transition-colors"
                 >

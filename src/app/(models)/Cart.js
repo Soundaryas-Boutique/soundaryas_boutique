@@ -8,7 +8,7 @@ const cartItemSchema = new Schema({
   },
   productName: { type: String, required: true },
   price: { type: Number, required: true },
-  selectedColor: { type: String }, // To distinguish variants
+  selectedColor: { type: String },
   quantity: { type: Number, required: true, min: 1 },
 });
 
@@ -18,7 +18,7 @@ const cartSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      unique: true, // Ensures only one cart per user
+      unique: true,
     },
     items: [cartItemSchema],
   },

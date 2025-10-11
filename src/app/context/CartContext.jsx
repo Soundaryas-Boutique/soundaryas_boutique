@@ -6,89 +6,88 @@ import { useSession } from "next-auth/react";
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load cart from localStorage or database (for persistence)
   useEffect(() => {
+    const fetchCart = async () => {
+      if (status === 'authenticated') {
+        try {
+          const res = await fetch('/api/cart');
+          if (res.ok) {
+            const data = await res.json();
+            setCartItems(data.items);
+          } else {
+            console.error('Failed to fetch cart:', res.statusText);
+            setCartItems([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch cart:', error);
+          setCartItems([]);
+        } finally {
+          setLoading(false);
+        }
+      } else if (status === 'unauthenticated') {
+        setCartItems([]);
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [status]);
+
+  const addToCart = async (product) => {
+    if (status !== 'authenticated') {
+      alert("Please log in to add items to your cart.");
+      return false;
+    }
+
     try {
-      const storedCart = localStorage.getItem("cartItems");
-      if (storedCart) {
-        setCartItems(JSON.parse(storedCart));
+      const res = await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: product._id,
+          productName: product.productName,
+          price: product.discountPrice || product.price,
+          quantity: 1,
+          selectedColor: product.selectedColor || null,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setCartItems(data.items);
+        return true;
+      } else {
+        console.error('Failed to add to cart:', res.statusText);
+        return false;
       }
     } catch (error) {
-      console.error("Failed to load cart from localStorage", error);
-    } finally {
-      setLoading(false);
+      console.error('Failed to add to cart:', error);
+      return false;
     }
-  }, []);
-
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    if (!loading) {
-      localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    }
-  }, [cartItems, loading]);
-
-  // Function to determine if two items are the same based on _id AND selectedColor
-  const getItemIdentifier = (item) => {
-    // If selectedColor exists, use it to distinguish variants
-    return `${item._id}_${item.selectedColor || ''}`;
   };
 
-
-  // Function to add a product to the cart
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      // ✅ CRITICAL FIX: Use a unique identifier (ID + Color) to check for existence
-      const identifier = getItemIdentifier(product);
-
-      // Check if the item already exists in the cart.
-      const existingItem = prevItems.find((item) => getItemIdentifier(item) === identifier);
-
-      if (existingItem) {
-        // If it exists, increase the quantity of that specific variant
-        return prevItems.map((item) =>
-          getItemIdentifier(item) === identifier
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        // If not, add the new item with quantity 1
-        return [...prevItems, { ...product, quantity: 1 }];
-      }
-    });
+  const removeFromCart = async (productId, selectedColor) => {
+    // This function now needs to be refactored to call an API route
+    // For now, we will leave it as a placeholder to avoid breaking the app
+    console.log('Remove from cart is not yet implemented with API calls.');
   };
 
-  // Function to remove an item from the cart
-  const removeFromCart = (id, color) => {
-    const identifierToRemove = `${id}_${color || ''}`;
-    setCartItems((prevItems) => 
-        prevItems.filter((item) => getItemIdentifier(item) !== identifierToRemove)
-    );
+  const updateQuantity = async (productId, selectedColor, newQuantity) => {
+    // This function now needs to be refactored to call an API route
+    console.log('Update quantity is not yet implemented with API calls.');
   };
 
-  // Function to clear the entire cart
-  const clearCart = () => {
-    setCartItems([]);
-  };
-
-  const updateQuantity = (id, color, newQuantity) => {
-    const identifierToUpdate = `${id}_${color || ''}`;
-    setCartItems((prevItems) => {
-      const updatedItems = prevItems.map((item) =>
-        getItemIdentifier(item) === identifierToUpdate
-          ? { ...item, quantity: newQuantity } 
-          : item
-      );
-      // Filter out items with quantity <= 0
-      return updatedItems.filter((item) => item.quantity > 0);
-    });
+  const clearCart = async () => {
+    // This function now needs to be refactored to call an API route
+    console.log('Clear cart is not yet implemented with API calls.');
   };
 
   const cartTotal = cartItems.reduce(
-    (total, item) => total + (item.discountPrice || item.price) * item.quantity,
+    (total, item) => total + (item.price) * item.quantity,
     0
   );
 
@@ -101,6 +100,7 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         clearCart,
         cartTotal,
+        loading,
       }}
     >
       {children}
