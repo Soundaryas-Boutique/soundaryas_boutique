@@ -3,7 +3,7 @@ import Saree from "@/app/(models)/Saree";
 import ProductsListClient from "../../../../components/ProductsListClient";
 
 export default async function ProductsPage({ params }) {
-  const { category } = params;
+  const { category } = await params;
 
   try {
     await connectDB();
