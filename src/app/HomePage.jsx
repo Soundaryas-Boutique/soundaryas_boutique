@@ -1,10 +1,13 @@
-"use client";
-
 import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
 import SareeCard from "../../components/SareeCard";
+import { getBestSellers, getNewArrivals } from "@/app/lib/sarees";
 
-export default function HomePage({ sarees }) {
+export default async function HomePage() {
+  // Fetch data server-side
+  const bestSellers = await getBestSellers(5);
+  const newArrivals = await getNewArrivals(5);
+
   return (
     <main>
       <SlidingBanner />
@@ -17,29 +20,22 @@ export default function HomePage({ sarees }) {
 
         {/* Desktop grid */}
         <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
-          {sarees.map((saree) => (
+          {bestSellers.map((saree) => (
             <SareeCard key={saree._id} saree={saree} variant="desktop" />
           ))}
         </div>
 
         {/* Mobile horizontal scroll */}
         <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
-          {sarees.map((saree) => (
+          {bestSellers.map((saree) => (
             <SareeCard key={saree._id} saree={saree} variant="mobile" />
           ))}
         </div>
 
-        {/* View All button */}
         <div className="text-center mt-6">
           <Link
-            href="/collections/new-arrivals"
-            className="font-secondary 
-                      px-2 py-1 text-sm
-                      sm:px-4 sm:py-1 sm:text-base 
-                      text-gray-500 rounded 
-                      ring-1 ring-gray-500 
-                      hover:ring-2 
-                      transition-all duration-300 ease-in-out"
+            href="/collections/best-sellers"
+            className="font-main px-2 py-1 text-sm sm:px-4 sm:py-1 sm:text-base text-gray-500 rounded ring-1 ring-gray-500 hover:ring-2 transition-all duration-300 ease-in-out"
           >
             VIEW ALL
           </Link>
@@ -47,39 +43,35 @@ export default function HomePage({ sarees }) {
       </section>
 
       {/* New Arrivals */}
-      <section className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-center text-[#B22222]">
-          NEW ARRIVALS
-        </h2>
+      <section className="bg-grey-light">
+        <section className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
+          <h2 className="text-2xl md:text-3xl font-secondary text-center text-grey-dark">
+            NEW ARRIVALS
+          </h2>
 
-        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
-          {sarees.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="desktop" />
-          ))}
-        </div>
+          {/* Desktop grid */}
+          <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
+            {newArrivals.map((saree) => (
+              <SareeCard key={saree._id} saree={saree} variant="desktop" />
+            ))}
+          </div>
 
-        {/* Mobile horizontal scroll */}
-        <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
-          {sarees.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="mobile" />
-          ))}
-        </div>
+          {/* Mobile horizontal scroll */}
+          <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
+            {newArrivals.map((saree) => (
+              <SareeCard key={saree._id} saree={saree} variant="mobile" />
+            ))}
+          </div>
 
-        {/* View All button */}
-        <div className="text-center mt-6">
-          <Link
-            href="/collections/new-arrivals"
-            className="font-secondary 
-                      px-2 py-1 text-sm
-                      sm:px-4 sm:py-1 sm:text-base 
-                      text-gray-500 rounded 
-                      ring-1 ring-gray-500 
-                      hover:ring-2 
-                      transition-all duration-300 ease-in-out"
-          >
-            VIEW ALL
-          </Link>
-        </div>
+          <div className="text-center mt-6">
+            <Link
+              href="/collections/new-arrivals"
+              className="font-main px-2 py-1 text-sm sm:px-4 sm:py-1 sm:text-base text-gray-500 rounded ring-1 ring-gray-500 hover:ring-2 transition-all duration-300 ease-in-out"
+            >
+              VIEW ALL
+            </Link>
+          </div>
+        </section>
       </section>
 
       {/* Leave a Review Section */}
@@ -97,7 +89,6 @@ export default function HomePage({ sarees }) {
         >
           Leave a Review
         </Link>
-
       </section>
     </main>
   );

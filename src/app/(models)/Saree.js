@@ -7,6 +7,7 @@ const sareeSchema = new mongoose.Schema(
     price: { type: Number, required: true, min: 0 },
     discountPrice: { type: Number, default: null },
     stock: { type: Number, required: true, default: 0 },
+    sold: { type: Number, default: 0 },
     category: { type: String, required: true, enum: ["Silk", "Cotton", "Designer", "Banarasi", "Casual", "Other"] },
     tags: [String],
     colors: [String],

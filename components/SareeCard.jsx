@@ -19,8 +19,8 @@ export default function SareeCard({ saree, variant = "desktop" }) {
   const isMobile = variant === "mobile";
 
   const containerClasses = isMobile
-    ? "relative min-w-[130px] bg-white overflow-hidden transition group"
-    : "relative bg-white overflow-hidden transition group";
+    ? "relative min-w-[130px] overflow-hidden transition group"
+    : "relative overflow-hidden transition group";
 
   const textSize = isMobile ? "text-xs" : "text-sm";
   const padding = isMobile ? "p-2" : "p-4";
