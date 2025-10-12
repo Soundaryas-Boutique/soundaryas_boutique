@@ -26,6 +26,31 @@ export default function NewsletterPage() {
     fetchSubscribers();
   }, []);
 
+  const downloadCSV = () => {
+    if (!subscribers.length) return;
+
+    const headers = ["Email", "Gender", "Subscription", "Exclusive Offer"];
+    const rows = subscribers.map(s => [
+      s.email,
+      s.gender,
+      s.subscriptionType,
+      s.exclusiveOffer ? "Yes" : "No",
+    ]);
+
+    const csvContent =
+      [headers, ...rows].map(e => e.map(v => `"${v}"`).join(",")).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "subscribers.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) return <p className="p-6">Loading subscribers...</p>;
   if (!subscribers.length) return <p className="p-6">No subscribers found.</p>;
 
@@ -43,9 +68,15 @@ export default function NewsletterPage() {
 
   return (
     <div className="p-6">
-      <button onClick={() => router.back()} className="mb-6 px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold text-lg hover:bg-gray-700 transition flex items-center gap-2">
-        ← Back
-      </button>
+      <div className="flex justify-between items-center mb-6">
+        <button onClick={() => router.back()} className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 transition">
+          ← Back
+        </button>
+
+        <button onClick={downloadCSV} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          Download CSV
+        </button>
+      </div>
 
       <h1 className="text-3xl font-bold mb-8 text-gray-800">Newsletter Subscribers Overview</h1>
 
@@ -80,30 +111,28 @@ export default function NewsletterPage() {
       </div>
 
       {/* Subscribers Table */}
-      <div className="bg-white p-6 rounded-xl shadow-lg">
+      <div className="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">Registered Subscribers</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-3">Email</th>
-                <th className="p-3">Gender</th>
-                <th className="p-3">Subscription</th>
-                <th className="p-3">Offers</th>
+        <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-3">Email</th>
+              <th className="p-3">Gender</th>
+              <th className="p-3">Subscription</th>
+              <th className="p-3">Offers</th>
+            </tr>
+          </thead>
+          <tbody>
+            {subscribers.map(s => (
+              <tr key={s._id} className="border-b hover:bg-gray-50 transition">
+                <td className="p-3">{s.email}</td>
+                <td className="p-3">{s.gender}</td>
+                <td className="p-3">{s.subscriptionType}</td>
+                <td className="p-3">{s.exclusiveOffer ? "Yes" : "No"}</td>
               </tr>
-            </thead>
-            <tbody>
-              {subscribers.map(s => (
-                <tr key={s._id} className="border-b hover:bg-gray-50 transition">
-                  <td className="p-3">{s.email}</td>
-                  <td className="p-3">{s.gender}</td>
-                  <td className="p-3">{s.subscriptionType}</td>
-                  <td className="p-3">{s.exclusiveOffer ? "Yes" : "No"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
