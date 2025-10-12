@@ -6,14 +6,11 @@ import { authOptions } from "@/app/lib/auth";
 export async function POST(req) {
   const { items } = await req.json();
 
-  // 🐛 FIX: Check for the secret key before instantiating Stripe
   if (!process.env.STRIPE_SECRET_KEY) {
     console.error("Stripe secret key is missing.");
     return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
   }
 
-  // ✅ FIX: Instantiate the Stripe client inside the function
-  // This prevents it from being executed during the build process
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   const session = await getServerSession(authOptions);
@@ -22,43 +19,28 @@ export async function POST(req) {
   }
 
   try {
-    const lineItems = items.map((item) => {
-      const images = (item.images && Array.isArray(item.images))
-        ? item.images.map((img) => img.url)
-        : [];
+    const totalAmount = items.reduce(
+      (sum, item) => sum + (item.price * item.quantity),
+      0
+    );
 
-      const price = item.discountPrice || item.price;
-      if (typeof price !== 'number' || isNaN(price) || price <= 0) {
-        throw new Error(`Invalid price for product: ${item.productName}`);
-      }
-
-      return {
-        price_data: {
-          currency: "inr",
-          product_data: {
-            name: item.productName,
-            images: images,
-          },
-          unit_amount: Math.round(price * 100),
-        },
-        quantity: item.quantity,
-      };
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(totalAmount * 100), // in cents
+      currency: "inr",
+      metadata: {
+        userId: session.user.id,
+      },
+      payment_method_types: ['card'],
     });
 
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${process.env.NEXTAUTH_URL}/success`,
-      cancel_url: `${process.env.NEXTAUTH_URL}/Cart`,
-      customer_email: session.user.email,
-    });
-
-    return NextResponse.json({ id: checkoutSession.id, url: checkoutSession.url });
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      id: paymentIntent.id,
+    }, { status: 200 });
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error("Error creating payment intent:", error);
     return NextResponse.json(
-      { error: "Error creating checkout session", details: error.message },
+      { error: "Error creating payment intent", details: error.message },
       { status: 500 }
     );
   }

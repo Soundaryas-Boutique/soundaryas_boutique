@@ -93,7 +93,7 @@ const Navbar = () => {
             </Link>
             <div className="flex-1"></div>
             <div className="flex gap-6 items-center text-[#8B0000]">
-<<<<<<< Updated upstream
+
               {status === "authenticated" ? (
                 <Link href="/Profile" className="relative">
                   <FiUser className="w-5 h-5 cursor-pointer" />
@@ -118,12 +118,7 @@ const Navbar = () => {
                 <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
               </button>
   
-=======
-              <Link href="/Profile" className="relative">
-                <FiUser className="w-5 h-5 cursor-pointer" />
-              </Link>
-              <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
->>>>>>> Stashed changes
+
               <Link
                 href={status === "authenticated" ? "/Cart" : "/Denied"}
                 className="relative"
@@ -230,13 +225,12 @@ const Navbar = () => {
                 <span className="flex items-center text-blue-600 font-medium"><FiUser className="mr-2" />Login</span>
               </button>
             )}
-<<<<<<< Updated upstream
+
             
             <Link href={status === "authenticated" ? "/Wishlist" : "/Denied"} className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
               <span className="flex items-center text-gray-800 font-medium"><FiHeart className="mr-2" />My Wish List</span>
             </Link>
-=======
->>>>>>> Stashed changes
+
           </nav>
         </div>
       </div>
