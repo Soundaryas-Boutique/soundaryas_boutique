@@ -1,9 +1,20 @@
 "use client";
 import React, { useState } from 'react';
 import { FiSend } from 'react-icons/fi';
+import CustomDropdown from './CustomDropdown'; // ✅ Import the CustomDropdown component
+
+const professionCategories = [
+  { value: "all", label: "All Subscribers" },
+  { value: "Doctor", label: "Doctors" },
+  { value: "Teacher", label: "Teachers" },
+  { value: "Engineer", label: "Engineers" },
+  { value: "Student", label: "Students" },
+  { value: "Other", label: "Other Professions" },
+];
 
 export default function WhatsAppSenderForm() {
   const [messageContent, setMessageContent] = useState('');
+  const [professionTarget, setProfessionTarget] = useState('all'); // ✅ New state for profession
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [success, setSuccess] = useState(null);
@@ -24,7 +35,7 @@ export default function WhatsAppSenderForm() {
       const res = await fetch('/api/admin/send-whatsapp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messageContent }),
+        body: JSON.stringify({ messageContent, professionTarget }), // ✅ Pass professionTarget to API
       });
 
       const data = await res.json();
@@ -36,6 +47,7 @@ export default function WhatsAppSenderForm() {
         setStatusMessage(data.message);
         setSuccess(true);
         setMessageContent('');
+        setProfessionTarget('all');
       }
 
     } catch (error) {
@@ -65,6 +77,19 @@ export default function WhatsAppSenderForm() {
             className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500"
             required
           ></textarea>
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium text-gray-700 mb-2">
+            Target Profession:
+          </label>
+          <CustomDropdown 
+            options={professionCategories}
+            value={professionTarget}
+            onChange={setProfessionTarget}
+            placeholder="-- Choose a profession to target --"
+            className="w-full"
+          />
         </div>
 
         <button
