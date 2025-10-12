@@ -13,7 +13,7 @@ export async function POST(req) {
 
   try {
     const body = await req.text();
-    const signature = headers().get("Stripe-Signature");
+    const signature = await headers().get("Stripe-Signature");
     let event;
 
     try {
