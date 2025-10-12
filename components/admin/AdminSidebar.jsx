@@ -10,18 +10,19 @@ import {
   FiBell, 
   FiMessageSquare,
   FiHome,
-  FiCalendar // ✅ Import the calendar icon
+  FiCalendar,
+  FiSend // ✅ Import the send icon
 } from 'react-icons/fi';
 
 const navItems = [
-
+  { name: 'Dashboard', href: '/admin/dashboard', icon: FiHome },
   { name: 'Products', href: '/admin/products', icon: FiPackage },
   { name: 'Orders', href: '/admin/orders', icon: FiShoppingBag },
-  { name: 'Messages', href: '/admin/messages', icon: FiMessageSquare },
   { name: 'Subscribers', href: '/admin/subscribers', icon: FiMail },
   { name: 'Promotions', href: '/admin/email-marketing', icon: FiBell },
+  { name: 'WhatsApp', href: '/admin/whatsapp-marketing', icon: FiSend }, // ✅ New WhatsApp link
   { name: 'Feedbacks', href: '/admin/feedback', icon: FiMessageSquare },
-  { name: 'Appointments', href: '/admin/appointments', icon: FiCalendar }, // ✅ New appointments link
+  { name: 'Appointments', href: '/admin/appointments', icon: FiCalendar },
 ];
 
 export default function AdminSidebar() {

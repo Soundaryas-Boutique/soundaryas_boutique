@@ -9,7 +9,7 @@ const SubscriberSchema = new mongoose.Schema(
       enum: ["Doctor", "Teacher", "Engineer", "Student", "Other"],
       default: "Other",
     },
-    phone: { type: String, trim: true }, // ✅ Added phone number field
+    phone: { type: String, trim: true, required: true }, // ✅ Made phone number required
   },
   { timestamps: true, collection: "subb" }
 );

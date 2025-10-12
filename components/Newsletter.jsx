@@ -14,7 +14,7 @@ const professions = [
 const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
   const [email, setEmail] = useState("");
   const [profession, setProfession] = useState("Other");
-  const [phone, setPhone] = useState(""); // ✅ Added state for phone
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -23,7 +23,7 @@ const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
     document.body.classList.remove("overflow-hidden");
     setEmail("");
     setProfession("Other");
-    setPhone(""); // ✅ Reset phone state
+    setPhone("");
     setMessage("");
   };
 
@@ -32,12 +32,12 @@ const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
     setLoading(true);
     setMessage("");
 
-    if (!email || !profession) {
-      setMessage("Email and profession are required.");
+    if (!email || !profession || !phone) { // ✅ Added phone to the required fields
+      setMessage("Email, phone, and profession are required.");
       setLoading(false);
       return;
     }
-    if (phone && !/^\d{10}$/.test(phone)) { // ✅ Simple phone number validation
+    if (phone && !/^\d{10}$/.test(phone)) {
       setMessage("Please enter a valid 10-digit phone number.");
       setLoading(false);
       return;
@@ -47,7 +47,7 @@ const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, profession, phone }), // ✅ Pass phone to API
+        body: JSON.stringify({ email, profession, phone }),
       });
 
       const data = await res.json();
@@ -55,7 +55,7 @@ const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
         setMessage(data.message);
         setEmail("");
         setProfession("Other");
-        setPhone(""); // ✅ Reset phone state
+        setPhone("");
         setTimeout(closePopup, 3000);
       } else {
         setMessage(data.message || "Something went wrong.");
@@ -98,12 +98,13 @@ const Newsletter = ({ isPopupOpen, setIsPopupOpen }) => {
                 placeholder="Select your profession"
                 className="w-full"
               />
-              <input // ✅ Added phone input field
+              <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number (optional)"
+                placeholder="Enter your 10-digit phone number"
                 className="w-full p-3 border rounded-md"
+                required // ✅ Made phone number input required
               />
               {message && (
                 <p className={`text-sm ${message.includes("success") ? "text-green-600" : "text-red-600"}`}>
