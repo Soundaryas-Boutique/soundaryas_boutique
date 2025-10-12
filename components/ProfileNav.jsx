@@ -25,6 +25,9 @@ const ProfileNav = () => {
           <li className="hover:bg-gray-100 p-2 rounded">
             <Link href="/Profile/Saved-Cards">Saved Cards</Link>
           </li>
+          <li className="hover:bg-gray-100 p-2 rounded">
+            <Link href="/logoutsecurity">Logout</Link>
+          </li>
         </ul>
 
         {/* Admin button */}
