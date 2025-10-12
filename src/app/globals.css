@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+
+@theme inline {
+  /* 🖋️ Font Variables */
+  --font-main: var(--font-poppins);
+  --font-secondary: var(--font-yeseva);
+
+  /* 🎨 Brand Colors */
+  --color-primary: #B71C1C;      /* Deep traditional red */
+  --color-secondary: #D4AF37;    /* Soft gold accent */
+  --color-white: #FFFFFF;        /* Base background */
+  --color-grey-dark: #555555;    /* Text grey (for body text) */
+  --color-grey-light: #F5F5F5;   /* Background grey (for sections/cards) */
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
