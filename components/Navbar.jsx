@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Newsletter from "./Newsletter";
+import NewsletterPopup from "./NewsletterPopup"; // ✅ Import the popup component
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -22,7 +22,8 @@ const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false); // ✅ New state for popup
 
   const timeoutRef = useRef(null);
 
@@ -63,22 +64,16 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Top Bar */}
       <div className="w-full shadow-sm border-b border-gray-200 sticky top-0 z-50 bg-white">
         <div className="max-w-[1440px] mx-auto px-4 py-4 flex items-center justify-between">
-          
-          {/* ✅ Mobile Header: Hamburger, Logo, and Icons */}
           <div className="flex items-center justify-between w-full lg:hidden">
-            {/* Hamburger Menu (Left) */}
             <FiMenu
               className="w-6 h-6 cursor-pointer text-[#8B0000]"
               onClick={toggleMobileMenu}
             />
-            {/* Logo (Center) */}
             <Link href="/" className="text-[#8B0000] text-xl tracking-wide font-semibold">
               Soundaryas Boutique
             </Link>
-            {/* Icons (Right) */}
             <div className="flex gap-4 items-center text-[#8B0000]">
               <Link href="/Profile" className="relative">
                 <FiUser className="w-5 h-5 cursor-pointer" />
@@ -92,16 +87,13 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* ✅ Desktop Header: Logo and Icons */}
           <div className="hidden lg:flex items-center justify-between w-full">
-            {/* Logo (Left) */}
             <Link href="/" className="text-[#8B0000] text-xl tracking-wide font-semibold">
               Soundaryas Boutique
             </Link>
-            {/* Spacer to push icons to the right */}
             <div className="flex-1"></div>
-            {/* Icons (Right) */}
             <div className="flex gap-6 items-center text-[#8B0000]">
+<<<<<<< Updated upstream
               {status === "authenticated" ? (
                 <Link href="/Profile" className="relative">
                   <FiUser className="w-5 h-5 cursor-pointer" />
@@ -126,18 +118,26 @@ const Navbar = () => {
                 <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
               </button>
   
+=======
+              <Link href="/Profile" className="relative">
+                <FiUser className="w-5 h-5 cursor-pointer" />
+              </Link>
+              <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+>>>>>>> Stashed changes
               <Link
                 href={status === "authenticated" ? "/Cart" : "/Denied"}
                 className="relative"
               >
                 <FiShoppingCart className="w-5 h-5 cursor-pointer" />
               </Link>
+              <button onClick={() => setIsPopupOpen(true)} className="hidden lg:block">
+                <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Desktop Category Bar */}
       <div className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200 hidden lg:block">
         <div className="relative">
           <div className="flex justify-center gap-5 text-[#A52A2A] font-medium px-4 py-2">
@@ -168,7 +168,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
       <div className={`fixed inset-y-0 left-0 w-2/3 max-w-xs z-50 bg-white overflow-y-auto transition-all duration-300 ease-in-out transform ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
@@ -211,6 +210,10 @@ const Navbar = () => {
             <Link href="/about-us" className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
               <span className="text-base font-medium text-gray-800">ABOUT US</span>
             </Link>
+            
+            <Link href="/wishlist" className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
+              <span className="flex items-center text-gray-800 font-medium"><FiHeart className="mr-2" />My Wish List</span>
+            </Link>
 
             {status === "authenticated" ? (
               <button 
@@ -227,15 +230,19 @@ const Navbar = () => {
                 <span className="flex items-center text-blue-600 font-medium"><FiUser className="mr-2" />Login</span>
               </button>
             )}
+<<<<<<< Updated upstream
             
             <Link href={status === "authenticated" ? "/Wishlist" : "/Denied"} className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
               <span className="flex items-center text-gray-800 font-medium"><FiHeart className="mr-2" />My Wish List</span>
             </Link>
+=======
+>>>>>>> Stashed changes
           </nav>
         </div>
       </div>
       
-      <Newsletter
+      {/* ✅ Newsletter Popup */}
+      <NewsletterPopup
         isPopupOpen={isPopupOpen}
         setIsPopupOpen={setIsPopupOpen}
       />
