@@ -1,80 +1,32 @@
-export const dynamic = "force-dynamic";
-
 import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
-import SareeCard from "../../components/SareeCard";
-import { getBestSellers, getNewArrivals } from "@/app/lib/sarees";
+import SareeSection from "../../components/SareeSection"; // Client component
+import { getHomepageSarees } from "@/app/lib/sarees";
+
+export const dynamic = "force-dynamic"; // ensures SSR
 
 export default async function HomePage() {
-  // Fetch data server-side
-  const bestSellers = await getBestSellers(5);
-  const newArrivals = await getNewArrivals(5);
+  // Server fetch for initial render
+  const { bestSellers, newArrivals } = await getHomepageSarees(5);
 
   return (
     <main>
       <SlidingBanner />
 
       {/* Best Sellers */}
-      <section className="max-w-[1440px] mx-auto pt-16 pb-8 px-4 md:px-8">
-        <h2 className="text-2xl md:text-3xl font-light text-center text-grey-dark font-secondary">
-          BEST SELLERS
-        </h2>
-
-        {/* Desktop grid */}
-        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
-          {bestSellers.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="desktop" />
-          ))}
-        </div>
-
-        {/* Mobile horizontal scroll */}
-        <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
-          {bestSellers.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="mobile" />
-          ))}
-        </div>
-
-        <div className="text-center mt-6">
-          <Link
-            href="/collections/best-sellers"
-            className="font-main px-2 py-1 text-sm sm:px-4 sm:py-1 sm:text-base text-gray-500 rounded ring-1 ring-gray-500 hover:ring-2 transition-all duration-300 ease-in-out"
-          >
-            VIEW ALL
-          </Link>
-        </div>
-      </section>
+      <SareeSection
+        title="BEST SELLERS"
+        viewAllLink="/collections/best-sellers"
+        initialData={bestSellers}
+      />
 
       {/* New Arrivals */}
-      <section className="bg-grey-light">
-        <section className="max-w-[1440px] mx-auto py-8 px-4 md:px-8">
-          <h2 className="text-2xl md:text-3xl font-secondary text-center text-grey-dark">
-            NEW ARRIVALS
-          </h2>
-
-          {/* Desktop grid */}
-          <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
-            {newArrivals.map((saree) => (
-              <SareeCard key={saree._id} saree={saree} variant="desktop" />
-            ))}
-          </div>
-
-          {/* Mobile horizontal scroll */}
-          <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
-            {newArrivals.map((saree) => (
-              <SareeCard key={saree._id} saree={saree} variant="mobile" />
-            ))}
-          </div>
-
-          <div className="text-center mt-6">
-            <Link
-              href="/collections/new-arrivals"
-              className="font-main px-2 py-1 text-sm sm:px-4 sm:py-1 sm:text-base text-gray-500 rounded ring-1 ring-gray-500 hover:ring-2 transition-all duration-300 ease-in-out"
-            >
-              VIEW ALL
-            </Link>
-          </div>
-        </section>
-      </section>
+      <SareeSection
+        title="NEW ARRIVALS"
+        viewAllLink="/collections/new-arrivals"
+        initialData={newArrivals}
+        bg="bg-grey-light"
+      />
 
       {/* Leave a Review Section */}
       <section className="bg-white py-12 text-center">
