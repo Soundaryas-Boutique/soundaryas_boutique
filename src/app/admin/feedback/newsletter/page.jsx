@@ -29,12 +29,15 @@ export default function NewsletterPage() {
   const downloadCSV = () => {
     if (!subscribers.length) return;
 
-    const headers = ["Email", "Gender", "Subscription", "Exclusive Offer"];
+    const headers = ["Email", "Phone", "Profession", "Gender", "Subscription", "Offers", "Subscribed On"];
     const rows = subscribers.map(s => [
       s.email,
+      s.phone || "N/A",
+      s.profession || "N/A",
       s.gender,
       s.subscriptionType,
       s.exclusiveOffer ? "Yes" : "No",
+      new Date(s.createdAt).toLocaleDateString(),
     ]);
 
     const csvContent =
@@ -69,11 +72,17 @@ export default function NewsletterPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <button onClick={() => router.back()} className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 transition">
+        <button
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-700 transition"
+        >
           ← Back
         </button>
 
-        <button onClick={downloadCSV} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+        <button
+          onClick={downloadCSV}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+        >
           Download CSV
         </button>
       </div>
@@ -86,8 +95,18 @@ export default function NewsletterPage() {
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Subscribers by Gender</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {genderData.map((entry, index) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
+              <Pie
+                data={genderData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label
+              >
+                {genderData.map((entry, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
               </Pie>
               <Tooltip />
               <Legend verticalAlign="bottom" />
@@ -100,8 +119,19 @@ export default function NewsletterPage() {
           <h2 className="text-2xl font-semibold mb-4 text-gray-700">Subscribers by Subscription Type</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={subscriptionData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} label>
-                {subscriptionData.map((entry, index) => <Cell key={index} fill={COLORS[index % COLORS.length]} />)}
+              <Pie
+                data={subscriptionData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                label
+              >
+                {subscriptionData.map((entry, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
               </Pie>
               <Tooltip />
               <Legend verticalAlign="bottom" />
@@ -117,18 +147,24 @@ export default function NewsletterPage() {
           <thead>
             <tr className="bg-gray-100">
               <th className="p-3">Email</th>
+              <th className="p-3">Phone</th>
+              <th className="p-3">Profession</th>
               <th className="p-3">Gender</th>
               <th className="p-3">Subscription</th>
               <th className="p-3">Offers</th>
+              <th className="p-3">Subscribed On</th>
             </tr>
           </thead>
           <tbody>
             {subscribers.map(s => (
               <tr key={s._id} className="border-b hover:bg-gray-50 transition">
                 <td className="p-3">{s.email}</td>
+                <td className="p-3">{s.phone || "N/A"}</td>
+                <td className="p-3">{s.profession || "N/A"}</td>
                 <td className="p-3">{s.gender}</td>
                 <td className="p-3">{s.subscriptionType}</td>
                 <td className="p-3">{s.exclusiveOffer ? "Yes" : "No"}</td>
+                <td className="p-3">{new Date(s.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
