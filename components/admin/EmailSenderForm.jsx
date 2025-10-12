@@ -1,13 +1,22 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { FiSend, FiEye } from 'react-icons/fi';
-import CustomDropdown from './CustomDropdown'; // ✅ Import the new component
+import CustomDropdown from './CustomDropdown';
 
 const emailCategories = [
   { value: 'special_offer', label: '🎁 Send Special Offer/Discount' },
   { value: 'new_product', label: '✨ Announce New Products' },
   { value: 'restocked', label: '🛍️ Notify Restocked Items' },
   { value: 'random_buy', label: '💖 Random Mail to Encourage Purchase' },
+];
+
+const professionCategories = [
+  { value: "all", label: "All Subscribers" },
+  { value: "Doctor", label: "Doctors" },
+  { value: "Teacher", label: "Teachers" },
+  { value: "Engineer", label: "Engineers" },
+  { value: "Student", label: "Students" },
+  { value: "Other", label: "Other Professions" },
 ];
 
 const generatePreviewContent = (category, productName) => {
@@ -41,6 +50,7 @@ const generatePreviewContent = (category, productName) => {
 export default function EmailSenderForm() {
   const [category, setCategory] = useState('');
   const [productName, setProductName] = useState('');
+  const [professionTarget, setProfessionTarget] = useState('all');
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [success, setSuccess] = useState(null);
@@ -77,7 +87,7 @@ export default function EmailSenderForm() {
       const res = await fetch('/api/admin/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, productName }),
+        body: JSON.stringify({ category, productName, professionTarget }), // ✅ Pass professionTarget
       });
 
       const data = await res.json();
@@ -90,6 +100,7 @@ export default function EmailSenderForm() {
         setSuccess(true);
         setCategory('');
         setProductName('');
+        setProfessionTarget('all');
       }
 
     } catch (error) {
@@ -110,11 +121,24 @@ export default function EmailSenderForm() {
           <label htmlFor="category" className="block text-lg font-medium text-gray-700 mb-2">
             Select Email Campaign:
           </label>
-          <CustomDropdown // ✅ This is the custom dropdown
+          <CustomDropdown 
             options={emailCategories}
             value={category}
             onChange={setCategory}
             placeholder="-- Choose a campaign type --"
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="professionTarget" className="block text-lg font-medium text-gray-700 mb-2">
+            Target Profession:
+          </label>
+          <CustomDropdown 
+            options={professionCategories}
+            value={professionTarget}
+            onChange={setProfessionTarget}
+            placeholder="-- Choose a profession to target --"
             className="w-full"
           />
         </div>

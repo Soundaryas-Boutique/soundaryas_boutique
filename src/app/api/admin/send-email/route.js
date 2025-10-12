@@ -55,17 +55,23 @@ export async function POST(req) {
 
   try {
     await connectDB();
-    const { category, productName } = await req.json();
+    const { category, productName, professionTarget } = await req.json(); // ✅ Get professionTarget
 
     if (!category) {
       return NextResponse.json({ message: "Missing email category" }, { status: 400 });
     }
     
-    const subscribers = await Subscriber.find({}, 'email');
+    // ✅ FIX: Conditionally filter subscribers based on professionTarget
+    let query = {};
+    if (professionTarget && professionTarget !== 'all') {
+      query = { profession: professionTarget };
+    }
+
+    const subscribers = await Subscriber.find(query, 'email'); // ✅ Use the query to filter
     const subscriberEmails = subscribers.map(sub => sub.email).join(', ');
 
     if (subscriberEmails.length === 0) {
-        return NextResponse.json({ message: "No subscribers found to send email." }, { status: 200 });
+        return NextResponse.json({ message: `No subscribers found for profession: ${professionTarget}.` }, { status: 200 });
     }
 
     const { subject, body } = generateContent(category, productName);

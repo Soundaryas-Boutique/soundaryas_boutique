@@ -5,18 +5,18 @@ import Subscriber from "@/app/(models)/Subscriber";
 export async function POST(req) {
   try {
     await connectDB();
-    const { email } = await req.json();
+    const { email, profession, phone } = await req.json(); // ✅ Get phone from the body
 
-    if (!email) {
-      return NextResponse.json({ message: "Email is required" }, { status: 400 });
+    if (!email || !profession) {
+      return NextResponse.json({ message: "Email and profession are required" }, { status: 400 });
     }
 
-    const subscriber = new Subscriber({ email });
+    const subscriber = new Subscriber({ email, profession, phone }); // ✅ Pass phone to the model
     await subscriber.save();
 
     return NextResponse.json({ message: "Subscribed successfully!" }, { status: 201 });
   } catch (error) {
-    if (error.code === 11000) { // Check for duplicate key error (MongoDB)
+    if (error.code === 11000) {
       return NextResponse.json({ message: "This email is already subscribed." }, { status: 409 });
     }
     console.error("❌ Subscription error:", error);
