@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
 import SareeCard from "../../components/SareeCard";
