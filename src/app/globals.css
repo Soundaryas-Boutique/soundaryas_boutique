@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-
-@theme inline{
-    --font-main: var(--font-cinzel);
-    --font-secondary: var(--font-noto);
-}
-
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
