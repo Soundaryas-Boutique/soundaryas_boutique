@@ -1,16 +1,15 @@
 "use client";
+
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
 import { FaTrashAlt } from "react-icons/fa";
 import { loadStripe } from "@stripe/stripe-js";
 import { useSession } from "next-auth/react";
-import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { data: session } = useSession();
   const { cartItems, removeFromCart, updateQuantity, cartTotal, loading } = useCart();
-  const router = useRouter();
 
   const handleCheckout = async () => {
     if (!session) {
@@ -20,47 +19,24 @@ export default function CartPage() {
 
     try {
       const stripePromise = loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+        { locale: 'en' }
       );
       const stripe = await stripePromise;
 
-      // 1. Create a payment intent on the server
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ items: cartItems }),
       });
-      const { clientSecret } = await response.json();
 
-      // 2. Confirm the card payment on the client
-      const { paymentIntent, error } = await stripe.confirmPayment({
-        elements: null, // You would use a Stripe Element here for a full form
-        clientSecret: clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}/success`,
-        },
-        redirect: 'if_required',
-      });
-
-      if (error) {
-        alert(`Payment failed: ${error.message}`);
-        console.error("Payment Error:", error);
-        return;
-      }
-
-      if (paymentIntent.status === 'succeeded') {
-        // 3. Confirm the order status from the database
-        const confirmOrderResponse = await fetch('/api/confirm-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentIntentId: paymentIntent.id }),
-        });
-
-        if (confirmOrderResponse.ok) {
-          router.push('/success');
-        } else {
-          router.push('/error'); // Redirect to an error page
-        }
+      const { url } = await response.json();
+      if (response.ok) {
+        window.location.href = url;
+      } else {
+        alert("Failed to create checkout session. Please try again.");
       }
     } catch (error) {
       console.error("Checkout failed:", error);
