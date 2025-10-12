@@ -115,7 +115,12 @@ const Navbar = () => {
                 </button>
               )}
   
-              <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+              <Link
+                href={status === "authenticated" ? "/Wishlist" : "/Denied"}
+                className="relative"
+              >
+                <FiHeart className="w-5 h-5 cursor-pointer hidden lg:block" />
+              </Link>
 
               <button onClick={() => setIsPopupOpen(true)} className="hidden lg:block">
                 <FiMail className="w-5 h-5 text-[#8B0000] cursor-pointer" />
@@ -223,7 +228,7 @@ const Navbar = () => {
               </button>
             )}
             
-            <Link href="/wishlist" className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
+            <Link href={status === "authenticated" ? "/Wishlist" : "/Denied"} className="block py-3 px-2 border-b border-gray-100 hover:bg-gray-50">
               <span className="flex items-center text-gray-800 font-medium"><FiHeart className="mr-2" />My Wish List</span>
             </Link>
           </nav>
