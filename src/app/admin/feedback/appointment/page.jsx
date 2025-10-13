@@ -1,61 +1,66 @@
-
-
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { ChevronLeft, Calendar, Bell, CheckCircle, Users, Clock, ShoppingBag } from "lucide-react";
-
-// --- MOCK DATA: Simulating appointment data from your form ---
-// Dates are set relative to today (October 8, 2025) for a relevant chart.
-const mockAppointments = [
-  { id: 1, fullName: "Priya Sharma", email: "priya@example.com", appointmentType: "Special Occasion Styling", preferredDate: "2025-10-08", timeSlot: "Afternoon (2pm-5pm)", status: "Confirmed" },
-  { id: 2, fullName: "Rohan Verma", email: "rohan@example.com", appointmentType: "Wardrobe Refresh", preferredDate: "2025-10-08", timeSlot: "Morning (10am-1pm)", status: "Pending" },
-  { id: 3, fullName: "Anjali Mehta", email: "anjali@example.com", appointmentType: "Bridal Consultation", preferredDate: "2025-10-09", timeSlot: "Afternoon (2pm-5pm)", status: "Confirmed" },
-  { id: 4, fullName: "Sameer Desai", email: "sam@example.com", appointmentType: "Custom Tailoring", preferredDate: "2025-10-07", timeSlot: "Evening (5pm-7pm)", status: "Confirmed" },
-  { id: 5, fullName: "Neha Kapoor", email: "neha@example.com", appointmentType: "Special Occasion Styling", preferredDate: "2025-10-06", timeSlot: "Afternoon (2pm-5pm)", status: "Confirmed" },
-  { id: 6, fullName: "Amit Patel", email: "amit@example.com", appointmentType: "Bridal Consultation", preferredDate: "2025-10-10", timeSlot: "Morning (10am-1pm)", status: "Pending" },
-  { id: 7, fullName: "Kavita Singh", email: "kavita@example.com", appointmentType: "Wardrobe Refresh", preferredDate: "2025-10-05", timeSlot: "Morning (10am-1pm)", status: "Confirmed" },
-  { id: 8, fullName: "Vikram Rathod", email: "vikram@example.com", appointmentType: "Special Occasion Styling", preferredDate: "2025-10-08", timeSlot: "Evening (5pm-7pm)", status: "Confirmed" },
-];
-// --- END OF MOCK DATA ---
-
+import { ChevronLeft, Bell, CheckCircle, Users } from "lucide-react";
 
 export default function AppointmentsAnalyticsDashboard() {
   const router = useRouter();
+  
+  // --- CHANGE: State for fetching and loading live data ---
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // --- 1. Process Data for Visualizations ---
+  // --- CHANGE: useEffect to fetch data from the API ---
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch('/api/appointments');
+        if (!res.ok) {
+          throw new Error('Failed to fetch appointments');
+        }
+        const data = await res.json();
+        setAppointments(data.appointments || []);
+      } catch (error) {
+        console.error("Failed to fetch analytics data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  // --- KPI Card Data ---
-  const totalAppointments = mockAppointments.length;
-  const pendingCount = mockAppointments.filter(a => a.status === 'Pending').length;
-  const today = new Date("2025-10-08T00:00:00.000Z"); // Setting a fixed "today" for consistent demo
+    fetchAppointments();
+  }, []);
+
+  // --- Data processing now uses the live 'appointments' state ---
+
+  // KPI Card Data
+  const totalAppointments = appointments.length;
+  const pendingCount = appointments.filter(a => a.status === 'Pending').length;
+  const today = new Date(); // Use the actual current date
   today.setHours(0, 0, 0, 0);
-  const confirmedTodayCount = mockAppointments.filter(a => {
+  const confirmedTodayCount = appointments.filter(a => {
       const appDate = new Date(a.preferredDate);
       appDate.setHours(0,0,0,0);
       return a.status === 'Confirmed' && appDate.getTime() === today.getTime();
   }).length;
 
-  // --- Chart Data ---
-  // Bar Chart: Appointments in the last 7 days
+  // Chart Data
   const last7DaysData = Array.from({ length: 7 }).map((_, i) => {
-    const d = new Date(today);
+    const d = new Date();
     d.setDate(d.getDate() - i);
     const dateString = d.toISOString().split('T')[0];
-    const count = mockAppointments.filter(a => a.preferredDate === dateString).length;
+    const count = appointments.filter(a => a.preferredDate.startsWith(dateString)).length;
     return {
       date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       Appointments: count,
     };
   }).reverse();
 
-  // Pie Chart: Appointment Type Distribution
-  const typeCounts = mockAppointments.reduce((acc, app) => {
+  const typeCounts = appointments.reduce((acc, app) => {
     acc[app.appointmentType] = (acc[app.appointmentType] || 0) + 1;
     return acc;
   }, {});
@@ -64,9 +69,8 @@ export default function AppointmentsAnalyticsDashboard() {
     value: typeCounts[key],
   }));
 
-  // Bar Chart: Popular Time Slots
-  const timeSlotCounts = mockAppointments.reduce((acc, app) => {
-    const slot = app.timeSlot.split(' ')[0]; // 'Morning', 'Afternoon', 'Evening'
+  const timeSlotCounts = appointments.reduce((acc, app) => {
+    const slot = app.timeSlot.split(' ')[0];
     acc[slot] = (acc[slot] || 0) + 1;
     return acc;
   }, {});
@@ -75,12 +79,20 @@ export default function AppointmentsAnalyticsDashboard() {
     Requests: timeSlotCounts[key],
   }));
 
-  // Table Data: Upcoming Confirmed Appointments
-  const upcomingAppointments = mockAppointments
+  const upcomingAppointments = appointments
     .filter(a => a.status === 'Confirmed' && new Date(a.preferredDate) >= today)
     .sort((a, b) => new Date(a.preferredDate) - new Date(b.preferredDate));
   
   const COLORS = ["#B22222", "#82ca9d", "#ffc658", "#8884d8"];
+
+  // --- CHANGE: Render a loading state while fetching data ---
+  if (isLoading) {
+    return (
+        <div className="min-h-screen flex items-center justify-center text-gray-500">
+            <p>Loading Analytics...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 p-4 sm:p-8 font-sans">
@@ -164,19 +176,25 @@ export default function AppointmentsAnalyticsDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {upcomingAppointments.map((app) => (
-                  <tr key={app.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
-                    <td className="p-3 font-medium text-gray-800">
-                      {new Date(app.preferredDate).toLocaleDateString("en-GB", { month: 'short', day: 'numeric' })}
-                      <span className="block text-xs text-gray-500">{app.timeSlot}</span>
-                    </td>
-                    <td className="p-3 text-gray-800">{app.fullName}</td>
-                    <td className="p-3 text-gray-600">{app.appointmentType}</td>
-                    <td className="p-3 text-blue-600 text-sm hover:underline">
-                      <a href={`mailto:${app.email}`}>{app.email}</a>
-                    </td>
-                  </tr>
-                ))}
+                {upcomingAppointments.length > 0 ? (
+                    upcomingAppointments.map((app) => (
+                    <tr key={app._id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td className="p-3 font-medium text-gray-800">
+                        {new Date(app.preferredDate).toLocaleDateString("en-GB", { month: 'short', day: 'numeric' })}
+                        <span className="block text-xs text-gray-500">{app.timeSlot}</span>
+                        </td>
+                        <td className="p-3 text-gray-800">{app.fullName}</td>
+                        <td className="p-3 text-gray-600">{app.appointmentType}</td>
+                        <td className="p-3 text-blue-600 text-sm hover:underline">
+                        <a href={`mailto:${app.email}`}>{app.email}</a>
+                        </td>
+                    </tr>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan="4" className="text-center py-10 text-gray-500">No upcoming confirmed appointments.</td>
+                    </tr>
+                )}
               </tbody>
             </table>
           </div>

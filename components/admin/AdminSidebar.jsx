@@ -11,7 +11,8 @@ import {
   FiMessageSquare,
   FiHome,
   FiCalendar,
-  FiSend // ✅ Import the send icon
+  FiSend,
+  FiScissors // --- CHANGE: Imported the Scissors icon ---
 } from 'react-icons/fi';
 
 const navItems = [
@@ -21,9 +22,11 @@ const navItems = [
   { name: 'Messages', href: '/admin/messages', icon: FiMessageSquare },
   { name: 'Subscribers', href: '/admin/subscribers', icon: FiMail },
   { name: 'Promotions', href: '/admin/email-marketing', icon: FiBell },
-  { name: 'WhatsApp', href: '/admin/whatsapp-marketing', icon: FiSend }, // ✅ New WhatsApp link
+  { name: 'WhatsApp', href: '/admin/whatsapp-marketing', icon: FiSend },
   { name: 'Feedbacks', href: '/admin/feedback', icon: FiMessageSquare },
   { name: 'Appointments', href: '/admin/appointments', icon: FiCalendar },
+  { name: 'Vendors', href: '/admin/vendor', icon: FiUsers },
+  { name: 'Tailoring', href: '/admin/tailoring', icon: FiScissors }
 ];
 
 export default function AdminSidebar() {
