@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// --- CHANGE: Imported useSession and your custom hook ---
+import { useSession } from "next-auth/react";
+import useUserInfo from "@/app/hooks/useUserInfo";
 import { Star, Search, Send, Loader, Edit, Trash2, X, ShoppingBag } from "lucide-react";
 import Link from 'next/link';
 
@@ -47,7 +50,8 @@ function EditReviewModal({ review, onClose, onUpdate }) {
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"><X size={24} /></button>
         <h2 className="text-2xl font-bold text-[#B22222] mb-4">Edit Review</h2>
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-          <div><label className="block font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" value={formData.name} onChange={handleChange} className="form-input" required /></div>
+          {/* --- CHANGE: Name field is now readOnly in the edit modal --- */}
+          <div><label className="block font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" value={formData.name} readOnly className="form-input bg-slate-100 cursor-not-allowed" /></div>
           <div><label className="block font-medium text-gray-700 mb-1">Comment</label><textarea name="comment" value={formData.comment} onChange={handleChange} rows={4} className="form-input" /></div>
           <div>
             <label className="block font-medium text-gray-700 mb-2">Rating *</label>
@@ -73,6 +77,12 @@ function EditReviewModal({ review, onClose, onUpdate }) {
 
 
 export default function ReviewPage() {
+  // --- CHANGE: Get user session and profile data using your hook ---
+  const { data: session, status: sessionStatus } = useSession();
+  const userEmail = session?.user?.email;
+  const { userInfo, loading: userInfoLoading } = useUserInfo(userEmail);
+
+  // --- Form State ---
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -83,20 +93,33 @@ export default function ReviewPage() {
   const [comments, setComments] = useState("");
   const [poll, setPoll] = useState({ quality: null, comfort: null, price: null, recommend: null, overall: null });
 
+  // --- Data & UI State ---
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
-
+  
+  // --- Review List State ---
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest-first");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // --- CHANGE: useEffect to auto-fill form with user data from session and your hook ---
+  useEffect(() => {
+    if (userInfo) {
+      setName(userInfo.name || session?.user?.name || '');
+      setEmail(userInfo.email || '');
+      setPhone(userInfo.phone || '');
+    } else if (session?.user) { // Fallback for when userInfo is still loading
+        setName(session.user.name || '');
+        setEmail(session.user.email || '');
+    }
+  }, [userInfo, session]);
+
   const fetchReviews = async () => {
     try {
       setIsLoading(true);
-      // CORRECTED: Ensure all fetch calls use the correct API endpoint
       const res = await fetch('/api/site-reviews');
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
@@ -124,15 +147,15 @@ export default function ReviewPage() {
       reviewData.poll = poll;
     }
     try {
-      // CORRECTED: Ensure all fetch calls use the correct API endpoint
       const res = await fetch('/api/site-reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reviewData),
       });
       if (res.ok) {
-        setName(''); setPhone(''); setEmail(''); setCategory(''); setMaterial('');
-        setRating(0); setComments(''); setPoll({ quality: null, comfort: null, price: null, recommend: null, overall: null });
+        // Don't clear user details, just the review-specific fields
+        setCategory(''); setMaterial(''); setRating(0); setComments('');
+        setPoll({ quality: null, comfort: null, price: null, recommend: null, overall: null });
         await fetchReviews();
       } else {
         throw new Error('Failed to submit review');
@@ -147,7 +170,6 @@ export default function ReviewPage() {
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm("Are you sure you want to delete this review?")) {
       try {
-        // CORRECTED: Ensure all fetch calls use the correct API endpoint
         const res = await fetch(`/api/site-reviews/${reviewId}`, { method: 'DELETE' });
         if (!res.ok) throw new Error("Delete failed");
         setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
@@ -159,7 +181,6 @@ export default function ReviewPage() {
 
   const handleUpdateReview = async (reviewId, updatedData) => {
     try {
-      // CORRECTED: Ensure all fetch calls use the correct API endpoint
       const res = await fetch(`/api/site-reviews/${reviewId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -197,6 +218,22 @@ export default function ReviewPage() {
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' });
   const DisplayStars = ({ count }) => ( <div className="flex items-center">{[...Array(5)].map((_, i) => <Star key={i} size={18} fill={i < count ? "#FFC107" : "none"} stroke="#B22222" />)}</div> );
 
+  // --- CHANGE: Handle loading and unauthenticated states ---
+  if (sessionStatus === "loading" || userInfoLoading) {
+    return <div className="min-h-screen flex items-center justify-center text-gray-500">Loading your information...</div>;
+  }
+  if (sessionStatus === "unauthenticated") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
+        <h2 className="text-2xl font-semibold mb-4">Authentication Required</h2>
+        <p className="text-gray-600 mb-6">Please log in to leave a review.</p>
+        <Link href="/signin" className="px-6 py-3 bg-[#B22222] text-white font-semibold rounded-lg shadow-md hover:bg-[#8B0000] transition-transform duration-200 hover:scale-105">
+          Go to Log In
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <>
       <main className="min-h-screen bg-gray-100 p-4 sm:p-8">
@@ -217,13 +254,25 @@ export default function ReviewPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md">
               <h2 className="text-2xl font-bold text-[#B22222] mb-2 border-b pb-4">Write a Review</h2>
-              <p className="text-sm text-gray-500 mt-2 mb-6">Fields marked with an asterisk (*) are required.</p>
+              <p className="text-sm text-gray-500 mt-2 mb-6">Your details are pre-filled. Fields marked with an asterisk (*) are required.</p>
               <form onSubmit={handleSubmit} className="space-y-6">
+                
+                {/* --- CHANGE: User detail fields are now read-only and styled accordingly --- */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div><label className="block font-medium text-gray-700 mb-1">Name *</label><input type="text" value={name} onChange={(e) => setName(e.target.value)} className="form-input" required /></div>
-                  <div><label className="block font-medium text-gray-700 mb-1">Phone *</label><input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="form-input" required /></div>
+                  <div>
+                    <label className="block font-medium text-gray-700 mb-1">Name *</label>
+                    <input type="text" value={name} className="form-input bg-slate-100 text-gray-500 cursor-not-allowed" readOnly />
+                  </div>
+                  <div>
+                    <label className="block font-medium text-gray-700 mb-1">Phone *</label>
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={`form-input ${userInfo?.phone ? 'bg-slate-100 text-gray-500 cursor-not-allowed' : ''}`} readOnly={!!userInfo?.phone} required />
+                  </div>
                 </div>
-                <div><label className="block font-medium text-gray-700 mb-1">Email *</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="form-input" required /></div>
+                <div>
+                  <label className="block font-medium text-gray-700 mb-1">Email *</label>
+                  <input type="email" value={email} className="form-input bg-slate-100 text-gray-500 cursor-not-allowed" readOnly />
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div><label className="block font-medium text-gray-700 mb-1">Category *</label><select value={category} onChange={handleCategoryChange} className="form-input" required><option value="">Select a Category</option>{Object.keys(productData).map((cat) => (<option key={cat} value={cat}>{cat}</option>))}</select></div>
                   <div><label className="block font-medium text-gray-700 mb-1">Material *</label><select value={material} onChange={(e) => setMaterial(e.target.value)} className="form-input" required disabled={!category}><option value="">Select a Material</option>{category && productData[category].map((mat) => (<option key={mat} value={mat}>{mat}</option>))}</select></div>
@@ -295,3 +344,4 @@ export default function ReviewPage() {
     </>
   );
 }
+
