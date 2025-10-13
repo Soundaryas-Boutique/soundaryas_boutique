@@ -1,15 +1,14 @@
-// --- FIX: Changed to a default import (no curly braces) ---
-import connectReviewDB from "../../../lib/mongoose"; 
-import siteReviewSchema from "../../../(models)/SiteReview";
+import { connectDB } from "../../../lib/mongoose"; // CORRECTED import
+import SiteReview from "../../../(models)/SiteReview"; // CORRECTED import
 import { NextResponse } from 'next/server';
 
-
+// --- UPDATE a review ---
 export async function PUT(request, { params }) {
   const { id } = params;
   const body = await request.json();
   try {
-    await connectReviewDB();
-    const updatedReview = await siteReviewSchema.findByIdAndUpdate(id, body, { new: true });
+    await connectDB(); // CORRECTED function call
+    const updatedReview = await SiteReview.findByIdAndUpdate(id, body, { new: true }); // CORRECTED model name
     
     if (!updatedReview) {
       return NextResponse.json({ message: 'Review not found' }, { status: 404 });
@@ -22,11 +21,12 @@ export async function PUT(request, { params }) {
   }
 }
 
+// --- DELETE a review ---
 export async function DELETE(request, { params }) {
   const { id } = params;
   try {
-    await connectReviewDB();
-    const deletedReview = await siteReviewSchema.findByIdAndDelete(id);
+    await connectDB(); // CORRECTED function call
+    const deletedReview = await SiteReview.findByIdAndDelete(id); // CORRECTED model name
     
     if (!deletedReview) {
       return NextResponse.json({ message: 'Review not found' }, { status: 404 });

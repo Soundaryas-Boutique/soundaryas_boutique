@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-const reviewSchema = new Schema(
+const siteReviewSchema = new Schema(
   {
     name: { type: String, required: true },
     phone: { type: String, required: true },
@@ -22,6 +22,7 @@ const reviewSchema = new Schema(
   }
 );
 
-const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
+// Use a consistent name: SiteReview
+const SiteReview = mongoose.models.SiteReview || mongoose.model('SiteReview', siteReviewSchema);
 
-export default Review;
+export default SiteReview;
