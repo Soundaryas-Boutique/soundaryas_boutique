@@ -10,11 +10,20 @@ export default function ComplaintPage() {
 
   const { userInfo } = useUserInfo(email);
 
+  const complaintTypes = [
+    "Delivery Delay",
+    "Product Quality",
+    "Payment Issue",
+    "Customer Service",
+    "Others",
+  ];
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     orderId: "",
+    complaintType: "",
     complaint: "",
   });
 
@@ -37,11 +46,27 @@ export default function ComplaintPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Complaint Submitted:", formData);
-    // send to API here if needed
-    setSubmitted(true);
+    try {
+      const res = await fetch("/api/complaint", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        console.log(data.message);
+        setSubmitted(true);
+      } else {
+        console.error(data.message);
+        alert(data.message || "Failed to submit complaint.");
+      }
+    } catch (error) {
+      console.error("Error submitting complaint:", error);
+      alert("Server error. Please try again later.");
+    }
   };
 
   if (submitted) {
@@ -49,9 +74,7 @@ export default function ComplaintPage() {
       <div className="flex items-center justify-center h-screen">
         <div className="p-6 bg-green-100 rounded-xl shadow-md text-center">
           <h2 className="text-xl font-semibold mb-2">✅ Complaint Registered</h2>
-          <p className="text-gray-700 mb-6">
-            Our team will contact you soon.
-          </p>
+          <p className="text-gray-700 mb-6">Our team will contact you soon.</p>
           <Link href="/">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
               Back to Shopping
@@ -68,9 +91,7 @@ export default function ComplaintPage() {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Complaint Registration
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Complaint Registration</h1>
 
         <label className="block mb-3">
           <span className="text-gray-700">Name</span>
@@ -118,8 +139,29 @@ export default function ComplaintPage() {
           />
         </label>
 
+        {/* Complaint Type Dropdown */}
         <label className="block mb-4">
-          <span className="text-gray-700">Complaint</span>
+          <span className="text-gray-700">Complaint Type</span>
+          <select
+            name="complaintType"
+            value={formData.complaintType}
+            onChange={handleChange}
+            required
+            className="mt-1 block w-full border p-2 rounded-lg"
+          >
+            <option value="" disabled>
+              Select complaint type
+            </option>
+            {complaintTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block mb-4">
+          <span className="text-gray-700">Complaint Description</span>
           <textarea
             name="complaint"
             required
