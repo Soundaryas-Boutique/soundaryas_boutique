@@ -22,9 +22,16 @@ This project is a full-stack e-commerce solution developed as a group project by
 
   - **Roll No:** CB.SC.U4CSE23239
   - **Name:** S Karthik Vishal S
-  - **Email ID:** karthikvishal1506@gmail.com
-  - **Phone No:** 91123456789
-  - **Photo:** [Insert Photo URL]
+
+  - - **Roll No:** CB.SC.U4CSE23240
+  - **Name:** S Shibi Krishna Ram
+
+  - - **Roll No:** CB.SC.U4CSE23608
+  - **Name:** Ananthasagar N
+
+  - - **Roll No:** CB.SC.U4CSE23629
+  - **Name:** Krishnan
+
 
 -----
 
