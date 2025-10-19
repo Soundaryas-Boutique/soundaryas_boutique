@@ -3,8 +3,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import OrderStatus from './OrderStatus';
-import { Trash2, FiEye } from 'lucide-react';
+import { Trash2, Download } from 'lucide-react'; // Added Download icon
 import CustomerDetailsModal from './CustomerDetailsModal';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { CSVLink } from 'react-csv';
 
 const PIE_CHART_COLORS = ['#8B0000', '#FFBB28', '#00C49F', '#0088FE'];
 
@@ -39,18 +42,14 @@ export default function OrdersDashboard() {
     fetchOrders();
   }, [session, status]);
 
-  // ✅ Memoize the processed data for charts
   const { topProductsData, orderStatusData } = useMemo(() => {
     const productCounts = {};
     const statusCounts = { processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
     
     orders.forEach(order => {
-      // Process for order status visualization
       if (statusCounts[order.orderStatus] !== undefined) {
         statusCounts[order.orderStatus]++;
       }
-
-      // Process for top selling products visualization
       order.products.forEach(product => {
         const name = product.productName;
         if (productCounts[name]) {
@@ -61,13 +60,11 @@ export default function OrdersDashboard() {
       });
     });
 
-    // Convert status counts to an array for the PieChart
     const statusChartData = Object.keys(statusCounts).map(status => ({
       name: status.charAt(0).toUpperCase() + status.slice(1),
       value: statusCounts[status],
     }));
 
-    // Sort products to find the top 3 and format for the BarChart
     const sortedProducts = Object.entries(productCounts)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 3)
@@ -109,6 +106,48 @@ export default function OrdersDashboard() {
     setSelectedCustomer(null);
   };
 
+  // ✅ New function to handle PDF download
+  const handleDownloadPdf = () => {
+    const doc = new jsPDF();
+    doc.text('Customer Orders Dashboard Report', 14, 20);
+
+    // Prepare data for the autoTable plugin
+    const tableColumn = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
+    const tableRows = orders.map(order => [
+      order._id.substring(0, 8) + '...',
+      order.userId?.name || 'User Deleted',
+      order.userId?.email || 'N/A',
+      order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
+      `₹${order.totalAmount.toFixed(2)}`,
+      order.orderStatus,
+      new Date(order.createdAt).toLocaleDateString()
+    ]);
+
+    // Use jspdf-autotable to generate the table
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 30,
+    });
+
+    // Save the PDF
+    doc.save('orders-report.pdf');
+  };
+
+  // ✅ New function to prepare data for CSV download
+  const getCsvData = () => {
+    const csvHeaders = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
+    const csvRows = orders.map(order => ({
+      "Order ID": order._id,
+      "Customer Name": order.userId?.name || 'User Deleted',
+      "Customer Email": order.userId?.email || 'N/A',
+      "Items (Qty)": order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
+      "Total": `₹${order.totalAmount.toFixed(2)}`,
+      "Status": order.orderStatus,
+      "Date": new Date(order.createdAt).toLocaleDateString()
+    }));
+    return csvRows;
+  };
 
   if (loading) return <div className="p-10 text-center">Loading all orders...</div>;
   if (error) return <div className="p-10 text-center text-red-600">Error loading orders: {error}</div>;
@@ -120,7 +159,26 @@ export default function OrdersDashboard() {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">All Customer Orders</h1>
       
-      {/* ✅ Visualizations Section */}
+      {/* ✅ Download Buttons */}
+      <div className="flex justify-end gap-4 mb-6">
+        <button
+          onClick={handleDownloadPdf}
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
+          title="Download as PDF"
+        >
+          <Download size={16} /> Download PDF
+        </button>
+        <CSVLink
+          data={getCsvData()}
+          filename={"orders-report.csv"}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+          target="_blank"
+        >
+          <Download size={16} /> Download CSV
+        </CSVLink>
+      </div>
+
+      {/* Visualizations Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         <div className="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
           <h2 className="text-xl font-bold mb-4 text-gray-800">Top 3 Selling Products</h2>
