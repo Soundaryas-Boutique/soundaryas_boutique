@@ -23,34 +23,45 @@ export default function SareeSection({ title, viewAllLink, initialData, bg }) {
   }, [title]);
 
   return (
-    // Only this section gets the background
-    <section className={`${bg || ""} py-8`}>
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8">
-        <h2 className="text-2xl md:text-3xl font-light text-center text-grey-dark font-secondary">
-          {title}
-        </h2>
+    <section className={`${bg || "bg-white"} py-10 lg:py-16`}>
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+        
+        {/* Decorative Header */}
+        <div className="flex flex-col items-center mb-8 lg:mb-10">
+          <div className="w-10 h-0.5 bg-secondary/30 mb-3"></div>
+          <h2 className="text-2xl md:text-3xl lg:text-3xl font-secondary text-center text-primary tracking-tight uppercase">
+            {title}
+          </h2>
+          <div className="flex items-center gap-3 mt-3">
+            <div className="h-[1px] w-8 lg:w-16 bg-secondary/40"></div>
+            <div className="w-2 h-2 rotate-45 border border-secondary/50"></div>
+            <div className="h-[1px] w-8 lg:w-16 bg-secondary/40"></div>
+          </div>
+        </div>
 
-        {/* Desktop grid */}
-        <div className="grid grid-cols-5 gap-8 hidden md:grid pt-6">
+        {/* Desktop Grid - Narrower Gaps */}
+        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
           {sarees.map((saree) => (
             <SareeCard key={saree._id} saree={saree} variant="desktop" />
           ))}
         </div>
 
-        {/* Mobile horizontal scroll */}
-        <div className="flex overflow-x-auto md:hidden gap-2 pt-6">
+        {/* Mobile Horizontal Scroll - Smaller Cards */}
+        <div className="flex overflow-x-auto md:hidden gap-3 pb-6 no-scrollbar -mx-6 px-6">
           {sarees.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="mobile" />
+            <div key={saree._id} className="min-w-[170px]">
+              <SareeCard saree={saree} variant="mobile" />
+            </div>
           ))}
         </div>
 
-        {/* View All button */}
-        <div className="text-center mt-6">
+        {/* Call to Action */}
+        <div className="text-center mt-8 lg:mt-10">
           <Link
             href={viewAllLink}
-            className="font-main px-2 py-1 text-sm sm:px-4 sm:py-1 sm:text-base text-gray-500 rounded ring-1 ring-gray-500 hover:ring-2 transition-all duration-300 ease-in-out"
+            className="btn-outline inline-block px-10 py-2.5 text-xs"
           >
-            VIEW ALL
+            Explore Collection
           </Link>
         </div>
       </div>
