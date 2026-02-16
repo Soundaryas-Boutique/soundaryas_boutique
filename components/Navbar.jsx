@@ -13,6 +13,8 @@ import {
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 import NewsletterPopup from "./NewsletterPopup";
 
 const Navbar = () => {
@@ -24,8 +26,22 @@ const Navbar = () => {
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const profileRef = useRef(null);
 
   const timeoutRef = useRef(null);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Categories with subcategories for luxury dropdowns
   const categories = [
@@ -118,10 +134,45 @@ const Navbar = () => {
 
             {/* Right: Utilities */}
             <div className="flex-1 flex items-center justify-end gap-5 lg:gap-8 text-primary">
-              <Link href="/Profile" className="group relative hidden lg:block">
-                <FiUser className="w-5 h-5 transition-colors group-hover:text-black" />
-                <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-              </Link>
+              {status === "authenticated" ? (
+                <div className="relative" ref={profileRef}>
+                  <button 
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    className="group relative hidden lg:block outline-none"
+                  >
+                    <FiUser className={`w-5 h-5 transition-colors ${isProfileOpen ? 'text-black' : 'group-hover:text-black'}`} />
+                    <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-secondary rounded-full transition-opacity ${isProfileOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  <div className={`absolute top-full right-0 mt-4 w-44 bg-white border border-gray-100 shadow-premium transition-all duration-300 transform origin-top-right z-[110] ${
+                    isProfileOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
+                  }`}>
+                    <div className="py-2">
+                      <Link 
+                        href="/Profile" 
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 text-[10px] uppercase tracking-widest text-grey-dark hover:text-primary hover:bg-gray-50 transition-all font-medium"
+                      >
+                        My Profile
+                      </Link>
+                      <button 
+                        onClick={() => { setShowLogoutConfirm(true); setIsProfileOpen(false); }}
+                        className="w-full flex items-center gap-3 px-5 py-3 text-[10px] uppercase tracking-widest text-secondary hover:bg-gray-50 transition-all text-left font-bold border-t border-gray-50"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => signIn()}
+                  className="group relative hidden lg:block outline-none"
+                >
+                  <FiUser className="w-5 h-5 transition-colors group-hover:text-black" />
+                </button>
+              )}
               
               <Link href="/Wishlist" className="group relative">
                 <FiHeart className="w-5 h-5 transition-colors group-hover:text-black" />
@@ -272,6 +323,68 @@ const Navbar = () => {
         isPopupOpen={isPopupOpen}
         setIsPopupOpen={setIsPopupOpen}
       />
+
+      {/* Logout Confirmation Modal */}
+      <Transition show={showLogoutConfirm} as={Fragment}>
+        <Dialog onClose={() => setShowLogoutConfirm(false)} className="relative z-[200]">
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          </Transition.Child>
+
+          <Transition.Child
+            as={Fragment}
+            enter="transition-transform ease-out duration-300"
+            enterFrom="scale-95 opacity-0"
+            enterTo="scale-100 opacity-100"
+            leave="transition-transform ease-in duration-200"
+            leaveFrom="scale-100 opacity-100"
+            leaveTo="scale-95 opacity-0"
+          >
+            <div className="fixed inset-0 flex items-center justify-center p-6">
+              <Dialog.Panel className="w-full max-w-sm bg-white overflow-hidden shadow-premium traditional-border">
+                <div className="p-8 text-center">
+                  <div className="w-16 h-16 bg-ivory rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FiUser className="w-8 h-8 text-secondary" />
+                  </div>
+                  
+                  <Dialog.Title className="text-xl font-secondary text-primary uppercase tracking-tight mb-2">
+                    Confirm Logout
+                  </Dialog.Title>
+                  <p className="text-xs text-grey-medium font-main mb-8 leading-relaxed italic">
+                    Are you sure you want to end your session at <br />Soundarya&apos;s Boutique?
+                  </p>
+
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={() => { signOut(); setShowLogoutConfirm(false); }}
+                      className="w-full bg-secondary text-ivory py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-primary transition-all shadow-md"
+                    >
+                      Confirm Logout
+                    </button>
+                    <button
+                      onClick={() => setShowLogoutConfirm(false)}
+                      className="w-full bg-white text-grey-medium py-3 text-[10px] uppercase tracking-[0.15em] font-bold border border-ivory hover:text-primary transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+
+                {/* Decorative Bottom Pattern */}
+                <div className="h-1.5 w-full bg-gradient-to-r from-secondary/40 via-secondary to-secondary/40"></div>
+              </Dialog.Panel>
+            </div>
+          </Transition.Child>
+        </Dialog>
+      </Transition>
     </>
   );
 };
