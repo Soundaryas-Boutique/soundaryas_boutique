@@ -4,6 +4,7 @@ import AuthProvider from "../../components/AuthProvider";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import NavbarWrapper from "../../components/NavbarWrapper";
+import ContentWrapper from "../../components/ContentWrapper";
 import IntroAnimation from "../../components/IntroAnimation";
 import OneTimeNewsletterPopup from "../../components/OneTimeNewsletterPopup";
 import { Poppins, Yeseva_One } from "next/font/google";
@@ -39,9 +40,9 @@ export default function RootLayout({ children }) {
               <IntroAnimation />
               {/* ✅ Render the popup here */}
               <NavbarWrapper />
-              <div className="min-h-screen pt-[110px] lg:pt-[160px]">
+              <ContentWrapper>
                 {children}
-              </div>
+              </ContentWrapper>
             </body>
           </CartProvider>
         </WishlistProvider>
