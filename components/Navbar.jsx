@@ -47,7 +47,7 @@ const Navbar = () => {
     { 
       name: "Boutique", 
       slug: "boutique",
-      subcategories: ["Our Story", "Craftsmanship", "Custom Orders", "Visit Us"] 
+      subcategories: ["Our Story", "Craftsmanship", "Visit Us"] 
     },
   ];
 

@@ -24,9 +24,7 @@ const navItems = [
   { name: 'Promotions', href: '/admin/email-marketing', icon: FiBell },
   { name: 'WhatsApp', href: '/admin/whatsapp-marketing', icon: FiSend },
   { name: 'Feedbacks', href: '/admin/feedback', icon: FiMessageSquare },
-  { name: 'Appointments', href: '/admin/appointments', icon: FiCalendar },
   { name: 'Vendors', href: '/admin/vendor', icon: FiUsers },
-  { name: 'Tailoring', href: '/admin/tailoring', icon: FiScissors }
 ];
 
 export default function AdminSidebar() {

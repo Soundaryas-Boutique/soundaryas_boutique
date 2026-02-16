@@ -4,12 +4,6 @@ import Link from "next/link";
 export default function FeedbackPage() {
   const feedbackOptions = [
     {
-      title: "Complaints",
-      description: "View and manage user complaints, with visual reports.",
-      href: "/admin/feedback/complaints",
-      color: "bg-red-100 text-red-700",
-    },
-    {
       title: "Product Reviews",
       description: "See what customers think about your products.",
       href: "/admin/feedback/reviews",
@@ -26,12 +20,6 @@ export default function FeedbackPage() {
       description: "Manage newsletter subscriptions and campaigns.",
       href: "/admin/feedback/newsletter",
       color: "bg-orange-100 text-orange-700",
-    },
-    {
-      title: "Appointmet",
-      description: "Veiw appointmets in detail here.",
-      href: "/admin/feedback/appointment",
-      color: "bg-yellow-100 text-yellow-700",
     },
   ];
 
