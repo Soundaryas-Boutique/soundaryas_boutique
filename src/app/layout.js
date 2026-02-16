@@ -43,7 +43,6 @@ export default function RootLayout({ children }) {
               <NavbarWrapper />
               <ContentWrapper>
                 {children}
-                <Footer />
               </ContentWrapper>
             </body>
           </CartProvider>
