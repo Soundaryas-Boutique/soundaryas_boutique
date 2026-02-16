@@ -16,11 +16,8 @@ export async function GET(req) {
   try {
     await connectDB();
     const userId = session.user.id;
-
-    console.log("Fetching orders for userId:", userId);
     const orders = await Order.find({ userId: userId }).sort({ createdAt: -1 });
-    console.log("Database query result:", orders);
-    
+
     const serializedOrders = JSON.parse(JSON.stringify(orders));
     return NextResponse.json(serializedOrders);
   } catch (err) {
