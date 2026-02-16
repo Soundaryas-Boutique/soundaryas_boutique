@@ -151,7 +151,7 @@ const Navbar = () => {
                 onMouseLeave={handleCategoryLeave}
               >
                 <Link 
-                  href={`/collections/${category.slug}`}
+                  href={category.slug === "collections" ? "/collections" : `/collections/${category.slug}`}
                   className="text-[11px] uppercase tracking-[0.25em] font-medium text-grey-dark hover:text-primary transition-colors py-2 block"
                 >
                   {category.name}
@@ -213,9 +213,13 @@ const Navbar = () => {
                     className="w-full flex justify-between items-center py-5 group"
                     onClick={() => setActiveMobileCategory(activeMobileCategory === idx ? null : idx)}
                   >
-                    <span className="text-[12px] uppercase tracking-[0.2em] font-semibold text-grey-dark group-hover:text-primary transition-colors">
+                    <Link 
+                      href={category.slug === "collections" ? "/collections" : `/collections/${category.slug}`}
+                      className="text-[12px] uppercase tracking-[0.2em] font-semibold text-grey-dark group-hover:text-primary transition-colors"
+                      onClick={toggleMobileMenu}
+                    >
                       {category.name}
-                    </span>
+                    </Link>
                     <FiChevronDown className={`w-4 h-4 text-primary transition-transform duration-300 ${activeMobileCategory === idx ? 'rotate-180' : ''}`} />
                   </button>
                   
