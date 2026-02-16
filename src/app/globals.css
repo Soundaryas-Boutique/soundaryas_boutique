@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
-
 @theme inline {
   /* 🖋️ Font Variables */
   --font-main: var(--font-poppins);
   --font-secondary: var(--font-yeseva);
 
-  /* 🎨 Brand Colors */
-  --color-primary: #B71C1C;      /* Deep traditional red */
-  --color-secondary: #D4AF37;    /* Soft gold accent */
-  --color-white: #FFFFFF;        /* Base background */
-  --color-grey-dark: #555555;    /* Text grey (for body text) */
-  --color-grey-light: #F5F5F5;   /* Background grey (for sections/cards) */
+  /* 🎨 Brand Colors - Traditional Silk Inspired */
+  --color-primary: #B71C1C;
+  /* Deep traditional red (Sindoor/Kumkum) */
+  --color-secondary: #D4AF37;
+  /* Classic gold (Zari) */
+  --color-accent: #004D40;
+  /* Emerald silk green */
+  --color-royal: #4A148C;
+  /* Royal silk purple */
+  --color-saffron: #F4511E;
+  /* Traditional saree orange */
+  --color-ivory: #FFFDD0;
+  /* Off-white silk base */
+
+  --color-white: #FFFFFF;
+  /* Pure background */
+  --color-grey-dark: #333333;
+  /* Deep text grey */
+  --color-grey-medium: #757575;
+  /* Secondary text */
+  --color-grey-light: #F9F7F2;
+  /* Creamy section background */
+
+  /* Shadows */
+  --shadow-premium: 0 10px 30px -10px rgba(183, 28, 28, 0.15);
+  --shadow-gold: 0 4px 20px -5px rgba(212, 175, 55, 0.3);
+}
+
+@layer base {
+  body {
+    @apply font-main text-grey-dark bg-white antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-secondary tracking-wide text-primary leading-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
 }
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Decorative Border */
+  .traditional-border {
+    position: relative;
+    padding: 20px;
+  }
+
+  .traditional-border::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 1px solid var(--color-secondary);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* Silk Gradient Background */
+  .silk-bg {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFFDD0 100%);
+  }
+
+  /* Premium Buttons */
+  .btn-primary {
+    @apply bg-primary text-white px-8 py-3 rounded-none font-medium transition-all duration-300 hover:bg-black hover:shadow-premium uppercase tracking-widest text-sm;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary px-8 py-3 rounded-none font-medium transition-all duration-300 hover:bg-primary hover:text-white uppercase tracking-widest text-sm;
+  }
+
+  .btn-gold {
+    @apply bg-secondary text-white px-8 py-3 rounded-none font-medium transition-all duration-300 hover:brightness-110 hover:shadow-gold uppercase tracking-widest text-sm;
+  }
+}
+
+@layer base {
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-grey-light;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-black;
   }
 }
 
@@ -29,14 +132,17 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   20% {
     opacity: 1;
     transform: translateY(0);
   }
+
   80% {
     opacity: 1;
     transform: translateY(0);
   }
+
   100% {
     opacity: 0;
     transform: translateY(20px);
