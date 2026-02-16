@@ -7,6 +7,7 @@ import NavbarWrapper from "../../components/NavbarWrapper";
 import ContentWrapper from "../../components/ContentWrapper";
 import IntroAnimation from "../../components/IntroAnimation";
 import OneTimeNewsletterPopup from "../../components/OneTimeNewsletterPopup";
+import Footer from "../../components/Footer";
 import { Poppins, Yeseva_One } from "next/font/google";
 
 // Poppins for body text
@@ -42,6 +43,7 @@ export default function RootLayout({ children }) {
               <NavbarWrapper />
               <ContentWrapper>
                 {children}
+                <Footer />
               </ContentWrapper>
             </body>
           </CartProvider>
