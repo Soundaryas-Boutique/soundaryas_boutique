@@ -59,7 +59,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center silk-bg py-20 px-4">
+    <div className="h-screen w-screen flex items-center justify-center silk-bg overflow-hidden">
       {status === "unauthenticated" && providers ? (
         Object.values(providers).map((provider, index) => {
           if (provider.id === "credentials") {
