@@ -55,7 +55,7 @@ const UserForm = () => {
       setErrorMessage("Password must be at least 6 characters long");
       return;
     }
-  
+
 
     const res = await fetch("/api/Users", {
       method: "POST",
@@ -74,146 +74,178 @@ const UserForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-lg bg-white shadow-lg rounded-xl p-6 sm:p-8">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Create New Account
-        </h1>
+    <div className="flex justify-center items-center py-20 min-h-screen silk-bg px-4">
+      <div className="w-full max-w-2xl bg-white shadow-premium relative overflow-hidden transition-all">
+        {/* Decorative Gradient Top */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary" />
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Name */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Name</label>
-            <input
-              name="name"
-              type="text"
-              onChange={handleChange}
-              value={formData.name}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
+        <div className="p-8 md:p-12">
+          <h1 className="text-3xl md:text-4xl font-secondary text-center mb-2 text-primary">
+            Create Account
+          </h1>
+
+          <div className="flex justify-center items-center gap-2 mb-8">
+            <div className="h-[1px] w-8 bg-secondary/50"></div>
+            <div className="w-1.5 h-1.5 rotate-45 border border-secondary"></div>
+            <div className="h-[1px] w-8 bg-secondary/50"></div>
           </div>
 
-          {/* Email */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              name="email"
-              type="email"
-              onChange={handleChange}
-              value={formData.email}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Name */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Name</label>
+              <input
+                name="name"
+                type="text"
+                onChange={handleChange}
+                value={formData.name}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Password */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              name="password"
-              type="password"
-              onChange={handleChange}
-              value={formData.password}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* Email */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Email</label>
+              <input
+                name="email"
+                type="email"
+                onChange={handleChange}
+                value={formData.email}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Confirm Password */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              onChange={handleChange}
-              value={formData.confirmPassword}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* Password */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Password</label>
+              <input
+                name="password"
+                type="password"
+                onChange={handleChange}
+                value={formData.password}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Phone */}
-          <div className="flex flex-col sm:col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">Phone</label>
-            <PhoneInput
-              country={"in"}
-              value={formData.phone}
-              onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
-              inputClass="!w-full !h-10 !text-sm"
-              containerClass="w-full"
-            />
-          </div>
+            {/* Confirm Password */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Confirm Password</label>
+              <input
+                name="confirmPassword"
+                type="password"
+                onChange={handleChange}
+                value={formData.confirmPassword}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Street */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Street</label>
-            <input
-              name="address"
-              type="text"
-              onChange={handleChange}
-              value={formData.address}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* Phone */}
+            <div className="flex flex-col md:col-span-2">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Phone</label>
+              <PhoneInput
+                country={"in"}
+                value={formData.phone}
+                onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
+                inputClass="!w-full !h-[46px] !text-sm !bg-ivory/30 !border-secondary/30 !rounded-none focus:!border-primary !font-main"
+                containerClass="w-full"
+                buttonClass="!bg-ivory/30 !border-secondary/30 !rounded-none"
+              />
+            </div>
 
-          {/* Pincode */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">Pincode</label>
-            <input
-              name="pincode"
-              type="text"
-              onChange={handleChange}
-              value={formData.pincode}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* Street */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Street</label>
+              <input
+                name="address"
+                type="text"
+                onChange={handleChange}
+                value={formData.address}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* City */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">City</label>
-            <input
-              name="city"
-              type="text"
-              onChange={handleChange}
-              value={formData.city}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* Pincode */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Pincode</label>
+              <input
+                name="pincode"
+                type="text"
+                onChange={handleChange}
+                value={formData.pincode}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* State */}
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">State</label>
-            <input
-              name="state"
-              type="text"
-              onChange={handleChange}
-              value={formData.state}
-              className="border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
-          </div>
+            {/* City */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">City</label>
+              <input
+                name="city"
+                type="text"
+                onChange={handleChange}
+                value={formData.city}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Country */}
-          <div className="flex flex-col col-span-2">
-            <label className="text-sm font-medium text-gray-700 mb-1">Country</label>
-            <Select
-              options={countryOptions}
-              onChange={handleCountryChange}
-              className="text-sm"
-              placeholder="Select your country"
-            />
-          </div>
+            {/* State */}
+            <div className="flex flex-col">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">State</label>
+              <input
+                name="state"
+                type="text"
+                onChange={handleChange}
+                value={formData.state}
+                className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
+              />
+            </div>
 
-          {/* Submit */}
-          <div className="col-span-2 mt-4">
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200 shadow-md"
-            >
-              Create Account
-            </button>
-          </div>
-        </form>
+            {/* Country */}
+            <div className="flex flex-col md:col-span-2">
+              <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Country</label>
+              <Select
+                options={countryOptions}
+                onChange={handleCountryChange}
+                className="text-sm font-main"
+                placeholder="Select your country"
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    backgroundColor: 'rgba(255, 253, 208, 0.3)', // bg-ivory/30
+                    borderColor: 'rgba(212, 175, 55, 0.3)', // border-secondary/30
+                    borderRadius: 0,
+                    padding: '2px',
+                    boxShadow: 'none',
+                    '&:hover': {
+                      borderColor: '#B71C1C' // border-primary
+                    }
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isSelected ? '#B71C1C' : state.isFocused ? 'rgba(212, 175, 55, 0.1)' : 'white',
+                    color: state.isSelected ? 'white' : 'black',
+                  })
+                }}
+              />
+            </div>
 
-        {errorMessage && (
-          <p className="text-red-500 text-center text-sm mt-4">{errorMessage}</p>
-        )}
+            {/* Submit */}
+            <div className="md:col-span-2 mt-6">
+              <button
+                type="submit"
+                className="w-full btn-primary"
+              >
+                Create Account
+              </button>
+            </div>
+          </form>
+
+          {errorMessage && (
+            <div className="mt-6 bg-red-50 border-l-4 border-primary p-4 text-center">
+              <p className="text-primary text-sm font-medium">{errorMessage}</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
