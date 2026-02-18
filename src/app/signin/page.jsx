@@ -34,8 +34,8 @@ export default function Signin() {
   // Session loading state
   if (status === "loading") {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-700 text-2xl">Loading session...</p>
+      <div className="flex items-center justify-center h-screen silk-bg">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-6 py-20">
+    <div className="min-h-screen flex items-center justify-center silk-bg py-20 px-4">
       {status === "unauthenticated" && providers ? (
         Object.values(providers).map((provider, index) => {
           if (provider.id === "credentials") {
@@ -67,57 +67,86 @@ export default function Signin() {
               <form
                 key={provider.id}
                 onSubmit={handleCredentialsLogin}
-                className={`w-[500px] p-6 rounded-lg shadow transition-all duration-1000 bg-gray-200 ease-out ${
-                  loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                }`}
-                style={{ transitionDelay: `${800 + index * 200}ms` }}
+                className={`w-full max-w-md bg-white p-8 md:p-10 shadow-premium transition-all duration-1000 ease-out relative ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+                  }`}
+                style={{ transitionDelay: `${200 + index * 200}ms` }}
               >
-                <h2 className="text-2xl font-semibold text-center mb-4">
-                  Sign in with Email
+                {/* Decorative Elements */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
+
+                <h2 className="text-3xl md:text-4xl font-secondary text-center mb-2 text-primary">
+                  Welcome Back
                 </h2>
+
+                <div className="flex justify-center items-center gap-2 mb-6">
+                  <div className="h-[1px] w-8 bg-secondary/50"></div>
+                  <div className="w-1.5 h-1.5 rotate-45 border border-secondary"></div>
+                  <div className="h-[1px] w-8 bg-secondary/50"></div>
+                </div>
+
+                <p className="text-center text-grey-medium mb-8 font-main text-sm uppercase tracking-widest">
+                  Sign in to your account
+                </p>
+
                 {error && (
-                  <p className="text-red-500 text-sm mb-2 text-center">{error}</p>
+                  <div className="bg-red-50 border-l-4 border-primary p-4 mb-6">
+                    <p className="text-primary text-sm font-medium">{error}</p>
+                  </div>
                 )}
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full mb-3 px-4 py-2 mt-3 border rounded-lg focus:outline-none"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full mb-4 px-4 mt-3 py-2 border rounded-lg focus:outline-none"
-                />
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-grey-dark text-xs font-bold uppercase tracking-wider mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-grey-dark text-xs font-bold uppercase tracking-wider mb-2">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-2 mb-6">
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs text-grey-medium hover:text-primary transition-colors uppercase tracking-wider"
+                  >
+                    Forgot Password?
+                  </Link>
+                </div>
 
                 <button
                   type="submit"
-                  className="w-full py-2 rounded-lg mt-3 font-semibold bg-blue-600 text-white hover:bg-blue-700"
+                  className="w-full btn-primary"
                 >
                   Login
                 </button>
 
-                <div className="mt-10 text-center">
-                  New User?{" "}
+                <div className="mt-8 text-center border-t border-grey-medium/10 pt-6">
+                  <span className="text-grey-medium text-sm">New to Soundarya's? </span>
                   <Link
                     href="/CreateUser"
-                    className="text-blue-500 hover:underline"
+                    className="text-primary hover:text-secondary font-medium transition-colors ml-1 uppercase text-sm tracking-wide"
                   >
                     Create Account
-                  </Link>
-                </div>
-
-                <div className="mt-4 text-center">
-                  <Link
-                    href="/forgot-password"
-                    className="text-blue-500 hover:underline"
-                  >
-                    Forgot your password?
                   </Link>
                 </div>
               </form>
@@ -126,7 +155,10 @@ export default function Signin() {
           return null;
         })
       ) : (
-        <p className="text-black">Loading sign-in options...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-primary font-secondary text-xl">Loading login experience...</p>
+        </div>
       )}
     </div>
   );
