@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FiX } from "react-icons/fi";
 
-export default function SignInModal({ isOpen, onClose }) {
+export default function SignInModal({ isOpen, onClose, onSwitchToSignup }) {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -157,13 +157,12 @@ export default function SignInModal({ isOpen, onClose }) {
 
                                 <div className="mt-8 text-center border-t border-grey-medium/10 pt-6">
                                     <span className="text-grey-medium text-xs">New to Soundarya's? </span>
-                                    <Link
-                                        href="/CreateUser"
-                                        onClick={onClose}
+                                    <button
+                                        onClick={onSwitchToSignup}
                                         className="text-primary hover:text-secondary font-medium transition-colors ml-1 uppercase text-xs tracking-wide"
                                     >
                                         Create Account
-                                    </Link>
+                                    </button>
                                 </div>
                             </div>
                         </Dialog.Panel>
