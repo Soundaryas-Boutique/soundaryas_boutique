@@ -17,6 +17,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import NewsletterPopup from "./NewsletterPopup";
 import SignInModal from "./SignInModal";
+import CreateAccountModal from "./CreateAccountModal";
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -29,6 +30,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false); // ✅ SignIn Modal State
+  const [isCreateAccountOpen, setIsCreateAccountOpen] = useState(false); // ✅ Create Account Modal State
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const profileRef = useRef(null);
 
@@ -328,6 +330,20 @@ const Navbar = () => {
       <SignInModal
         isOpen={isSignInOpen}
         onClose={() => setIsSignInOpen(false)}
+        onSwitchToSignup={() => {
+          setIsSignInOpen(false);
+          setIsCreateAccountOpen(true);
+        }}
+      />
+
+      {/* Create Account Popup Modal */}
+      <CreateAccountModal
+        isOpen={isCreateAccountOpen}
+        onClose={() => setIsCreateAccountOpen(false)}
+        onSwitchToSignIn={() => {
+          setIsCreateAccountOpen(false);
+          setIsSignInOpen(true);
+        }}
       />
 
       {/* Logout Confirmation Modal */}
