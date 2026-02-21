@@ -5,7 +5,6 @@ import {
   FiHeart,
   FiShoppingCart,
   FiMenu,
-  FiMail,
   FiX,
   FiChevronDown,
   FiSearch
@@ -17,9 +16,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import CreateAccountModal from "./CreateAccountModal";
 import { useCart } from "@/app/context/CartContext";
-import NewsletterPopup from "./NewsletterPopup";
 import SignInModal from "./SignInModal";
-// removed duplicate NewsletterPopup import
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -29,7 +26,6 @@ const Navbar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMobileCategory, setActiveMobileCategory] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false); // ✅ SignIn Modal State
@@ -145,7 +141,7 @@ const Navbar = () => {
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="group relative hidden lg:block outline-none"
+                    className="group relative hidden lg:block outline-none cursor-pointer"
                   >
                     <FiUser className={`w-5 h-5 transition-colors ${isProfileOpen ? 'text-black' : 'group-hover:text-black'}`} />
                     <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 bg-secondary rounded-full transition-opacity ${isProfileOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}></span>
@@ -164,7 +160,7 @@ const Navbar = () => {
                       </Link>
                       <button
                         onClick={() => { setShowLogoutConfirm(true); setIsProfileOpen(false); }}
-                        className="w-full flex items-center gap-3 px-5 py-3 text-[10px] uppercase tracking-widest text-secondary hover:bg-gray-50 transition-all text-left font-bold border-t border-gray-50"
+                        className="w-full flex items-center gap-3 px-5 py-3 text-[10px] uppercase cursor-pointer tracking-widest text-secondary hover:bg-gray-50 transition-all text-left font-bold border-t border-gray-50"
                       >
                         Logout
                       </button>
@@ -185,11 +181,8 @@ const Navbar = () => {
                 <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-secondary text-[8px] text-white font-bold">0</span>
               </Link>
 
-              <button onClick={() => setIsPopupOpen(true)} className="group relative hidden lg:block">
-                <FiMail className="w-5 h-5 transition-colors group-hover:text-black" />
-              </button>
 
-              <button onClick={() => setIsCartOpen(true)} className="group relative">
+              <button onClick={() => setIsCartOpen(true)} className="group relative cursor-pointer">
                 <FiShoppingCart className="w-5 h-5 transition-colors group-hover:text-black" />
                 <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] text-white font-bold">{cartItems.length}</span>
               </button>
@@ -322,10 +315,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      <NewsletterPopup
-        isPopupOpen={isPopupOpen}
-        setIsPopupOpen={setIsPopupOpen}
-      />
 
       {/* Search Modal or Popup could be added here similarly */}
 
