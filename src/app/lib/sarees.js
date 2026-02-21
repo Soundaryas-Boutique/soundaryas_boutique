@@ -73,3 +73,21 @@ export async function getHomepageSarees(limit = 5) {
     newArrivals: newArrivalsRaw.map(serializeSaree),
   };
 }
+
+/**
+ * Fetch related sarees by category, excluding current saree
+ */
+export async function getRelatedSarees(category, currentSlug, limit = 5) {
+  await connectDB();
+
+  const relatedRaw = await Saree.find({ 
+    category, 
+    slug: { $ne: currentSlug },
+    status: "active" 
+  })
+    .limit(limit)
+    .select("productName price discountPrice images slug category createdAt updatedAt")
+    .lean();
+
+  return relatedRaw.map(serializeSaree);
+}

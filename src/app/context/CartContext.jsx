@@ -9,6 +9,7 @@ export const CartProvider = ({ children }) => {
   const { data: session, status } = useSession();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const debounceTimeoutRef = useRef(null);
 
   const fetchCart = useCallback(async () => {
@@ -56,11 +57,11 @@ export const CartProvider = ({ children }) => {
             : item
         );
       } else {
-        return [...prevItems, { ...product, quantity: 1 }];
+        return [...prevItems, { ...product, quantity: 1, productId: product._id }];
       }
     });
 
-    // Then, send the update to the server (you would create a separate API for this)
+    // Then, send the update to the server
     await fetch('/api/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -68,12 +69,15 @@ export const CartProvider = ({ children }) => {
         productId: product._id,
         productName: product.productName,
         price: product.discountPrice || product.price,
-        quantity: 1, // API handles the increment
+        quantity: 1, 
         selectedColor: product.selectedColor || null,
         images: product.images
       }),
     });
-    return true; // Assume success for fast UI
+    
+    // Open the drawer after adding
+    setIsCartOpen(true);
+    return true; 
   };
 
   const updateQuantity = (productId, selectedColor, newQuantity) => {
@@ -99,7 +103,7 @@ export const CartProvider = ({ children }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ productId, selectedColor, newQuantity }),
       });
-    }, 500); // Wait 500ms before sending the update
+    }, 500); 
   };
   
   const removeFromCart = (productId, selectedColor) => {
@@ -139,6 +143,8 @@ export const CartProvider = ({ children }) => {
         clearCart,
         cartTotal,
         loading,
+        isCartOpen,
+        setIsCartOpen
       }}
     >
       {children}

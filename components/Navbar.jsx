@@ -15,13 +15,16 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import CreateAccountModal from "./CreateAccountModal";
+import { useCart } from "@/app/context/CartContext";
 import NewsletterPopup from "./NewsletterPopup";
 import SignInModal from "./SignInModal";
-import CreateAccountModal from "./CreateAccountModal";
+// removed duplicate NewsletterPopup import
 
 const Navbar = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { cartItems, setIsCartOpen } = useCart();
 
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -186,10 +189,10 @@ const Navbar = () => {
                 <FiMail className="w-5 h-5 transition-colors group-hover:text-black" />
               </button>
 
-              <Link href="/Cart" className="group relative">
+              <button onClick={() => setIsCartOpen(true)} className="group relative">
                 <FiShoppingCart className="w-5 h-5 transition-colors group-hover:text-black" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] text-white font-bold">0</span>
-              </Link>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] text-white font-bold">{cartItems.length}</span>
+              </button>
             </div>
           </div>
         </div>

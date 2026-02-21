@@ -6,6 +6,7 @@ import { WishlistProvider } from "./context/WishlistContext";
 import NavbarWrapper from "../../components/NavbarWrapper";
 import ContentWrapper from "../../components/ContentWrapper";
 import IntroAnimation from "../../components/IntroAnimation";
+import CartDrawer from "../../components/CartDrawer";
 import OneTimeNewsletterPopup from "../../components/OneTimeNewsletterPopup";
 import Footer from "../../components/Footer";
 import { Poppins, Yeseva_One } from "next/font/google";
@@ -39,7 +40,7 @@ export default function RootLayout({ children }) {
           <CartProvider>
             <body className={`${poppins.variable} ${yeseva.variable} min-h-screen bg-white text-black font-main`}>
               <IntroAnimation />
-              {/* ✅ Render the popup here */}
+              <CartDrawer />
               <NavbarWrapper />
               <ContentWrapper>
                 {children}
