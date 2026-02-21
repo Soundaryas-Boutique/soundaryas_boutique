@@ -7,11 +7,12 @@ import Footer from "./Footer";
 export default function ContentWrapper({ children }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isDenied = pathname === "/Denied";
 
   return (
-    <div className={`min-h-screen ${isAdmin ? "" : "pt-[110px] lg:pt-[160px]"}`}>
+    <div className={`min-h-screen ${(isAdmin || isDenied) ? "" : "pt-[110px] lg:pt-[160px]"}`}>
       {children}
-      {!isAdmin && <Footer />}
+      {(!isAdmin && !isDenied) && <Footer />}
     </div>
   );
 }

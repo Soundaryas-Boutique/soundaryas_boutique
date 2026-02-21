@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/mongoose";
 import Subscriber from "@/app/(models)/Subscriber";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth";
 import nodemailer from "nodemailer";
-
-const isAdmin = async (session) => {
-  return session && session.user.role === "Admin";
-};
+import { isAdmin } from "@/app/lib/authUtils";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -48,8 +43,7 @@ const generateContent = (category, productName) => {
 
 
 export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!await isAdmin(session)) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 

@@ -23,7 +23,7 @@ export default function Signin() {
   // 🐛 FIX: Moved redirection logic into useEffect to avoid updating state during render
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
-      if (session.user.role === "Admin") {
+      if (session.user.role === "admin") {
         router.push("/admin/products");
       } else {
         router.push("/");

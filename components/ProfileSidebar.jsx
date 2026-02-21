@@ -12,7 +12,7 @@ import { useSession } from "next-auth/react";
 
 const ProfileSidebar = ({ activeTab, setActiveTab }) => {
   const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "Admin";
+  const isAdmin = session?.user?.role === "admin";
 
   const menuItems = [
     { id: "profile", label: "Profile Details", icon: FiUser },

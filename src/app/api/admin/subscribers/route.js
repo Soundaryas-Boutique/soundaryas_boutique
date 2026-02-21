@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/mongoose";
 import Subscriber from "@/app/(models)/Subscriber";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth";
-
-// Helper function to check admin status
-const isAdmin = async (session) => {
-  return session && session.user.role === "Admin";
-};
+import { isAdmin } from "@/app/lib/authUtils";
 
 // GET: Fetch ALL subscribers for Admin Dashboard
 export async function GET() {
-  const session = await getServerSession(authOptions);
-  if (!await isAdmin(session)) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 

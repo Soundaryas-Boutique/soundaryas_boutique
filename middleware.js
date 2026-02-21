@@ -11,9 +11,8 @@ export default withAuth(
     }
 
     // Protect /admin routes → Admins only
-    if (pathname.startsWith("/admin") && role !== "Admin") {
+    if (pathname.startsWith("/admin") && role !== "admin") {
       return NextResponse.redirect(new URL("/Denied", req.url));
-      // Or: return NextResponse.redirect(new URL("/login?callbackUrl=" + pathname, req.url));
     }
 
     // Protect /cart routes → Users only
