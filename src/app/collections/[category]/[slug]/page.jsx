@@ -1,9 +1,10 @@
 import { connectDB } from "@/app/lib/mongoose";
 import Saree from "@/app/(models)/Saree";
 import ProductDetailsClient from "./ProductDetailsClient";
+import { getRelatedSarees } from "@/app/lib/sarees";
 
 export default async function ProductDetailsPage({ params }) {
-  const { slug } = await params;
+  const { category, slug } = await params;
 
   await connectDB();
   const saree = await Saree.findOne({ slug }).lean();
@@ -14,8 +15,11 @@ export default async function ProductDetailsPage({ params }) {
     );
   }
 
+  // Fetch related sarees
+  const relatedSarees = await getRelatedSarees(category, slug);
+
   // ✅ Convert the Mongoose object to a plain JavaScript object
   const serializedSaree = JSON.parse(JSON.stringify(saree));
 
-  return <ProductDetailsClient saree={serializedSaree} />;
+  return <ProductDetailsClient saree={serializedSaree} relatedSarees={relatedSarees} />;
 }
