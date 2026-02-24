@@ -29,7 +29,7 @@ This project is a full-stack e-commerce solution developed as a group project by
   - - **Roll No:** CB.SC.U4CSE23608
   - **Name:** Ananthasagar N
 
-  - - **Roll No:** CB.SC.U4CSE23629
+  - - **Roll No:** CB.SC.U4CSE23628
   - **Name:** Krishnan
 
 
