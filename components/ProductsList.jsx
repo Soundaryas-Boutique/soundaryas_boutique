@@ -52,7 +52,7 @@ export default function ProductsList({ initialSarees, category }) {
         <h3 className="text-sm font-secondary text-primary uppercase tracking-widest font-bold mb-1">
           Filter By
         </h3>
-        <p className="text-[10px] text-grey-medium uppercase tracking-[0.1em]">Price Range</p>
+        <p className="text-eyebrow text-grey-medium uppercase tracking-[0.1em]">Price Range</p>
       </div>
 
       <div className="space-y-3">
@@ -88,16 +88,16 @@ export default function ProductsList({ initialSarees, category }) {
         >
           <div className="flex items-center gap-3">
             <Bars3BottomLeftIcon className="w-5 h-5 text-secondary" />
-            <span className="text-[10px] uppercase tracking-[0.2em] font-bold">Filters</span>
+            <span className="text-eyebrow uppercase tracking-[0.2em] font-bold">Filters</span>
           </div>
-          <span className="text-[10px] text-grey-medium">({filteredSarees.length})</span>
+          <span className="text-eyebrow text-grey-medium">({filteredSarees.length})</span>
         </button>
 
         <div className="relative flex-1 group">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="w-full border border-ivory px-6 py-4 text-[10px] uppercase tracking-[0.2em] font-bold text-primary appearance-none outline-none bg-white"
+            className="w-full border border-ivory px-6 py-4 text-eyebrow uppercase tracking-[0.2em] font-bold text-primary appearance-none outline-none bg-white"
           >
             <option value="relevance">Relevance</option>
             <option value="low-high">Price: Low to High</option>
@@ -114,7 +114,7 @@ export default function ProductsList({ initialSarees, category }) {
             {renderPriceFilters()}
             
             <div className="mt-12 pt-8 border-t border-ivory/50">
-              <p className="text-[9px] uppercase tracking-[0.2em] text-grey-medium font-medium leading-relaxed italic opacity-70">
+              <p className="text-eyebrow uppercase tracking-[0.2em] text-grey-medium font-medium leading-relaxed italic opacity-70">
                 Displaying pieces from the curated {category} collection.
               </p>
             </div>
@@ -125,17 +125,17 @@ export default function ProductsList({ initialSarees, category }) {
         <section className="md:col-span-3 lg:col-span-4">
           {/* Summary Bar */}
           <div className="hidden md:flex justify-between items-center mb-8 pb-4 border-b border-ivory/30">
-            <p className="text-[10px] uppercase tracking-[0.15em] text-grey-medium font-medium">
+            <p className="text-eyebrow uppercase tracking-[0.15em] text-grey-medium font-medium">
               Showing {filteredSarees.length} products
             </p>
             
             <div className="flex items-center gap-4">
-              <span className="text-[10px] uppercase tracking-[0.1em] text-grey-medium font-bold">Sort By</span>
+              <span className="text-eyebrow uppercase tracking-[0.1em] text-grey-medium font-bold">Sort By</span>
               <div className="relative group min-w-[140px]">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full bg-transparent text-[10px] uppercase tracking-[0.15em] font-bold text-primary py-1 pr-8 border-none focus:ring-0 cursor-pointer appearance-none outline-none"
+                  className="w-full bg-transparent text-eyebrow uppercase tracking-[0.15em] font-bold text-primary py-1 pr-8 border-none focus:ring-0 cursor-pointer appearance-none outline-none"
                 >
                   <option value="relevance">Relevance</option>
                   <option value="low-high">Price: Low to High</option>
@@ -161,7 +161,7 @@ export default function ProductsList({ initialSarees, category }) {
                 </p>
                 <button 
                   onClick={() => setActiveRange(PRICE_RANGES[0])}
-                  className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold border-b border-primary hover:text-secondary hover:border-secondary transition-all"
+                  className="text-eyebrow uppercase tracking-[0.2em] text-primary font-bold border-b border-primary hover:text-secondary hover:border-secondary transition-all"
                 >
                   Clear all filters
                 </button>
@@ -210,7 +210,7 @@ export default function ProductsList({ initialSarees, category }) {
               <div className="mt-8 pt-6 border-t border-ivory">
                 <button
                   onClick={() => setIsFilterOpen(false)}
-                  className="w-full bg-primary text-ivory py-4 text-[10px] uppercase tracking-[0.2em] font-bold"
+                  className="w-full bg-primary text-ivory py-4 text-eyebrow uppercase tracking-[0.2em] font-bold"
                 >
                   View {filteredSarees.length} Results
                 </button>

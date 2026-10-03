@@ -109,7 +109,7 @@ export default function SignInModal({ isOpen, onClose, onSwitchToSignup }) {
 
                                 <form onSubmit={handleCredentialsLogin} className="space-y-5">
                                     <div>
-                                        <label className="block text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">
+                                        <label className="block text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">
                                             Email Address
                                         </label>
                                         <input
@@ -123,7 +123,7 @@ export default function SignInModal({ isOpen, onClose, onSwitchToSignup }) {
                                     </div>
 
                                     <div>
-                                        <label className="block text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">
+                                        <label className="block text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">
                                             Password
                                         </label>
                                         <input
@@ -140,7 +140,7 @@ export default function SignInModal({ isOpen, onClose, onSwitchToSignup }) {
                                         <Link
                                             href="/forgot-password"
                                             onClick={onClose}
-                                            className="text-[10px] text-grey-medium hover:text-primary transition-colors uppercase tracking-wider"
+                                            className="text-eyebrow text-grey-medium hover:text-primary transition-colors uppercase tracking-wider"
                                         >
                                             Forgot Password?
                                         </Link>

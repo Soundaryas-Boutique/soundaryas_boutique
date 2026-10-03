@@ -103,7 +103,7 @@ export default function WishlistPage() {
                 <p className="text-grey-dark font-main font-semibold text-lg">
                   {formatPrice(item.price)}
                 </p>
-                <p className="text-[10px] uppercase tracking-widest text-secondary mt-3">
+                <p className="text-eyebrow uppercase tracking-widest text-secondary mt-3">
                   In Stock - Handcrafted
                 </p>
               </div>
@@ -111,7 +111,7 @@ export default function WishlistPage() {
               <div className="flex items-center gap-6 mt-6 sm:mt-0 pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-ivory/50 sm:pl-8">
                 <button
                   onClick={() => handleMoveToCart(item.id)}
-                  className="btn-primary !px-6 !py-2.5 text-[10px] uppercase tracking-[0.2em]"
+                  className="btn-primary !px-6 !py-2.5 text-eyebrow uppercase tracking-[0.2em]"
                 >
                   Move to Cart
                 </button>
@@ -147,12 +147,12 @@ export default function WishlistPage() {
               </div>
             </div>
 
-            <p className="text-[10px] text-grey-medium font-main italic leading-relaxed text-center opacity-70">
+            <p className="text-eyebrow text-grey-medium font-main italic leading-relaxed text-center opacity-70">
               Save your favorite pieces and bring them home when the moment is right.
             </p>
 
             <div className="mt-8 pt-6 border-t border-ivory flex justify-center">
-               <div className="text-[9px] uppercase tracking-widest text-center text-secondary font-medium">
+               <div className="text-eyebrow uppercase tracking-widest text-center text-secondary font-medium">
                  Your Personalized Collection
                </div>
             </div>

@@ -18,7 +18,7 @@ export default async function AllCollectionsPage() {
           <h1 className="text-2xl md:text-3xl font-secondary text-primary tracking-tight uppercase">
             All Collections
           </h1>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-grey-medium mt-2">
+          <p className="text-eyebrow uppercase tracking-[0.2em] text-grey-medium mt-2">
             Home / <span className="text-secondary">Collections</span>
           </p>
         </div>

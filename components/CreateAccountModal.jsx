@@ -141,7 +141,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
                                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     {/* Name */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Name</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Name</label>
                                         <input
                                             name="name"
                                             type="text"
@@ -154,7 +154,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Email */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Email</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Email</label>
                                         <input
                                             name="email"
                                             type="email"
@@ -167,7 +167,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Password */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Password</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Password</label>
                                         <input
                                             name="password"
                                             type="password"
@@ -180,7 +180,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Confirm Password */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Confirm Password</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Confirm Password</label>
                                         <input
                                             name="confirmPassword"
                                             type="password"
@@ -193,7 +193,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Phone */}
                                     <div className="flex flex-col md:col-span-2">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Phone</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Phone</label>
                                         <PhoneInput
                                             country={"in"}
                                             value={formData.phone}
@@ -206,7 +206,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Street */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Street</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Street</label>
                                         <input
                                             name="address"
                                             type="text"
@@ -218,7 +218,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Pincode */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Pincode</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Pincode</label>
                                         <input
                                             name="pincode"
                                             type="text"
@@ -230,7 +230,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* City */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">City</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">City</label>
                                         <input
                                             name="city"
                                             type="text"
@@ -242,7 +242,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* State */}
                                     <div className="flex flex-col">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">State</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">State</label>
                                         <input
                                             name="state"
                                             type="text"
@@ -254,7 +254,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }
 
                                     {/* Country */}
                                     <div className="flex flex-col md:col-span-2">
-                                        <label className="text-grey-dark text-[10px] font-bold uppercase tracking-wider mb-2">Country</label>
+                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Country</label>
                                         <Select
                                             options={countryOptions}
                                             onChange={handleCountryChange}

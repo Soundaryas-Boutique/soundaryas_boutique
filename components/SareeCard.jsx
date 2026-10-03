@@ -47,7 +47,7 @@ export default function SareeCard({ saree, variant = "desktop" }) {
           />
         ) : (
           <div className="w-full h-full bg-ivory/20 flex items-center justify-center">
-            <span className="text-[9px] uppercase tracking-widest text-grey-medium">Boutique</span>
+            <span className="text-eyebrow uppercase tracking-widest text-grey-medium">Boutique</span>
           </div>
         )}
 
@@ -57,7 +57,7 @@ export default function SareeCard({ saree, variant = "desktop" }) {
 
         {/* Sale Tag */}
         {hasOffer && (
-          <div className="absolute top-2 left-2 lg:top-4 lg:left-4 bg-primary text-ivory text-[8px] lg:text-[9px] font-bold px-2 py-1 shadow-sm">
+          <div className="absolute top-2 left-2 lg:top-4 lg:left-4 bg-primary text-ivory text-eyebrow lg:text-eyebrow font-bold px-2 py-1 shadow-sm">
             <span className="uppercase tracking-widest">{discountPercentage}% OFF</span>
           </div>
         )}
@@ -83,18 +83,18 @@ export default function SareeCard({ saree, variant = "desktop" }) {
 
       {/* Product Information */}
       <div className={`${isMobile ? 'p-2.5' : 'p-4'} flex flex-col items-center flex-1`}>
-        <h3 className={`${isMobile ? 'text-[10px]' : 'text-xs'} font-secondary text-primary tracking-wide text-center mb-1 line-clamp-1 group-hover:text-secondary transition-colors uppercase`}>
+        <h3 className={`${isMobile ? 'text-eyebrow' : 'text-xs'} font-secondary text-primary tracking-wide text-center mb-1 line-clamp-1 group-hover:text-secondary transition-colors uppercase`}>
           {saree.productName}
         </h3>
         
         <div className="mt-auto flex items-center gap-2">
           {hasOffer ? (
             <>
-              <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-grey-medium line-through font-main opacity-60 tabular-nums`}>{formatPrice(saree.price)}</span>
-              <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.discountPrice)}</span>
+              <span className="text-eyebrow text-grey-medium line-through font-main opacity-60 tabular-nums">{formatPrice(saree.price)}</span>
+              <span className={`${isMobile ? 'text-eyebrow' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.discountPrice)}</span>
             </>
           ) : (
-            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.price)}</span>
+            <span className={`${isMobile ? 'text-eyebrow' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.price)}</span>
           )}
         </div>
       </div>

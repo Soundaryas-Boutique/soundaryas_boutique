@@ -25,7 +25,7 @@ export const PersonalInfoSection = ({ userInfo, loading }) => {
               <item.icon className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[9px] uppercase tracking-widest text-grey-medium font-bold">{item.label}</span>
+              <span className="text-eyebrow uppercase tracking-widest text-grey-medium font-bold">{item.label}</span>
               <span className="text-xs text-primary font-main font-semibold">{item.value || "N/A"}</span>
             </div>
           </div>
@@ -69,16 +69,16 @@ export const OrdersSection = () => {
               <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
                 <div className="flex items-center gap-6">
                   <div>
-                    <p className="text-[9px] uppercase tracking-widest text-grey-medium font-bold">Order ID</p>
-                    <p className="text-[10px] text-primary font-bold">#{order.id.slice(-8).toUpperCase()}</p>
+                    <p className="text-eyebrow uppercase tracking-widest text-grey-medium font-bold">Order ID</p>
+                    <p className="text-eyebrow text-primary font-bold">#{order.id.slice(-8).toUpperCase()}</p>
                   </div>
                   <div>
-                    <p className="text-[9px] uppercase tracking-widest text-grey-medium font-bold">Placed On</p>
-                    <p className="text-[10px] text-primary">{new Date(order.createdAt).toLocaleDateString()}</p>
+                    <p className="text-eyebrow uppercase tracking-widest text-grey-medium font-bold">Placed On</p>
+                    <p className="text-eyebrow text-primary">{new Date(order.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-secondary mb-1">{order.status || "In Process"}</span>
+                  <span className="text-eyebrow uppercase tracking-[0.2em] font-bold text-secondary mb-1">{order.status || "In Process"}</span>
                   <p className="text-sm font-bold text-primary tabular-nums">{formatPrice(order.totalAmount ?? order.price)}</p>
                 </div>
               </div>
@@ -88,9 +88,9 @@ export const OrdersSection = () => {
                   <div className="w-10 h-10 bg-gray-50 flex items-center justify-center text-grey-medium">
                     <FiShoppingBag className="w-5 h-5" />
                   </div>
-                  <p className="text-[10px] uppercase tracking-widest text-primary font-bold">{order.productName || "Boutique Saree"}</p>
+                  <p className="text-eyebrow uppercase tracking-widest text-primary font-bold">{order.productName || "Boutique Saree"}</p>
                 </div>
-                <button className="text-[9px] uppercase tracking-widest font-bold text-grey-medium hover:text-primary transition-colors">Details</button>
+                <button className="text-eyebrow uppercase tracking-widest font-bold text-grey-medium hover:text-primary transition-colors">Details</button>
               </div>
             </div>
           ))}
@@ -99,7 +99,7 @@ export const OrdersSection = () => {
         <div className="py-20 text-center border-2 border-dashed border-ivory/30">
           <FiTruck className="w-12 h-12 text-ivory mx-auto mb-4" />
           <p className="text-sm font-main italic text-grey-medium">No orders found in your collection yet.</p>
-          <button className="mt-6 text-[10px] uppercase tracking-widest font-bold text-secondary border-b border-secondary hover:text-primary hover:border-primary transition-all pb-1">Start Exploring</button>
+          <button className="mt-6 text-eyebrow uppercase tracking-widest font-bold text-secondary border-b border-secondary hover:text-primary hover:border-primary transition-all pb-1">Start Exploring</button>
         </div>
       )}
     </div>
@@ -119,11 +119,11 @@ export const AddressSection = ({ userInfo, loading }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white border border-gray-100 p-6 flex flex-col gap-4">
           <div className="flex justify-between items-start">
-            <span className="text-[10px] uppercase tracking-widest bg-gray-100 px-2 py-1 font-bold text-grey-medium">Default</span>
+            <span className="text-eyebrow uppercase tracking-widest bg-gray-100 px-2 py-1 font-bold text-grey-medium">Default</span>
             <FiMapPin className="w-4 h-4 text-secondary" />
           </div>
           
-          <div className="text-[11px] text-primary font-main leading-relaxed">
+          <div className="text-eyebrow text-primary font-main leading-relaxed">
             <p className="font-bold mb-2 uppercase tracking-widest">Primary Residence</p>
             <p className="text-grey-medium">{userInfo?.name}</p>
             <p className="text-grey-medium">{userInfo?.address}</p>
@@ -131,14 +131,14 @@ export const AddressSection = ({ userInfo, loading }) => {
           </div>
 
           <div className="flex items-center gap-4 mt-2 border-t border-gray-50 pt-4">
-            <button className="text-[9px] uppercase tracking-widest font-bold text-secondary hover:text-primary transition-colors">Edit</button>
-            <button className="text-[9px] uppercase tracking-widest font-bold text-grey-medium">Remove</button>
+            <button className="text-eyebrow uppercase tracking-widest font-bold text-secondary hover:text-primary transition-colors">Edit</button>
+            <button className="text-eyebrow uppercase tracking-widest font-bold text-grey-medium">Remove</button>
           </div>
         </div>
 
         <button className="border-2 border-dashed border-gray-100 p-6 flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-all text-grey-medium">
           <span className="text-xl">+</span>
-          <span className="text-[9px] uppercase tracking-widest font-bold">Add New</span>
+          <span className="text-eyebrow uppercase tracking-widest font-bold">Add New</span>
         </button>
       </div>
     </div>

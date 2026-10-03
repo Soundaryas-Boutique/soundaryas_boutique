@@ -95,7 +95,7 @@ export default function CartDrawer() {
                           </p>
                           <button
                             onClick={() => setIsCartOpen(false)}
-                            className="text-[10px] uppercase tracking-widest font-bold text-primary border-b border-primary pb-1 hover:text-secondary hover:border-secondary transition-all"
+                            className="text-eyebrow uppercase tracking-widest font-bold text-primary border-b border-primary pb-1 hover:text-secondary hover:border-secondary transition-all"
                           >
                             Explore Our Curation
                           </button>
@@ -116,14 +116,14 @@ export default function CartDrawer() {
 
                               <div className="flex flex-1 flex-col pt-1">
                                 <div className="flex justify-between items-start">
-                                  <h4 className="text-[13px] font-secondary text-primary uppercase tracking-tight leading-tight max-w-[180px]">
+                                  <h4 className="text-sm font-secondary text-primary uppercase tracking-tight leading-tight max-w-[180px]">
                                     {item.productName}
                                   </h4>
                                   <p className="text-sm font-bold text-grey-dark tabular-nums">{formatPrice(item.price)}</p>
                                 </div>
                                 
                                 {item.selectedColor && (
-                                  <p className="text-[9px] uppercase tracking-widest text-secondary mt-1">{item.selectedColor}</p>
+                                  <p className="text-eyebrow uppercase tracking-widest text-secondary mt-1">{item.selectedColor}</p>
                                 )}
 
                                 <div className="mt-auto flex items-center justify-between">
@@ -159,10 +159,10 @@ export default function CartDrawer() {
                     {cartItems.length > 0 && (
                       <div className="border-t border-ivory/80 px-6 py-8 md:px-10 bg-ivory/10">
                         <div className="flex justify-between items-center mb-6">
-                          <span className="text-[11px] uppercase tracking-[0.3em] text-grey-medium">Subtotal</span>
+                          <span className="text-eyebrow uppercase tracking-[0.3em] text-grey-medium">Subtotal</span>
                           <span className="text-xl font-bold text-primary tabular-nums">{formatPrice(cartTotal)}</span>
                         </div>
-                        <p className="text-[10px] text-grey-medium italic mb-8 text-center bg-white/50 py-2">
+                        <p className="text-eyebrow text-grey-medium italic mb-8 text-center bg-white/50 py-2">
                           Complimentary boutique shipping included
                         </p>
                         
@@ -186,7 +186,7 @@ export default function CartDrawer() {
                           </button>
                           
                           {!session && (
-                            <p className="text-[9px] text-center text-secondary uppercase tracking-[0.2em] font-bold animate-pulse">
+                            <p className="text-eyebrow text-center text-secondary uppercase tracking-[0.2em] font-bold animate-pulse">
                               Please sign in to proceed
                             </p>
                           )}

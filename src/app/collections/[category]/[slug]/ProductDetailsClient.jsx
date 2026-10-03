@@ -45,7 +45,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
         )}
         
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] text-grey-medium mb-6">
+        <nav className="flex items-center gap-2 text-eyebrow uppercase tracking-[0.2em] text-grey-medium mb-6">
           <Link href="/" className="hover:text-primary transition-colors">Home</Link>
           <span className="text-secondary/50">/</span>
           <Link href={`/collections/${saree.category}`} className="hover:text-primary transition-colors">{saree.category}</Link>
@@ -86,7 +86,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
 
           {/* Product Info */}
           <div className="flex flex-col pt-2 max-w-lg">
-            <div className="inline-block px-2 py-0.5 bg-ivory text-primary text-[9px] font-bold tracking-[0.2em] uppercase w-fit mb-4">
+            <div className="inline-block px-2 py-0.5 bg-ivory text-primary text-eyebrow font-bold tracking-[0.2em] uppercase w-fit mb-4">
               {saree.category.replace("-", " ")}
             </div>
             
@@ -102,7 +102,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
                 )}
               </div>
               {saree.price > saree.discountPrice && (
-                <div className="px-2 py-0.5 border border-secondary text-secondary text-[9px] font-bold tracking-widest uppercase">
+                <div className="px-2 py-0.5 border border-secondary text-secondary text-eyebrow font-bold tracking-widest uppercase">
                   {Math.round(((saree.price - saree.discountPrice) / saree.price) * 100)}% OFF
                 </div>
               )}
@@ -112,7 +112,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
               {saree.description}
             </p>
 
-            <div className="bg-grey-light p-4 mb-8 text-[11px] flex flex-col gap-2">
+            <div className="bg-grey-light p-4 mb-8 text-eyebrow flex flex-col gap-2">
               <div className="flex justify-between border-b border-white pb-2">
                 <span className="uppercase tracking-widest text-grey-medium">Artisinal Material</span>
                 <span className="font-bold text-grey-dark uppercase">{saree.material || "Pure Silk"}</span>
@@ -173,7 +173,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
                 <h2 className="text-xl md:text-2xl font-secondary text-center text-primary tracking-tight uppercase">
                   Complete Your Look
                 </h2>
-                <p className="text-[9px] uppercase tracking-[0.3em] text-grey-medium mt-2">Curated recommendations just for you</p>
+                <p className="text-eyebrow uppercase tracking-[0.3em] text-grey-medium mt-2">Curated recommendations just for you</p>
                 <div className="flex items-center gap-2 mt-3">
                   <div className="h-[1px] w-10 bg-secondary/40"></div>
                   <div className="w-1.5 h-1.5 rotate-45 border border-secondary/50"></div>

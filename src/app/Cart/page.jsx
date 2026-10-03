@@ -109,7 +109,7 @@ export default function CartPage() {
                   />
                 ) : (
                   <div className="w-full h-full bg-ivory/30 flex items-center justify-center border border-ivory/50">
-                    <span className="text-[10px] uppercase tracking-widest text-grey-medium">Boutique</span>
+                    <span className="text-eyebrow uppercase tracking-widest text-grey-medium">Boutique</span>
                   </div>
                 )}
               </div>
@@ -131,7 +131,7 @@ export default function CartPage() {
 
               <div className="flex items-center gap-6 mt-6 sm:mt-0 pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-ivory/50 sm:pl-8">
                 <div className="flex items-center border border-ivory bg-ivory/10 px-2">
-                  <span className="text-[10px] uppercase tracking-widest text-secondary mr-1 font-medium">Qty:</span>
+                  <span className="text-eyebrow uppercase tracking-widest text-secondary mr-1 font-medium">Qty:</span>
                   <select
                     value={item.quantity}
                     onChange={(e) =>
@@ -194,7 +194,7 @@ export default function CartPage() {
               </button>
               
               {!session && (
-                <p className="text-[10px] text-center text-secondary uppercase tracking-[0.2em] font-medium animate-pulse">
+                <p className="text-eyebrow text-center text-secondary uppercase tracking-[0.2em] font-medium animate-pulse">
                   Please Sign In to Checkout
                 </p>
               )}
@@ -202,7 +202,7 @@ export default function CartPage() {
 
             {/* Trust Badges */}
             <div className="mt-8 pt-6 border-t border-ivory flex justify-center gap-4 opacity-40 grayscale">
-               <div className="text-[9px] uppercase tracking-widest text-center">
+               <div className="text-eyebrow uppercase tracking-widest text-center">
                  Traditional Craftsmanship | Secure Payments
                </div>
             </div>

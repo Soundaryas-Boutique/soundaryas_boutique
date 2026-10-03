@@ -103,7 +103,7 @@ const Navbar = () => {
       <header className="w-full z-[100] fixed top-0 left-0 bg-white">
         {/* Tier 1: Announcement Bar */}
         <div className="bg-primary text-ivory py-1.5 px-4 text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] font-medium">
+          <p className="text-eyebrow uppercase tracking-[0.3em] font-medium">
             Free Shipping on Orders Over ₹5000 • Handcrafted with Love
           </p>
         </div>
@@ -119,7 +119,7 @@ const Navbar = () => {
               </button>
               <div className="hidden lg:flex items-center gap-2 group cursor-pointer text-grey-medium hover:text-primary transition-colors">
                 <FiSearch className="w-4 h-4" />
-                <span className="text-[10px] uppercase tracking-widest font-medium">Search</span>
+                <span className="text-eyebrow uppercase tracking-widest font-medium">Search</span>
               </div>
             </div>
 
@@ -129,7 +129,7 @@ const Navbar = () => {
                 <h1 className="text-primary text-2xl lg:text-4xl font-secondary tracking-tight transition-transform duration-300 group-hover:scale-[1.02]">
                   Soundarya&apos;s
                 </h1>
-                <p className="text-secondary text-[9px] lg:text-[10px] uppercase tracking-[0.5em] font-medium -mt-1 lg:-mt-1.5">
+                <p className="text-secondary text-eyebrow lg:text-eyebrow uppercase tracking-[0.5em] font-medium -mt-1 lg:-mt-1.5">
                   Boutique
                 </p>
               </Link>
@@ -154,13 +154,13 @@ const Navbar = () => {
                       <Link
                         href="/Profile"
                         onClick={() => setIsProfileOpen(false)}
-                        className="flex items-center gap-3 px-5 py-3 text-[10px] uppercase tracking-widest text-grey-dark hover:text-primary hover:bg-gray-50 transition-all font-medium"
+                        className="flex items-center gap-3 px-5 py-3 text-eyebrow uppercase tracking-widest text-grey-dark hover:text-primary hover:bg-gray-50 transition-all font-medium"
                       >
                         My Profile
                       </Link>
                       <button
                         onClick={() => { setShowLogoutConfirm(true); setIsProfileOpen(false); }}
-                        className="w-full flex items-center gap-3 px-5 py-3 text-[10px] uppercase cursor-pointer tracking-widest text-secondary hover:bg-gray-50 transition-all text-left font-bold border-t border-gray-50"
+                        className="w-full flex items-center gap-3 px-5 py-3 text-eyebrow uppercase cursor-pointer tracking-widest text-secondary hover:bg-gray-50 transition-all text-left font-bold border-t border-gray-50"
                       >
                         Logout
                       </button>
@@ -178,13 +178,13 @@ const Navbar = () => {
 
               <Link href="/Wishlist" className="group relative">
                 <FiHeart className="w-5 h-5 transition-colors group-hover:text-black" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-secondary text-[8px] text-white font-bold">0</span>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-secondary text-eyebrow text-white font-bold">0</span>
               </Link>
 
 
               <button onClick={() => setIsCartOpen(true)} className="group relative cursor-pointer">
                 <FiShoppingCart className="w-5 h-5 transition-colors group-hover:text-black" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-[8px] text-white font-bold">{cartItems.length}</span>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-primary text-eyebrow text-white font-bold">{cartItems.length}</span>
               </button>
             </div>
           </div>
@@ -202,7 +202,7 @@ const Navbar = () => {
               >
                 <Link
                   href={category.slug === "collections" ? "/collections" : `/collections/${category.slug}`}
-                  className="text-[11px] uppercase tracking-[0.25em] font-medium text-grey-dark hover:text-primary transition-colors py-2 block"
+                  className="text-eyebrow uppercase tracking-[0.25em] font-medium text-grey-dark hover:text-primary transition-colors py-2 block"
                 >
                   {category.name}
                 </Link>
@@ -219,7 +219,7 @@ const Navbar = () => {
                       <Link
                         key={sIdx}
                         href="#"
-                        className="text-[10px] uppercase tracking-widest text-grey-medium hover:text-primary hover:translate-x-1 transition-all"
+                        className="text-eyebrow uppercase tracking-widest text-grey-medium hover:text-primary hover:translate-x-1 transition-all"
                       >
                         {sub}
                       </Link>
@@ -251,7 +251,7 @@ const Navbar = () => {
             </div>
 
             <nav className="flex-1 space-y-2 overflow-y-auto no-scrollbar">
-              <Link href="/" onClick={toggleMobileMenu} className="block py-4 text-[12px] uppercase tracking-[0.2em] font-semibold text-primary border-b border-gray-50">
+              <Link href="/" onClick={toggleMobileMenu} className="block py-4 text-xs uppercase tracking-[0.2em] font-semibold text-primary border-b border-gray-50">
                 Home
               </Link>
 
@@ -263,7 +263,7 @@ const Navbar = () => {
                   >
                     <Link
                       href={category.slug === "collections" ? "/collections" : `/collections/${category.slug}`}
-                      className="text-[12px] uppercase tracking-[0.2em] font-semibold text-grey-dark group-hover:text-primary transition-colors"
+                      className="text-xs uppercase tracking-[0.2em] font-semibold text-grey-dark group-hover:text-primary transition-colors"
                       onClick={toggleMobileMenu}
                     >
                       {category.name}
@@ -279,7 +279,7 @@ const Navbar = () => {
                           key={sIdx}
                           href="#"
                           onClick={toggleMobileMenu}
-                          className="block text-[11px] uppercase tracking-widest text-grey-medium hover:text-primary"
+                          className="block text-eyebrow uppercase tracking-widest text-grey-medium hover:text-primary"
                         >
                           {sub}
                         </Link>
@@ -289,7 +289,7 @@ const Navbar = () => {
                 </div>
               ))}
 
-              <Link href="/about-us" onClick={toggleMobileMenu} className="block py-5 text-[12px] uppercase tracking-[0.2em] font-semibold text-grey-dark border-b border-gray-50">
+              <Link href="/about-us" onClick={toggleMobileMenu} className="block py-5 text-xs uppercase tracking-[0.2em] font-semibold text-grey-dark border-b border-gray-50">
                 Our Story
               </Link>
             </nav>
@@ -379,13 +379,13 @@ const Navbar = () => {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => { signOut(); setShowLogoutConfirm(false); }}
-                      className="w-full bg-secondary text-ivory py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-primary transition-all shadow-md"
+                      className="w-full bg-secondary text-ivory py-4 text-eyebrow uppercase tracking-[0.2em] font-bold hover:bg-primary transition-all shadow-md"
                     >
                       Confirm Logout
                     </button>
                     <button
                       onClick={() => setShowLogoutConfirm(false)}
-                      className="w-full bg-white text-grey-medium py-3 text-[10px] uppercase tracking-[0.15em] font-bold border border-ivory hover:text-primary transition-all"
+                      className="w-full bg-white text-grey-medium py-3 text-eyebrow uppercase tracking-[0.15em] font-bold border border-ivory hover:text-primary transition-all"
                     >
                       Cancel
                     </button>

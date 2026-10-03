@@ -24,7 +24,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-pulse flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-ivory border-t-secondary rounded-full animate-spin"></div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-grey-medium font-bold">Loading Account...</p>
+          <p className="text-eyebrow uppercase tracking-[0.2em] text-grey-medium font-bold">Loading Account...</p>
         </div>
       </div>
     );
@@ -36,7 +36,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
         <h1 className="text-3xl font-secondary text-primary uppercase tracking-tighter mb-4">Guest View</h1>
         <p className="text-grey-medium font-main italic mb-10 max-w-md"> Please sign in to access your curated collection, order history, and saved addresses. </p>
         <Link href="/signin">
-          <button className="bg-primary text-ivory px-12 py-4 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-secondary transition-all shadow-premium">
+          <button className="bg-primary text-ivory px-12 py-4 text-eyebrow uppercase tracking-[0.2em] font-bold hover:bg-secondary transition-all shadow-premium">
             Enter Boutique
           </button>
         </Link>
@@ -67,7 +67,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
               {loading && !userInfo ? "..." : (userInfo?.name?.split(" ")[0] || session?.user?.name?.split(" ")[0] || "User")}
             </span>
           </h1>
-          <p className="text-[10px] uppercase tracking-widest text-grey-medium mt-2">
+          <p className="text-eyebrow uppercase tracking-widest text-grey-medium mt-2">
             Explore your boutique account and orders
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
       </div>
 
       {error && (
-        <div className="mt-12 p-4 bg-red-50 border border-red-100 text-red-600 text-[10px] uppercase tracking-widest font-bold text-center">
+        <div className="mt-12 p-4 bg-red-50 border border-red-100 text-red-600 text-eyebrow uppercase tracking-widest font-bold text-center">
           Notice: {error.message}. Some details may not be available.
         </div>
       )}

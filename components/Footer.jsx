@@ -28,7 +28,7 @@ const Footer = () => {
                 <h2 className="text-primary text-2xl lg:text-3xl font-secondary tracking-tight">
                   Soundarya&apos;s
                 </h2>
-                <p className="text-secondary text-[9px] lg:text-[10px] uppercase tracking-[0.5em] font-medium -mt-1">
+                <p className="text-secondary text-eyebrow lg:text-eyebrow uppercase tracking-[0.5em] font-medium -mt-1">
                   Boutique
                 </p>
               </Link>
@@ -100,18 +100,18 @@ const Footer = () => {
 
         {/* Bottom Section: Legal & Trust */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-grey-medium text-[10px] uppercase tracking-[0.2em] font-medium order-2 md:order-1">
+          <div className="text-grey-medium text-eyebrow uppercase tracking-[0.2em] font-medium order-2 md:order-1">
             © {currentYear} Soundarya&apos;s Boutique. All Rights Reserved.
           </div>
           
-          <div className="flex items-center gap-8 text-[10px] uppercase tracking-[0.2em] font-medium text-grey-medium order-1 md:order-2">
+          <div className="flex items-center gap-8 text-eyebrow uppercase tracking-[0.2em] font-medium text-grey-medium order-1 md:order-2">
             <Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link>
             <Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link>
             <Link href="#" className="hover:text-primary transition-colors">Shipping & Returns</Link>
           </div>
 
           <div className="flex items-center gap-4 opacity-50 order-3 grayscale">
-             <div className="text-[10px] uppercase tracking-widest border border-secondary/50 px-3 py-1 text-secondary font-bold">
+             <div className="text-eyebrow uppercase tracking-widest border border-secondary/50 px-3 py-1 text-secondary font-bold">
                Handcrafted in India
              </div>
           </div>

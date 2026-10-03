@@ -38,7 +38,7 @@ const DeniedPage = () => {
         {/* Minimalist Link Back */}
         <Link 
           href="/"
-          className="text-[10px] uppercase tracking-[0.3em] font-bold text-secondary hover:text-primary transition-colors duration-300 pb-1 border-b border-secondary/20 hover:border-primary/40"
+          className="text-eyebrow uppercase tracking-[0.3em] font-bold text-secondary hover:text-primary transition-colors duration-300 pb-1 border-b border-secondary/20 hover:border-primary/40"
         >
           Return to Curation
         </Link>

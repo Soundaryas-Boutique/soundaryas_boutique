@@ -36,7 +36,7 @@ const ProfileSidebar = ({ activeTab, setActiveTab }) => {
               }`}
             >
               <item.icon className={`w-4 h-4 ${activeTab === item.id ? "text-secondary" : "group-hover:text-primary"}`} />
-              <span className="text-[10px] uppercase tracking-widest font-bold">
+              <span className="text-eyebrow uppercase tracking-widest font-bold">
                 {item.label}
               </span>
             </button>
@@ -52,7 +52,7 @@ const ProfileSidebar = ({ activeTab, setActiveTab }) => {
         >
           <div className="flex items-center gap-3">
             <FiLayout className="w-4 h-4 text-secondary" />
-            <span className="text-[9px] uppercase tracking-widest font-bold">Admin Dashboard</span>
+            <span className="text-eyebrow uppercase tracking-widest font-bold">Admin Dashboard</span>
           </div>
           <FiChevronRight className="w-3 h-3 text-secondary" />
         </Link>

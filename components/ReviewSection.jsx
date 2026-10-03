@@ -7,7 +7,7 @@ export default function ReviewSection() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-16 bg-gradient-to-b from-secondary/0 via-secondary/40 to-secondary/0"></div>
       
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <div className="inline-block px-4 py-1 border border-secondary/30 text-secondary text-[10px] uppercase tracking-[0.4em] mb-6">
+        <div className="inline-block px-4 py-1 border border-secondary/30 text-secondary text-eyebrow uppercase tracking-[0.4em] mb-6">
           Testimonials
         </div>
         
