@@ -21,7 +21,7 @@ export default function OrdersDashboard() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const fetchOrders = async () => {
-    if (status !== 'authenticated' || session.user.role !== 'Admin') {
+    if (status !== 'authenticated' || session.user.role !== 'admin') {
       setLoading(false);
       return;
     }
@@ -152,7 +152,7 @@ export default function OrdersDashboard() {
 
   if (loading) return <div className="p-10 text-center">Loading all orders...</div>;
   if (error) return <div className="p-10 text-center text-red-600">Error loading orders: {error}</div>;
-  if (status !== 'authenticated' || session.user.role !== 'Admin') {
+  if (status !== 'authenticated' || session.user.role !== 'admin') {
     return <div className="p-10 text-center text-red-600">ACCESS DENIED. Only Admin can view this page.</div>;
   }
   
