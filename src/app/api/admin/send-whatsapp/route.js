@@ -4,11 +4,11 @@ import Subscriber from "@/app/(models)/Subscriber";
 import twilio from "twilio";
 import { isAdmin } from "@/app/lib/authUtils";
 
-// Initialize Twilio client
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+// Initialize Twilio client lazily, so a missing/invalid SID doesn't throw at
+// module evaluation (which happens during `next build` page-data collection).
+function getTwilioClient() {
+  return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+}
 
 export async function POST(req) {
   if (!(await isAdmin())) {
@@ -29,6 +29,8 @@ export async function POST(req) {
     if (subscribers.length === 0) {
       return NextResponse.json({ message: "No subscribers with a phone number found." }, { status: 200 });
     }
+
+    const twilioClient = getTwilioClient();
 
     const sendingPromises = subscribers.map(sub => {
       return twilioClient.messages.create({
