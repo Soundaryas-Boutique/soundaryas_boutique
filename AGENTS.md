@@ -29,9 +29,10 @@ npm run lint    # eslint .  (`next lint` was removed in Next 16)
 ## Conventions
 
 - Query through `supabase()` from `src/app/lib/supabase.js`. It holds the
-  service-role key and so must never be imported into a Client Component —
-  every caller is a route handler or a Server Component that has already
-  checked the session.
+  secret key (`sb_secret_…`) and so must never be imported into a Client
+  Component — every caller is a route handler or a Server Component that has
+  already checked the session. The publishable key is not used anywhere: with
+  RLS on and no policies it would read nothing.
 - Always check the `error` the client returns; it does not throw on its own.
 - Columns are camelCase and quoted in the DDL, matching the JSON keys the
   components read. There is no snake_case mapping layer — do not add one.
@@ -52,7 +53,7 @@ npm run lint    # eslint .  (`next lint` was removed in Next 16)
 ## Environment
 
 Secrets live in `.env.local` (gitignored). Required:
-`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`,
+`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`,
 `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
 `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`, `TWILIO_ACCOUNT_SID`,
 `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`.

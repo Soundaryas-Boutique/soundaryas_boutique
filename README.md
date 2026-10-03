@@ -85,7 +85,9 @@ Create a file named `.env.local` in the root of your project and add the followi
 ```env
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+# The secret key, not the publishable one: it runs server-side and must
+# bypass RLS. Settings -> API Keys in the Supabase dashboard.
+SUPABASE_SECRET_KEY=sb_secret_...
 
 # NextAuth.js
 NEXTAUTH_SECRET=a_long_random_secret_string

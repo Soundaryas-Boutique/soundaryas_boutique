@@ -200,9 +200,10 @@ create trigger subscribers_set_updated_at before update on subscribers
 -- ---------------------------------------------------------------- access
 --
 -- Every query runs server-side through a route handler that checks the NextAuth
--- session, using the service-role key. RLS is enabled with no policies so that
--- the anon key -- if it ever reaches a browser -- can read nothing. Add
--- policies here before querying any table from client code.
+-- session, using the secret key (sb_secret_...). RLS is enabled with no policies
+-- so that the publishable key -- which is the one safe to ship to a browser --
+-- can read nothing. Add policies here before querying any table from client
+-- code.
 
 alter table users        enable row level security;
 alter table sarees       enable row level security;
