@@ -154,30 +154,6 @@ create index contacts_created_at_idx on contacts ("createdAt" desc);
 create trigger contacts_set_updated_at before update on contacts
   for each row execute function set_updated_at();
 
--- ------------------------------------------------------------ site_reviews
-
--- The timestamp column is "date", not "createdAt" -- the review UI sorts and
--- displays it under that name.
-create table site_reviews (
-  id          uuid primary key default gen_random_uuid(),
-  name        text not null,
-  phone       text not null,
-  email       text not null,
-  category    text not null,
-  material    text not null,
-  rating      integer not null check (rating between 1 and 5),
-  comment     text,
-  -- { quality, comfort, price, recommend, overall }
-  poll        jsonb not null default '{}',
-  date        timestamptz not null default now(),
-  "updatedAt" timestamptz not null default now()
-);
-
-create index site_reviews_date_idx on site_reviews (date desc);
-
-create trigger site_reviews_set_updated_at before update on site_reviews
-  for each row execute function set_updated_at();
-
 -- ------------------------------------------------------------- subscribers
 
 create table subscribers (
@@ -212,5 +188,4 @@ alter table cart_items   enable row level security;
 alter table orders       enable row level security;
 alter table order_items  enable row level security;
 alter table contacts     enable row level security;
-alter table site_reviews enable row level security;
 alter table subscribers  enable row level security;

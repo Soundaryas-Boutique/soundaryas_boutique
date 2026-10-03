@@ -1,7 +1,6 @@
 import Link from "next/link";
 import SlidingBanner from "../../components/SlidingBanner";
 import SareeSection from "../../components/SareeSection";
-import ReviewSection from "../../components/ReviewSection";
 import { getHomepageSarees } from "@/app/lib/sarees";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +28,6 @@ export default async function HomePage() {
       />
 
       {/* Review Section */}
-      <ReviewSection />
     </main>
   );
 }
