@@ -1,8 +1,6 @@
 // This file is crucial for passing authOptions to other API routes
-import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
 import bcrypt from "bcrypt";
 
 export const authOptions = {
@@ -14,8 +12,12 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await connectDB();
-        const user = await User.findOne({ email: credentials.email });
+        const { data: user } = await supabase()
+          .from("users")
+          .select("id, email, name, role, password")
+          .eq("email", credentials.email)
+          .maybeSingle();
+
         if (!user) {
           throw new Error("Invalid email or password");
         }
@@ -23,7 +25,7 @@ export const authOptions = {
         if (!isMatch) {
           throw new Error("Invalid email or password");
         }
-        return { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
+        return { id: user.id, email: user.email, name: user.name, role: user.role };
       },
     }),
   ],

@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/lib/auth";
+import { supabase } from "@/app/lib/supabase";
+import { isAdmin } from "@/app/lib/authUtils";
 
 export async function GET(req) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "Admin") {
-      // ✅ Add a check for unauthorized access
+    if (!(await isAdmin())) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -19,18 +15,19 @@ export async function GET(req) {
       return NextResponse.json({ error: "Email parameter is missing" }, { status: 400 });
     }
 
-    await connectDB();
-    
-    const user = await User.findOne({ email: email }).lean();
+    const { data: user, error } = await supabase()
+      .from("users")
+      .select("id, name, email, phone, role, address, city, state, country, pincode, createdAt, updatedAt")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (error) throw error;
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // ✅ Fix: Serialize the Mongoose object before returning
-    const serializedUser = JSON.parse(JSON.stringify(user));
-
-    return NextResponse.json(serializedUser, { status: 200 });
+    return NextResponse.json(user, { status: 200 });
 
   } catch (error) {
     console.error("API Error fetching user:", error);

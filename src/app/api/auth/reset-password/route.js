@@ -1,10 +1,8 @@
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
 import bcrypt from "bcrypt";
 
 export async function POST(req) {
   try {
-    await connectDB();
     const { token, password } = await req.json();
 
     if (!token || !password) {
@@ -14,10 +12,14 @@ export async function POST(req) {
       );
     }
 
-    const user = await User.findOne({
-      resetToken: token,
-      resetTokenExpiry: { $gt: Date.now() }
-    });
+    const { data: user, error } = await supabase()
+      .from("users")
+      .select("id")
+      .eq("resetToken", token)
+      .gt("resetTokenExpiry", new Date().toISOString())
+      .maybeSingle();
+
+    if (error) throw error;
 
     if (!user) {
       return new Response(
@@ -26,11 +28,16 @@ export async function POST(req) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
-    user.resetToken = undefined;
-    user.resetTokenExpiry = undefined;
-    await user.save();
+    const { error: updateError } = await supabase()
+      .from("users")
+      .update({
+        password: await bcrypt.hash(password, 10),
+        resetToken: null,
+        resetTokenExpiry: null,
+      })
+      .eq("id", user.id);
+
+    if (updateError) throw updateError;
 
     return new Response(
       JSON.stringify({ message: "Password reset successful" }),

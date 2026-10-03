@@ -1,19 +1,34 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
+
+const PROFILE_FIELDS = "name, phone, address, email";
+
+/**
+ * The email is taken from the session rather than the request: this route used
+ * to read and write any profile by email with no authentication at all.
+ */
+async function sessionEmail() {
+  const session = await getServerSession(authOptions);
+  return session?.user?.email ?? null;
+}
 
 // Fetch profile
-export async function GET(req) {
+export async function GET() {
   try {
-    await connectDB();
-    const { searchParams } = new URL(req.url);
-    const email = searchParams.get("email");
-
+    const email = await sessionEmail();
     if (!email) {
-      return NextResponse.json({ error: "Email required" }, { status: 400 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await User.findOne({ email }).select("name phone address email");
+    const { data: user, error } = await supabase()
+      .from("users")
+      .select(PROFILE_FIELDS)
+      .eq("email", email)
+      .maybeSingle();
+
+    if (error) throw error;
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -27,20 +42,21 @@ export async function GET(req) {
 // Update profile
 export async function PUT(req) {
   try {
-    await connectDB();
-    const body = await req.json();
-    const { email, name, phone, address } = body;
-
+    const email = await sessionEmail();
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { name, phone, address },
-      { new: true }
-    ).select("name phone address email");
+    const { name, phone, address } = await req.json();
 
+    const { data: updatedUser, error } = await supabase()
+      .from("users")
+      .update({ name, phone, address })
+      .eq("email", email)
+      .select(PROFILE_FIELDS)
+      .maybeSingle();
+
+    if (error) throw error;
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
