@@ -1,93 +1,65 @@
-import Saree from "@/app/(models)/Saree";
-import { connectDB } from "./mongoose";
+import { supabase } from "./supabase";
 
-/**
- * Convert a saree object to a fully serializable plain object
- * @param {Object} saree 
- * @returns {Object}
- */
-function serializeSaree(saree) {
-  return {
-    ...saree,
-    _id: saree._id.toString(),
-    createdAt: saree.createdAt?.toISOString(),
-    updatedAt: saree.updatedAt?.toISOString(),
-    images: saree.images?.map((img) => ({
-      ...img,
-      _id: img._id?.toString(),
-    })),
-  };
-}
+// Supabase returns plain JSON (ISO date strings, numbers), so unlike the
+// Mongoose version these rows can be handed to Client Components as they are.
+
+const CARD_FIELDS =
+  "id, productName, price, discountPrice, images, slug, category, createdAt, updatedAt";
 
 /**
  * Fetch top best sellers
  */
 export async function getBestSellers(limit = 5) {
-  await connectDB();
+  const { data, error } = await supabase()
+    .from("sarees")
+    .select(CARD_FIELDS)
+    .eq("status", "active")
+    .order("sold", { ascending: false })
+    .limit(limit);
 
-  const bestSellersRaw = await Saree.find({ status: "active" })
-    .sort({ sold: -1 })
-    .limit(limit)
-    .select("productName price discountPrice images slug category createdAt updatedAt")
-    .lean();
-
-  return bestSellersRaw.map(serializeSaree);
+  if (error) throw error;
+  return data;
 }
 
 /**
  * Fetch latest sarees (new arrivals)
  */
 export async function getNewArrivals(limit = 5) {
-  await connectDB();
+  const { data, error } = await supabase()
+    .from("sarees")
+    .select(CARD_FIELDS)
+    .eq("status", "active")
+    .order("createdAt", { ascending: false })
+    .limit(limit);
 
-  const newArrivalsRaw = await Saree.find({ status: "active" })
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .select("productName price discountPrice images slug category createdAt updatedAt")
-    .lean();
-
-  return newArrivalsRaw.map(serializeSaree);
+  if (error) throw error;
+  return data;
 }
 
 /**
  * Fetch both best sellers and new arrivals in parallel
  */
 export async function getHomepageSarees(limit = 5) {
-  await connectDB();
-
-  const [bestSellersRaw, newArrivalsRaw] = await Promise.all([
-    Saree.find({ status: "active" })
-      .sort({ sold: -1 })
-      .limit(limit)
-      .select("productName price discountPrice images slug category createdAt updatedAt")
-      .lean(),
-    Saree.find({ status: "active" })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .select("productName price discountPrice images slug category createdAt updatedAt")
-      .lean(),
+  const [bestSellers, newArrivals] = await Promise.all([
+    getBestSellers(limit),
+    getNewArrivals(limit),
   ]);
 
-  return {
-    bestSellers: bestSellersRaw.map(serializeSaree),
-    newArrivals: newArrivalsRaw.map(serializeSaree),
-  };
+  return { bestSellers, newArrivals };
 }
 
 /**
  * Fetch related sarees by category, excluding current saree
  */
 export async function getRelatedSarees(category, currentSlug, limit = 5) {
-  await connectDB();
+  const { data, error } = await supabase()
+    .from("sarees")
+    .select(CARD_FIELDS)
+    .eq("category", category)
+    .eq("status", "active")
+    .neq("slug", currentSlug)
+    .limit(limit);
 
-  const relatedRaw = await Saree.find({ 
-    category, 
-    slug: { $ne: currentSlug },
-    status: "active" 
-  })
-    .limit(limit)
-    .select("productName price discountPrice images slug category createdAt updatedAt")
-    .lean();
-
-  return relatedRaw.map(serializeSaree);
+  if (error) throw error;
+  return data;
 }

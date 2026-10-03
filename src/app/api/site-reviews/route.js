@@ -1,12 +1,15 @@
-import { connectDB } from "../../lib/mongoose"; // CORRECTED import
-import SiteReview from "../../(models)/SiteReview"; // CORRECTED import
+import { supabase } from "../../lib/supabase";
 import { NextResponse } from 'next/server';
 
 // --- GET all reviews ---
 export async function GET() {
   try {
-    await connectDB(); // CORRECTED function call
-    const reviews = await SiteReview.find({}).sort({ date: -1 }); // CORRECTED model name
+    const { data: reviews, error } = await supabase()
+      .from("site_reviews")
+      .select("*")
+      .order("date", { ascending: false });
+
+    if (error) throw error;
     return NextResponse.json({ reviews });
   } catch (error) {
     console.error("GET Error:", error);
@@ -17,10 +20,17 @@ export async function GET() {
 // --- POST a new review ---
 export async function POST(request) {
   try {
-    const body = await request.json();
-    await connectDB(); // CORRECTED function call
-    const newReview = await SiteReview.create(body); // CORRECTED model name
-    return NextResponse.json({ message: 'Review Submitted!', review: newReview }, { status: 201 });
+    // id and date are assigned by the database.
+    const { id, date, ...body } = await request.json();
+
+    const { data: review, error } = await supabase()
+      .from("site_reviews")
+      .insert(body)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json({ message: 'Review Submitted!', review }, { status: 201 });
   } catch (error) {
     console.error("POST Error:", error);
     return NextResponse.json({ message: 'Error submitting review' }, { status: 500 });

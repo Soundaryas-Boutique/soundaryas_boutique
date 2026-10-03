@@ -1,5 +1,4 @@
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
+import { supabase } from "@/app/lib/supabase";
 import ProductsList from "../../../components/ProductsList";
 
 export const metadata = {
@@ -9,9 +8,8 @@ export const metadata = {
 
 export default async function AllCollectionsPage() {
   try {
-    await connectDB();
-    let sarees = await Saree.find({}).lean();
-    sarees = JSON.parse(JSON.stringify(sarees));
+    const { data: sarees, error } = await supabase().from("sarees").select("*");
+    if (error) throw error;
 
     return (
       <main className="max-w-[1440px] mx-auto py-8 lg:py-12 px-6 md:px-12 bg-white">

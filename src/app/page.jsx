@@ -1,16 +1,14 @@
 import HomePage from "./HomePage";
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
+import { supabase } from "@/app/lib/supabase";
 import NewsletterSection from "../../components/NewsletterSection"; // ✅ Import newsletter section
 
 export default async function Page() {
-  await connectDB();
-  const sarees = await Saree.find({}).lean();
-  const serializedSarees = JSON.parse(JSON.stringify(sarees));
+  const { data: sarees, error } = await supabase().from("sarees").select("*");
+  if (error) throw error;
 
   return (
     <>
-      <HomePage sarees={serializedSarees} />
+      <HomePage sarees={sarees} />
  {/* ✅ Render the newsletter section on the homepage */}
     </>
   );

@@ -1,13 +1,17 @@
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
+import { supabase } from "@/app/lib/supabase";
 import ProductDetailsClient from "./ProductDetailsClient";
 import { getRelatedSarees } from "@/app/lib/sarees";
 
 export default async function ProductDetailsPage({ params }) {
   const { category, slug } = await params;
 
-  await connectDB();
-  const saree = await Saree.findOne({ slug }).lean();
+  const { data: saree, error } = await supabase()
+    .from("sarees")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) throw error;
 
   if (!saree) {
     return (
@@ -18,8 +22,5 @@ export default async function ProductDetailsPage({ params }) {
   // Fetch related sarees
   const relatedSarees = await getRelatedSarees(category, slug);
 
-  // ✅ Convert the Mongoose object to a plain JavaScript object
-  const serializedSaree = JSON.parse(JSON.stringify(saree));
-
-  return <ProductDetailsClient saree={serializedSaree} relatedSarees={relatedSarees} />;
+  return <ProductDetailsClient saree={saree} relatedSarees={relatedSarees} />;
 }

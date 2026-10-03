@@ -1,19 +1,24 @@
-import { connectDB } from "../../../lib/mongoose"; // CORRECTED import
-import SiteReview from "../../../(models)/SiteReview"; // CORRECTED import
+import { supabase } from "../../../lib/supabase";
 import { NextResponse } from 'next/server';
 
 // --- UPDATE a review ---
 export async function PUT(request, { params }) {
-  const { id } = await params;
-  const body = await request.json();
   try {
-    await connectDB(); // CORRECTED function call
-    const updatedReview = await SiteReview.findByIdAndUpdate(id, body, { new: true }); // CORRECTED model name
-    
+    const { id } = await params;
+    const { id: _ignored, ...body } = await request.json();
+
+    const { data: updatedReview, error } = await supabase()
+      .from("site_reviews")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
     if (!updatedReview) {
       return NextResponse.json({ message: 'Review not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({ message: 'Review updated!', review: updatedReview }, { status: 200 });
   } catch (error) {
     console.error("PUT Error:", error);
@@ -23,15 +28,21 @@ export async function PUT(request, { params }) {
 
 // --- DELETE a review ---
 export async function DELETE(request, { params }) {
-  const { id } = await params;
   try {
-    await connectDB(); // CORRECTED function call
-    const deletedReview = await SiteReview.findByIdAndDelete(id); // CORRECTED model name
-    
+    const { id } = await params;
+
+    const { data: deletedReview, error } = await supabase()
+      .from("site_reviews")
+      .delete()
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
     if (!deletedReview) {
       return NextResponse.json({ message: 'Review not found' }, { status: 404 });
     }
-    
+
     return NextResponse.json({ message: 'Review deleted successfully!' }, { status: 200 });
   } catch (error) {
     console.error("DELETE Error:", error);
