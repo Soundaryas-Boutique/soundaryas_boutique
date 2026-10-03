@@ -32,6 +32,19 @@
   --shadow-premium: 0 10px 30px -10px rgba(183, 28, 28, 0.15);
   --shadow-gold: 0 4px 20px -5px rgba(212, 175, 55, 0.3);
 
+  /* --------------------------------------------------------------- Admin
+     The back office reads as the same shop in workwear. One large coloured
+     surface -- the navigation rail, the storefront red in shadow -- and
+     zari gold as the only accent, used for the active item and the primary
+     action and nowhere else.
+
+     Status colours are drawn from the brand palette rather than generic
+     traffic lights, so a paid order is emerald silk and a cancelled one is
+     the sindoor red the shop already uses. */
+  --color-rail: #4A0E0E;
+  --color-rail-ink: #F4E9D7;
+  --color-rail-muted: #C8A98F;
+
   /* ----------------------------------------------------------- Container
      The page content width. It was written as max-w-[1440px] in a dozen
      places (and max-w-[1400px] in one). Use the `container-page` utility
