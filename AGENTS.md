@@ -1,6 +1,6 @@
 # Soundarya's Boutique
 
-An e-commerce storefront for sarees: Next.js App Router, MongoDB/Mongoose,
+An e-commerce storefront for sarees: Next.js App Router, Supabase (Postgres),
 NextAuth v4, Stripe checkout, Cloudinary image hosting.
 
 ## Commands
@@ -14,22 +14,36 @@ npm run lint    # eslint .  (`next lint` was removed in Next 16)
 
 ## Layout
 
-- `src/app/` — App Router routes, API route handlers, and `(models)/` Mongoose schemas.
+- `src/app/` — App Router routes and API route handlers.
+- `supabase/schema.sql` — the whole database definition. Apply it to a fresh
+  project and keep it as the source of truth; change it here, not only in the
+  dashboard.
 - `components/` — shared components. **Note the location:** this is at the repo
   root, *not* under `src/`. The `@/*` alias maps to `./src/*` only, so components
   are reached by relative path (`../../components/Navbar`).
-- `src/app/lib/` — `mongoose.js` (cached connection), `auth.js` (NextAuth options),
-  `authUtils.js` (`isAdmin`, `validateAdmin`), `sarees.js` (query helpers).
+- `src/app/lib/` — `supabase.js` (server client), `auth.js` (NextAuth options),
+  `authUtils.js` (`isAdmin`, `ADMIN_ROLE`), `sarees.js`, `cart.js` and
+  `orders.js` (query helpers and shared select strings).
 - `middleware.js` — route guards at the repo root.
 
 ## Conventions
 
-- Call `await connectDB()` before any Mongoose query. The connection is cached
-  on `global.mongoose`, so calling it per request is cheap and expected.
+- Query through `supabase()` from `src/app/lib/supabase.js`. It holds the
+  service-role key and so must never be imported into a Client Component —
+  every caller is a route handler or a Server Component that has already
+  checked the session.
+- Always check the `error` the client returns; it does not throw on its own.
+- Columns are camelCase and quoted in the DDL, matching the JSON keys the
+  components read. There is no snake_case mapping layer — do not add one.
+- Prefer one embedded select over several round trips: `products:order_items(...)`
+  and `items:cart_items(..., sarees(images))` replace Mongoose's `.populate()`
+  and keep the keys the components already expect.
 - `params` in pages and route handlers is a Promise — always `await params`.
   Next 16 removed synchronous access.
-- Serialize Mongoose documents before passing them to Client Components
-  (`.lean()` then convert `_id`/dates, as `src/app/lib/sarees.js` does).
+- Rows are already plain JSON (ISO dates, numbers), so they can be passed to
+  Client Components as they are — no `JSON.parse(JSON.stringify(...))` needed.
+- Select explicit columns on `users`; `select("*")` would hand the bcrypt hash
+  to the client.
 - Do not construct third-party SDK clients at module scope when they validate
   credentials eagerly. `next build` evaluates modules during page-data
   collection, so a missing env var fails the build. Build such clients inside
@@ -37,8 +51,8 @@ npm run lint    # eslint .  (`next lint` was removed in Next 16)
 
 ## Environment
 
-Secrets live in `.env.local` (gitignored). Required: `MONGODB_URI`,
-`NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`,
+Secrets live in `.env.local` (gitignored). Required:
+`NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`,
 `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
 `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS`, `TWILIO_ACCOUNT_SID`,
 `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`.
@@ -99,14 +113,13 @@ Co-Authored-By: Claude Code
 
 ## Known gotchas
 
-- **Admin role casing is inconsistent and currently broken in places.** The
-  `User` schema enum is lowercase `["user", "admin"]`, and `authUtils.isAdmin`,
-  `middleware.js` and `src/app/admin/layout.jsx` all compare against `"admin"`.
-  But `src/app/api/sarees/[id]/route.js`, `src/app/api/Users/route.js`,
-  `src/app/api/Users/[email]/route.js` and `components/admin/ProductForm.jsx`
-  compare against `"Admin"`, which no stored role can equal — those admin-only
-  checks reject every user. Prefer `isAdmin()` from `src/app/lib/authUtils.js`
-  over inline comparisons.
+- Compare the admin role through `isAdmin()` or `ADMIN_ROLE` from
+  `src/app/lib/authUtils.js`, never an inline string. Several routes used to
+  test for `"Admin"` while the stored value is `"admin"`, so those admin-only
+  checks rejected everyone. `components/admin/ProductForm.jsx` still has a
+  client-side `"Admin"` comparison; it only hides UI, but it is wrong too.
+- RLS is on with no policies, so the anon key can read nothing. Any query from
+  client code needs a policy written in `supabase/schema.sql` first.
 - The `middleware.js` matcher guards `/cart/:path*`, but the route directory is
   `src/app/Cart/`. The matcher does not match the capitalised path, so `/Cart`
   is unguarded.
@@ -114,6 +127,13 @@ Co-Authored-By: Claude Code
   upload preset instead of reading the `CLOUDINARY_*` env vars.
 - Both `package-lock.json` and `yarn.lock` are committed. npm is the package
   manager in use, and it keeps the stray `yarn.lock` in sync on install.
+- next-auth must stay at 4.24.13 or newer: earlier 4.x releases cap their `next`
+  peer at `^15` and make every `npm install` fail against Next 16.
+- `src/app/api/auth/forgot-password/route.js` reads `EMAIL_USER`/`EMAIL_PASS`,
+  which nothing sets — the rest of the app uses `SMTP_*`. Password-reset mail
+  cannot send until those agree.
+- `src/app/api/profile/route.js` has no callers. It is live and authenticated,
+  but nothing in the UI fetches it.
 - `middleware.js` is deprecated in Next 16 in favour of `proxy.js`, but `proxy`
   forces the Node runtime and next-auth v4's `withAuth` targets the middleware
   convention. Left as-is deliberately.
