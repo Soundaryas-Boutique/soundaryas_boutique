@@ -5,7 +5,6 @@ import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import NavbarWrapper from "../../components/NavbarWrapper";
 import ContentWrapper from "../../components/ContentWrapper";
-import IntroAnimation from "../../components/IntroAnimation";
 import CartDrawer from "../../components/CartDrawer";
 import OneTimeNewsletterPopup from "../../components/OneTimeNewsletterPopup";
 import Footer from "../../components/Footer";
@@ -39,7 +38,6 @@ export default function RootLayout({ children }) {
         <WishlistProvider>
           <CartProvider>
             <body className={`${poppins.variable} ${yeseva.variable} min-h-screen bg-white text-black font-main`}>
-              <IntroAnimation />
               <CartDrawer />
               <NavbarWrapper />
               <ContentWrapper>
