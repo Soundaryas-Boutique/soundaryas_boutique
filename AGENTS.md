@@ -185,7 +185,7 @@ For any page that shows data, verify:
 - Product name, price, compare-at price, currency, variants, stock and images
   all come from Supabase and agree with each other. **No placeholder or
   hardcoded product data ships.** `components/admin/SubscribersDashboard.jsx`
-  and `src/app/admin/vendor/page.jsx` still render mock arrays.
+  still renders a mock array.
 - Every data-driven component handles **loading, empty** (no products, empty
   cart, no search results), **error** (API failure, with retry or fallback) and
   **out-of-stock**.

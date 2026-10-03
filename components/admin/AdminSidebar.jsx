@@ -6,7 +6,6 @@ import {
   FiPackage, 
   FiShoppingBag, 
   FiMail, 
-  FiUsers, 
   FiBell, 
   FiMessageSquare,
   FiHome,
@@ -24,7 +23,6 @@ const navItems = [
   { name: 'Promotions', href: '/admin/email-marketing', icon: FiBell },
   { name: 'WhatsApp', href: '/admin/whatsapp-marketing', icon: FiSend },
   { name: 'Feedbacks', href: '/admin/feedback', icon: FiMessageSquare },
-  { name: 'Vendors', href: '/admin/vendor', icon: FiUsers },
 ];
 
 export default function AdminSidebar() {
