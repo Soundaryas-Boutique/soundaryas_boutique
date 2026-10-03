@@ -8,11 +8,8 @@ const CARD_COUNT = 8;
 
 export default function Loading() {
   return (
-    <main
-      className="max-w-[1440px] mx-auto py-8 lg:py-12 px-6 md:px-12 bg-white"
-      role="status"
-      aria-live="polite"
-    >
+    <main className="bg-white" role="status" aria-live="polite">
+      <div className="container-page py-8 lg:py-12">
       <span className="sr-only">Loading collection…</span>
 
       {/* Header: h1 + breadcrumb */}
@@ -58,6 +55,7 @@ export default function Loading() {
             ))}
           </div>
         </section>
+      </div>
       </div>
     </main>
   );

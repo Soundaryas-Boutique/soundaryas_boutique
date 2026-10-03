@@ -32,7 +32,8 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
 
   if (status === "unauthenticated") {
     return (
-      <main className="max-w-[1440px] mx-auto py-20 px-6 text-center bg-white min-h-[60vh] flex flex-col items-center justify-center">
+      <main className="bg-white min-h-[60vh]">
+        <div className="container-page py-20 text-center flex flex-col items-center justify-center">
         <h1 className="text-3xl font-secondary text-primary uppercase tracking-tighter mb-4">Guest View</h1>
         <p className="text-grey-medium font-main italic mb-10 max-w-md"> Please sign in to access your curated collection, order history, and saved addresses. </p>
         <Link href="/signin">
@@ -40,6 +41,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
             Enter Boutique
           </button>
         </Link>
+        </div>
       </main>
     );
   }
@@ -58,7 +60,8 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
   };
 
   return (
-    <main className="max-w-[1440px] mx-auto py-10 lg:py-14 px-6 md:px-12 bg-white min-h-screen animate-fadeIn">
+    <main className="bg-white min-h-screen animate-fadeIn">
+      <div className="container-page py-10 lg:py-14">
       {/* Header & Breadcrumbs (Reduced Space) */}
       <div className="mb-10 border-b border-gray-100 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -90,6 +93,7 @@ export default function ProfilePage({ initialUserInfo, initialSession }) {
           Notice: {error.message}. Some details may not be available.
         </div>
       )}
+      </div>
     </main>
   );
 }

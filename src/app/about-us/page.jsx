@@ -136,8 +136,8 @@ const TeamCard = ({ name, designation, work, image, github, linkedin, portfolio,
 // This is a Server Component. It fetches data (if needed) and renders the UI.
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-br from-red-50 to-white py-16 px-6 sm:px-10 lg:px-16">
-      <div className="max-w-[1400px] mx-auto space-y-20">
+    <main className="min-h-screen bg-gradient-to-br from-red-50 to-white py-16">
+      <div className="container-page space-y-20">
         
         {/* === HEADER & PROJECT CONTEXT === */}
         <section className="text-center animate-delay-100" style={{ animation: `fadeInUp 0.8s ease-out 0ms forwards` }}>

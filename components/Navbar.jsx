@@ -110,7 +110,7 @@ const Navbar = () => {
 
         {/* Tier 2: Main Branding & Utilities */}
         <div className="w-full bg-white border-b border-gray-50 py-3 lg:py-4">
-          <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
+          <div className="container-page flex items-center justify-between">
 
             {/* Left: Search (Desktop) / Menu (Mobile) */}
             <div className="flex-1 flex items-center">
@@ -192,7 +192,7 @@ const Navbar = () => {
 
         {/* Tier 3: Category Navigation (Desktop) */}
         <nav className="hidden lg:block w-full bg-white/95 backdrop-blur-md py-2 border-b border-gray-100 shadow-sm">
-          <div className="max-w-[1440px] mx-auto flex justify-center items-center gap-12">
+          <div className="container-page flex justify-center items-center gap-12">
             {categories.map((category, idx) => (
               <div
                 key={idx}

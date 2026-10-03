@@ -32,6 +32,13 @@
   --shadow-premium: 0 10px 30px -10px rgba(183, 28, 28, 0.15);
   --shadow-gold: 0 4px 20px -5px rgba(212, 175, 55, 0.3);
 
+  /* ----------------------------------------------------------- Container
+     The page content width. It was written as max-w-[1440px] in a dozen
+     places (and max-w-[1400px] in one). Use the `container-page` utility
+     defined below rather than this token directly. */
+  --container-page: 90rem;
+  /* 1440px */
+
   /* ---------------------------------------------------------------- Type
      Tailwind's default steps stay as they are: text-xs 12, sm 14, base 16,
      lg 18, xl 20, 2xl 24, 3xl 30, 4xl 36, 5xl 48, 6xl 60. The tokens below
@@ -73,6 +80,27 @@
   /* 20 -> 24px */
   --text-h3: clamp(1.25rem, 1.1667rem + 0.3704vw, 1.5rem);
   --text-h3--line-height: 1.3;
+}
+
+/* The page shell, as a zero-runtime utility.
+   
+   Pair it with a full-bleed parent rather than putting a background on it:
+
+     <main class="bg-white">            <- band: spans the viewport
+       <div class="container-page py-12">   <- content: centred and gutted
+   
+   Backgrounds, borders and min-heights belong on the band. Putting them on
+   the container clamps them to 1440px, which only looks right while the
+   body happens to be the same colour. */
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  max-width: var(--container-page);
+  padding-inline: calc(var(--spacing) * 6);
+
+  @media (width >= 48rem) {
+    padding-inline: calc(var(--spacing) * 12);
+  }
 }
 
 @layer base {

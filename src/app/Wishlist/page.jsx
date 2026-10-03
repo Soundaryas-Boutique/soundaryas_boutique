@@ -60,7 +60,8 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="max-w-[1440px] mx-auto py-12 lg:py-20 px-6 md:px-12 bg-white">
+    <div className="bg-white">
+      <div className="container-page py-12 lg:py-20">
       {/* Decorative Header */}
       <div className="flex flex-col items-center mb-12 lg:mb-16">
         <div className="w-10 h-0.5 bg-secondary/30 mb-4"></div>
@@ -158,6 +159,7 @@ export default function WishlistPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

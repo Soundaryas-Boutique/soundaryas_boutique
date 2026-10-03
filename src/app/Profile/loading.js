@@ -4,11 +4,8 @@
 
 export default function Loading() {
   return (
-    <main
-      className="max-w-[1440px] mx-auto py-10 lg:py-14 px-6 md:px-12 bg-white min-h-screen"
-      role="status"
-      aria-live="polite"
-    >
+    <main className="bg-white min-h-screen" role="status" aria-live="polite">
+      <div className="container-page py-10 lg:py-14">
       <span className="sr-only">Loading profile…</span>
 
       {/* Header */}
@@ -41,6 +38,7 @@ export default function Loading() {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </main>
   );

@@ -7,12 +7,23 @@ export const metadata = {
 };
 
 export default async function AllCollectionsPage() {
-  try {
-    const { data: sarees, error } = await supabase().from("sarees").select("*");
-    if (error) throw error;
+  // No try/catch: the Supabase client returns an error rather than throwing,
+  // and wrapping JSX in a try block cannot catch render errors anyway -- React
+  // renders the elements after this function has already returned.
+  const { data: sarees, error } = await supabase().from("sarees").select("*");
 
+  if (error) {
+    console.error("Error fetching all sarees:", error);
     return (
-      <main className="max-w-[1440px] mx-auto py-8 lg:py-12 px-6 md:px-12 bg-white">
+      <p role="alert" className="text-center text-gray-600 py-20">
+        Failed to load the collections.
+      </p>
+    );
+  }
+
+  return (
+    <main className="bg-white">
+      <div className="container-page py-8 lg:py-12">
         {/* Simplified Header */}
         <div className="flex flex-col items-start mb-8 border-b border-ivory pb-6">
           <h1 className="text-2xl md:text-3xl font-secondary text-primary tracking-tight uppercase">
@@ -24,14 +35,7 @@ export default async function AllCollectionsPage() {
         </div>
 
         <ProductsList initialSarees={sarees} category="All" />
-      </main>
-    );
-  } catch (err) {
-    console.error("Error fetching all sarees:", err);
-    return (
-      <p className="text-center text-gray-600 py-20">
-        Failed to load the collections.
-      </p>
-    );
-  }
+      </div>
+    </main>
+  );
 }

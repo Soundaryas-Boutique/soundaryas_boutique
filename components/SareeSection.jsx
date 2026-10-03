@@ -24,7 +24,7 @@ export default function SareeSection({ title, viewAllLink, initialData, bg }) {
 
   return (
     <section className={`${bg || "bg-white"} py-10 lg:py-16`}>
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+      <div className="container-page">
         
         {/* Decorative Header */}
         <div className="flex flex-col items-center mb-8 lg:mb-10">
