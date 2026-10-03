@@ -121,10 +121,16 @@ export const CartProvider = ({ children }) => {
   const clearCart = async () => {
     if (status !== 'authenticated') return;
     try {
-      await fetch('/api/cart/clear', { method: 'POST' });
+      const res = await fetch('/api/cart/clear', { method: 'POST' });
+      // fetch only rejects on network failure, so a 404 or 500 has to be
+      // checked explicitly -- otherwise the list is emptied locally while the
+      // rows survive, and the next fetchCart() brings them back.
+      if (!res.ok) {
+        throw new Error(`Failed to clear cart: ${res.status}`);
+      }
       setCartItems([]);
     } catch (error) {
-      console.error('Failed to clear cart:', error);
+      console.error(error);
     }
   };
   
