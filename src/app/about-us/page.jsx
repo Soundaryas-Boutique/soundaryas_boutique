@@ -1,4 +1,3 @@
-"use client"
 import React from 'react';
 import { FiUser, FiCode, FiMail, FiGithub, FiLinkedin, FiBriefcase } from 'react-icons/fi';
 import { SiMongodb, SiExpress, SiReact, SiNextdotjs, SiTailwindcss, SiStripe, SiCloudinary } from 'react-icons/si';
@@ -138,18 +137,6 @@ const TeamCard = ({ name, designation, work, image, github, linkedin, portfolio,
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-red-50 to-white py-16 px-6 sm:px-10 lg:px-16">
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       <div className="max-w-[1400px] mx-auto space-y-20">
         
         {/* === HEADER & PROJECT CONTEXT === */}

@@ -173,6 +173,21 @@
   }
 }
 
+/* Used by the about-us sections via an inline animation shorthand. Lives
+   here rather than in a styled-jsx block so that page can stay a Server
+   Component -- styled-jsx forces "use client". */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes fadeInOut {
   0% {
     opacity: 0;
