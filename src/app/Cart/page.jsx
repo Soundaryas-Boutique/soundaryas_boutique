@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
+import { formatPrice } from "@/app/lib/money";
 import Image from "next/image";
 import Link from "next/link";
 import { FaTrashAlt } from "react-icons/fa";
@@ -124,7 +125,7 @@ export default function CartPage() {
                   </p>
                 )}
                 <p className="text-grey-dark font-main font-semibold text-lg">
-                  ₹{item.price.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  {formatPrice(item.price)}
                 </p>
               </div>
 
@@ -146,7 +147,7 @@ export default function CartPage() {
                   </select>
                 </div>
                 <p className="font-main font-bold text-primary text-xl min-w-[100px] text-right">
-                  ₹{(item.price * item.quantity).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  {formatPrice(item.price * item.quantity)}
                 </p>
                 <button
                   onClick={() => removeFromCart(item.productId, item.selectedColor)}
@@ -170,7 +171,7 @@ export default function CartPage() {
             <div className="space-y-4 mb-8">
               <div className="flex justify-between items-center text-sm font-main text-grey-medium">
                 <span className="tracking-wide">Subtotal</span>
-                <span className="font-semibold text-grey-dark">₹{cartTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                <span className="font-semibold text-grey-dark tabular-nums">{formatPrice(cartTotal)}</span>
               </div>
               <div className="flex justify-between items-center text-sm font-main text-grey-medium">
                 <span className="tracking-wide">Shipping</span>
@@ -180,7 +181,7 @@ export default function CartPage() {
 
             <div className="flex justify-between items-center text-xl font-main text-primary border-t border-secondary/30 pt-6 mb-10">
               <span className="font-secondary tracking-widest uppercase text-lg">Total</span>
-              <span className="font-bold tracking-tighter">₹{cartTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+              <span className="font-bold tracking-tighter tabular-nums">{formatPrice(cartTotal)}</span>
             </div>
 
             <div className="space-y-4">

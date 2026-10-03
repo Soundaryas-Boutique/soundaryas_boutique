@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
+import { formatPrice } from '@/app/lib/money';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import OrderStatus from './OrderStatus';
 import { Trash2, Download } from 'lucide-react'; // Added Download icon
@@ -118,7 +119,7 @@ export default function OrdersDashboard() {
       order.userId?.name || 'User Deleted',
       order.userId?.email || 'N/A',
       order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
-      `₹${order.totalAmount.toFixed(2)}`,
+      formatPrice(order.totalAmount),
       order.orderStatus,
       new Date(order.createdAt).toLocaleDateString()
     ]);
@@ -142,7 +143,7 @@ export default function OrdersDashboard() {
       "Customer Name": order.userId?.name || 'User Deleted',
       "Customer Email": order.userId?.email || 'N/A',
       "Items (Qty)": order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
-      "Total": `₹${order.totalAmount.toFixed(2)}`,
+      "Total": formatPrice(order.totalAmount),
       "Status": order.orderStatus,
       "Date": new Date(order.createdAt).toLocaleDateString()
     }));
@@ -245,7 +246,7 @@ export default function OrdersDashboard() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900">
-                    ₹{order.totalAmount.toFixed(2)}
+                    {formatPrice(order.totalAmount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <OrderStatus 

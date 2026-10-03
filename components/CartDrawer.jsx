@@ -5,6 +5,7 @@ import { X, ShoppingBag, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/app/context/CartContext';
+import { formatPrice } from '@/app/lib/money';
 import { useSession } from 'next-auth/react';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -118,7 +119,7 @@ export default function CartDrawer() {
                                   <h4 className="text-[13px] font-secondary text-primary uppercase tracking-tight leading-tight max-w-[180px]">
                                     {item.productName}
                                   </h4>
-                                  <p className="text-sm font-bold text-grey-dark">₹{item.price.toLocaleString()}</p>
+                                  <p className="text-sm font-bold text-grey-dark tabular-nums">{formatPrice(item.price)}</p>
                                 </div>
                                 
                                 {item.selectedColor && (
@@ -159,7 +160,7 @@ export default function CartDrawer() {
                       <div className="border-t border-ivory/80 px-6 py-8 md:px-10 bg-ivory/10">
                         <div className="flex justify-between items-center mb-6">
                           <span className="text-[11px] uppercase tracking-[0.3em] text-grey-medium">Subtotal</span>
-                          <span className="text-xl font-bold text-primary">₹{cartTotal.toLocaleString()}</span>
+                          <span className="text-xl font-bold text-primary tabular-nums">{formatPrice(cartTotal)}</span>
                         </div>
                         <p className="text-[10px] text-grey-medium italic mb-8 text-center bg-white/50 py-2">
                           Complimentary boutique shipping included

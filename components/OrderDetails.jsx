@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { formatPrice } from "@/app/lib/money";
 import { useSession } from "next-auth/react";
 
 export default function OrderDetails() {
@@ -88,7 +89,7 @@ export default function OrderDetails() {
                   {order.products.map((product, index) => (
                     <li key={index} className="flex justify-between items-center border-l-4 border-gray-300 pl-4 py-2 bg-white rounded-r-md shadow-sm">
                       <span className="font-semibold">{product.productName} (x{product.quantity})</span>
-                      <span className="font-extrabold">₹{product.price.toFixed(2)}</span>
+                      <span className="font-extrabold tabular-nums">{formatPrice(product.price)}</span>
                     </li>
                   ))}
                 </ul>
@@ -98,11 +99,11 @@ export default function OrderDetails() {
                 <p className="font-bold text-gray-800 mb-2">Order Summary:</p>
                 <div className="flex justify-between items-center text-sm text-gray-600 border-b pb-2 mb-2">
                   <span>Subtotal:</span>
-                  <span>₹{order.totalAmount.toFixed(2)}</span>
+                  <span className="tabular-nums">{formatPrice(order.totalAmount)}</span>
                 </div>
                 <div className="flex justify-between items-center text-xl font-bold text-[#B22222] mt-4">
                   <span>Total Paid:</span>
-                  <span>₹{order.totalAmount.toFixed(2)}</span>
+                  <span className="tabular-nums">{formatPrice(order.totalAmount)}</span>
                 </div>
               </div>
             </div>

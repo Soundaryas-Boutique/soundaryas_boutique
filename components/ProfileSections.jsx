@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { formatPrice } from "@/app/lib/money";
 import { FiUser, FiMail, FiPhone, FiPackage, FiShoppingBag, FiTruck, FiMapPin } from "react-icons/fi";
 
 // Personal Info Section
@@ -78,7 +79,7 @@ export const OrdersSection = () => {
                 </div>
                 <div className="flex flex-col items-end">
                   <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-secondary mb-1">{order.status || "In Process"}</span>
-                  <p className="text-sm font-bold text-primary">₹{order.totalAmount || order.price}</p>
+                  <p className="text-sm font-bold text-primary tabular-nums">{formatPrice(order.totalAmount ?? order.price)}</p>
                 </div>
               </div>
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
+import { formatPrice } from "@/app/lib/money";
 
 export default function SareeCard({ saree, variant = "desktop" }) {
   const href = `/collections/${saree.category}/${encodeURIComponent(
@@ -86,11 +87,11 @@ export default function SareeCard({ saree, variant = "desktop" }) {
         <div className="mt-auto flex items-center gap-2">
           {hasOffer ? (
             <>
-              <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-grey-medium line-through font-main opacity-60`}>₹{saree.price}</span>
-              <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight`}>₹{saree.discountPrice}</span>
+              <span className={`${isMobile ? 'text-[9px]' : 'text-[10px]'} text-grey-medium line-through font-main opacity-60 tabular-nums`}>{formatPrice(saree.price)}</span>
+              <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.discountPrice)}</span>
             </>
           ) : (
-            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight`}>₹{saree.price}</span>
+            <span className={`${isMobile ? 'text-[10px]' : 'text-xs'} text-primary font-bold font-main tracking-tight tabular-nums`}>{formatPrice(saree.price)}</span>
           )}
         </div>
       </div>

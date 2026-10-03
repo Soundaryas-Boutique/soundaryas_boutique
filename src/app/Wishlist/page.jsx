@@ -1,6 +1,7 @@
 "use client";
 
 import { useWishlist } from "@/app/context/WishlistContext";
+import { formatPrice } from "@/app/lib/money";
 import Image from "next/image";
 import Link from "next/link";
 import { FaTrashAlt } from "react-icons/fa";
@@ -100,7 +101,7 @@ export default function WishlistPage() {
                   {item.productName}
                 </h2>
                 <p className="text-grey-dark font-main font-semibold text-lg">
-                  ₹{item.price.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  {formatPrice(item.price)}
                 </p>
                 <p className="text-[10px] uppercase tracking-widest text-secondary mt-3">
                   In Stock - Handcrafted
@@ -141,7 +142,7 @@ export default function WishlistPage() {
               <div className="flex justify-between items-center text-sm font-main text-grey-medium">
                 <span className="tracking-wide">Estimated Subtotal</span>
                 <span className="font-semibold text-grey-dark">
-                  ₹{wishlistItems.reduce((acc, item) => acc + item.price, 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  {formatPrice(wishlistItems.reduce((acc, item) => acc + item.price, 0))}
                 </span>
               </div>
             </div>

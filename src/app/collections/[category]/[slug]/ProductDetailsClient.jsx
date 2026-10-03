@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Heart, Check, ShoppingBag, ArrowRight } from 'lucide-react';
 import SareeCard from "../../../../../components/SareeCard";
 import Link from "next/link";
+import { formatPrice } from "@/app/lib/money";
 
 export default function ProductDetailsClient({ saree, relatedSarees }) {
   const { addToCart } = useCart();
@@ -95,9 +96,9 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
 
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-grey-dark">₹{saree.discountPrice.toLocaleString()}</span>
+                <span className="text-2xl font-bold text-grey-dark tabular-nums">{formatPrice(saree.discountPrice ?? saree.price)}</span>
                 {saree.price > saree.discountPrice && (
-                  <span className="text-xs text-grey-medium line-through opacity-60 italic">₹{saree.price.toLocaleString()}</span>
+                  <span className="text-xs text-grey-medium line-through opacity-60 italic tabular-nums">{formatPrice(saree.price)}</span>
                 )}
               </div>
               {saree.price > saree.discountPrice && (

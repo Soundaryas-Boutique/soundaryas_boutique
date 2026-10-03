@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { formatPrice } from "@/app/lib/money";
 
 export default function ProductPageClient({ product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
@@ -32,9 +33,9 @@ export default function ProductPageClient({ product }) {
       {/* Description & price */}
       <p className="mb-2">{product.description}</p>
       <p className="text-xl font-semibold mb-4">
-        ₹{product.discountPrice || product.price}{" "}
+        {formatPrice(product.discountPrice ?? product.price)}{" "}
         {product.discountPrice && (
-          <span className="line-through text-gray-500 ml-2">₹{product.price}</span>
+          <span className="line-through text-gray-500 ml-2 tabular-nums">{formatPrice(product.price)}</span>
         )}
       </p>
 
