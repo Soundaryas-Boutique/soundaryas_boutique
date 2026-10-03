@@ -42,14 +42,14 @@ export default function SareeSection({ title, viewAllLink, initialData, bg }) {
         {/* Desktop Grid - Narrower Gaps */}
         <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
           {sarees.map((saree) => (
-            <SareeCard key={saree._id} saree={saree} variant="desktop" />
+            <SareeCard key={saree.id} saree={saree} variant="desktop" />
           ))}
         </div>
 
         {/* Mobile Horizontal Scroll - Smaller Cards */}
         <div className="flex overflow-x-auto md:hidden gap-3 pb-6 no-scrollbar -mx-6 px-6">
           {sarees.map((saree) => (
-            <div key={saree._id} className="min-w-[170px]">
+            <div key={saree.id} className="min-w-[170px]">
               <SareeCard saree={saree} variant="mobile" />
             </div>
           ))}

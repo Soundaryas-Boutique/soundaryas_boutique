@@ -31,7 +31,7 @@ export const WishlistProvider = ({ children }) => {
 
   const addToWishlist = (product) => {
     setWishlistItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item._id === product._id);
+      const existingItem = prevItems.find((item) => item.id === product.id);
       if (!existingItem) {
         return [...prevItems, product];
       }
@@ -40,7 +40,7 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const removeFromWishlist = (id) => {
-    setWishlistItems((prevItems) => prevItems.filter((item) => item._id !== id));
+    setWishlistItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
   const clearWishlist = () => {

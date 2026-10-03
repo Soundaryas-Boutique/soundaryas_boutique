@@ -48,16 +48,16 @@ export const CartProvider = ({ children }) => {
     // Update locally first for instant feedback
     setCartItems(prevItems => {
       const existingItem = prevItems.find(
-        item => item.productId === product._id && item.selectedColor === product.selectedColor
+        item => item.productId === product.id && item.selectedColor === product.selectedColor
       );
       if (existingItem) {
         return prevItems.map(item => 
-          item.productId === product._id && item.selectedColor === product.selectedColor
+          item.productId === product.id && item.selectedColor === product.selectedColor
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prevItems, { ...product, quantity: 1, productId: product._id }];
+        return [...prevItems, { ...product, quantity: 1, productId: product.id }];
       }
     });
 
@@ -66,7 +66,7 @@ export const CartProvider = ({ children }) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        productId: product._id,
+        productId: product.id,
         productName: product.productName,
         price: product.discountPrice || product.price,
         quantity: 1, 

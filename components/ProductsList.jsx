@@ -150,7 +150,7 @@ export default function ProductsList({ initialSarees, category }) {
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-10">
             {filteredSarees.length > 0 ? (
               filteredSarees.map((saree) => (
-                <div key={saree._id}>
+                <div key={saree.id}>
                   <SareeCard saree={saree} />
                 </div>
               ))

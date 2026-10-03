@@ -86,7 +86,7 @@ export default function OrdersDashboard() {
         throw new Error('Failed to delete order.');
       }
       
-      setOrders(orders.filter(order => order._id !== orderId));
+      setOrders(orders.filter(order => order.id !== orderId));
     } catch (err) {
       alert(`Error deleting order: ${err.message}`);
     }
@@ -114,7 +114,7 @@ export default function OrdersDashboard() {
     // Prepare data for the autoTable plugin
     const tableColumn = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
     const tableRows = orders.map(order => [
-      order._id.substring(0, 8) + '...',
+      order.id.substring(0, 8) + '...',
       order.userId?.name || 'User Deleted',
       order.userId?.email || 'N/A',
       order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
@@ -138,7 +138,7 @@ export default function OrdersDashboard() {
   const getCsvData = () => {
     const csvHeaders = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
     const csvRows = orders.map(order => ({
-      "Order ID": order._id,
+      "Order ID": order.id,
       "Customer Name": order.userId?.name || 'User Deleted',
       "Customer Email": order.userId?.email || 'N/A',
       "Items (Qty)": order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
@@ -225,9 +225,9 @@ export default function OrdersDashboard() {
               <tr><td colSpan="6" className="py-4 text-center text-gray-500">No orders found yet.</td></tr>
             ) : (
               orders.map((order) => (
-                <tr key={order._id}>
+                <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order._id.substring(0, 8)}...
+                    {order.id.substring(0, 8)}...
                     <div className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -241,7 +241,7 @@ export default function OrdersDashboard() {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {order.products.map(p => 
-                      <div key={p._id}>- {p.productName} (x{p.quantity})</div>
+                      <div key={p.id}>- {p.productName} (x{p.quantity})</div>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900">
@@ -249,14 +249,14 @@ export default function OrdersDashboard() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <OrderStatus 
-                      orderId={order._id}
+                      orderId={order.id}
                       currentStatus={order.orderStatus}
                       onStatusUpdate={handleStatusUpdate}
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
-                      onClick={() => handleOrderDelete(order._id)}
+                      onClick={() => handleOrderDelete(order.id)}
                       className="text-red-600 hover:text-red-900 transition-colors"
                     >
                       <Trash2 size={16} />

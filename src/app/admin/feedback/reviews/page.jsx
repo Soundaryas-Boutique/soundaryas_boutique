@@ -200,7 +200,7 @@ export default function ReviewsDashboardPage() {
                 <tbody>
                   {reviews.length > 0 ? (
                     reviews.map((review) => (
-                      <tr key={review._id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                      <tr key={review.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td className="p-3 font-medium text-gray-800">{review.name}</td>
                         <td className="p-3"><StarRatingDisplay rating={review.rating} /></td>
                         <td className="p-3 text-gray-600 text-sm italic">"{review.comment}"</td>

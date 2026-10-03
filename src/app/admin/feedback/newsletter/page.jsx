@@ -157,7 +157,7 @@ export default function NewsletterPage() {
           </thead>
           <tbody>
             {subscribers.map(s => (
-              <tr key={s._id} className="border-b hover:bg-gray-50 transition">
+              <tr key={s.id} className="border-b hover:bg-gray-50 transition">
                 <td className="p-3">{s.email}</td>
                 <td className="p-3">{s.phone || "N/A"}</td>
                 <td className="p-3">{s.profession || "N/A"}</td>

@@ -21,21 +21,21 @@ const useSession = () => MOCK_SESSION_DATA;
 // Mock subscriber data with mock 'createdAt' dates for monthly grouping (up to October 2024)
 const mockSubscribers = [
   // Older data for context
-  { _id: 's1', email: 'john@example.com', name: 'John Doe', phone: '123-456-7890', createdAt: '2024-07-15T10:00:00Z' },
-  { _id: 's2', email: 'jane@example.com', name: 'Jane Smith', phone: '987-654-3210', createdAt: '2024-07-20T10:00:00Z' },
-  { _id: 's3', email: 'alice@example.com', name: 'Alice', phone: null, createdAt: '2024-08-01T10:00:00Z' },
-  { _id: 's4', email: 'bob@example.com', name: 'Bob', phone: '555-123-4567', createdAt: '2024-08-05T10:00:00Z' },
-  { _id: 's5', email: 'charlie@example.com', name: 'Charlie', phone: null, createdAt: '2024-09-10T10:00:00Z' },
-  { _id: 's6', email: 'david@example.com', name: 'David', phone: '111-222-3333', createdAt: '2024-09-25T10:00:00Z' },
-  { _id: 's7', email: 'eve@example.com', name: 'Eve', phone: null, createdAt: '2024-09-28T10:00:00Z' },
+  { id: 's1', email: 'john@example.com', name: 'John Doe', phone: '123-456-7890', createdAt: '2024-07-15T10:00:00Z' },
+  { id: 's2', email: 'jane@example.com', name: 'Jane Smith', phone: '987-654-3210', createdAt: '2024-07-20T10:00:00Z' },
+  { id: 's3', email: 'alice@example.com', name: 'Alice', phone: null, createdAt: '2024-08-01T10:00:00Z' },
+  { id: 's4', email: 'bob@example.com', name: 'Bob', phone: '555-123-4567', createdAt: '2024-08-05T10:00:00Z' },
+  { id: 's5', email: 'charlie@example.com', name: 'Charlie', phone: null, createdAt: '2024-09-10T10:00:00Z' },
+  { id: 's6', email: 'david@example.com', name: 'David', phone: '111-222-3333', createdAt: '2024-09-25T10:00:00Z' },
+  { id: 's7', email: 'eve@example.com', name: 'Eve', phone: null, createdAt: '2024-09-28T10:00:00Z' },
   // October data (as requested by user)
-  { _id: 's8', email: 'frank@example.com', name: 'Frank', phone: '444-555-6666', createdAt: '2024-10-01T10:00:00Z' },
-  { _id: 's9', email: 'grace@example.com', name: 'Grace', phone: null, createdAt: '2024-10-05T10:00:00Z' },
-  { _id: 's10', email: 'heidi@example.com', name: 'Heidi', phone: '777-888-9999', createdAt: '2024-10-10T10:00:00Z' },
-  { _id: 's11', email: 'ivan@example.com', name: 'Ivan', phone: null, createdAt: '2024-10-15T10:00:00Z' },
-  { _id: 's12', email: 'judy@example.com', name: 'Judy', phone: '222-333-4444', createdAt: '2024-10-20T10:00:00Z' },
-  { _id: 's13', email: 'kevin@example.com', name: 'Kevin', phone: null, createdAt: '2024-10-25T10:00:00Z' },
-  { _id: 's14', email: 'lisa@example.com', name: 'Lisa', phone: '999-000-1111', createdAt: '2024-10-30T10:00:00Z' },
+  { id: 's8', email: 'frank@example.com', name: 'Frank', phone: '444-555-6666', createdAt: '2024-10-01T10:00:00Z' },
+  { id: 's9', email: 'grace@example.com', name: 'Grace', phone: null, createdAt: '2024-10-05T10:00:00Z' },
+  { id: 's10', email: 'heidi@example.com', name: 'Heidi', phone: '777-888-9999', createdAt: '2024-10-10T10:00:00Z' },
+  { id: 's11', email: 'ivan@example.com', name: 'Ivan', phone: null, createdAt: '2024-10-15T10:00:00Z' },
+  { id: 's12', email: 'judy@example.com', name: 'Judy', phone: '222-333-4444', createdAt: '2024-10-20T10:00:00Z' },
+  { id: 's13', email: 'kevin@example.com', name: 'Kevin', phone: null, createdAt: '2024-10-25T10:00:00Z' },
+  { id: 's14', email: 'lisa@example.com', name: 'Lisa', phone: '999-000-1111', createdAt: '2024-10-30T10:00:00Z' },
 ];
 
 // Helper to format date keys (YYYY-MM)
@@ -225,7 +225,7 @@ export default function SubscribersDashboard() {
                 <tr><td colSpan="4" className="py-8 text-center text-lg text-gray-500">No subscribers found yet.</td></tr>
               ) : (
                 subscribers.map((sub) => (
-                  <tr key={sub._id} className="hover:bg-indigo-50 transition-colors duration-150">
+                  <tr key={sub.id} className="hover:bg-indigo-50 transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-700">{sub.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{sub.name || 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{sub.phone || 'N/A'}</td>
