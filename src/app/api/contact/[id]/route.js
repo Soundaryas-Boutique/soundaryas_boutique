@@ -6,7 +6,8 @@ import Contact from "@/app/(models)/Contact";
 export async function GET(req, { params }) {
   try {
     await connectDB();
-    const msg = await Contact.findById(params.id);
+    const { id } = await params;
+    const msg = await Contact.findById(id);
     if (!msg) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
@@ -21,7 +22,8 @@ export async function GET(req, { params }) {
 export async function DELETE(req, { params }) {
   try {
     await connectDB();
-    await Contact.findByIdAndDelete(params.id);
+    const { id } = await params;
+    await Contact.findByIdAndDelete(id);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Error deleting message:", err);

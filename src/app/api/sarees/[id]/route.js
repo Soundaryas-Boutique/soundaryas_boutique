@@ -36,8 +36,9 @@ export async function PUT(req, { params }) {
 
   await connectDB();
   try {
+    const { id } = await params;
     const body = await req.json();
-    const updated = await Saree.findByIdAndUpdate(params.id, body, { new: true });
+    const updated = await Saree.findByIdAndUpdate(id, body, { new: true });
 
     if (!updated) {
       return NextResponse.json({ error: "Saree not found" }, { status: 404 });

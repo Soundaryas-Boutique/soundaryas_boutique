@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 // --- UPDATE a review ---
 export async function PUT(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const body = await request.json();
   try {
     await connectDB(); // CORRECTED function call
@@ -23,7 +23,7 @@ export async function PUT(request, { params }) {
 
 // --- DELETE a review ---
 export async function DELETE(request, { params }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     await connectDB(); // CORRECTED function call
     const deletedReview = await SiteReview.findByIdAndDelete(id); // CORRECTED model name
