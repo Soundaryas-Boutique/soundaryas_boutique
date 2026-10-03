@@ -104,8 +104,7 @@ const TeamCard = ({ name, designation, work, image, github, linkedin, portfolio,
           alt={name} 
           width={128} 
           height={128} 
-          objectFit="cover" 
-          className="rounded-full"
+          className="rounded-full object-cover"
         />
       ) : (
         <FiUser size={48} className="text-gray-500" />
@@ -195,8 +194,7 @@ export default function AboutPage() {
                       alt={item.name} 
                       width={128} 
                       height={128} 
-                      objectFit="cover" 
-                      className="rounded-full"
+                      className="rounded-full object-cover"
                     />
                   ) : (
                     item.icon ? React.cloneElement(item.icon, { size: 48 }) : <FiUser size={48} className="text-gray-500" />

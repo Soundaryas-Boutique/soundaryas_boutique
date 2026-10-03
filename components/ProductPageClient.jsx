@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { formatPrice } from "@/app/lib/money";
+import Image from "next/image";
 
 export default function ProductPageClient({ product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
@@ -21,10 +22,13 @@ export default function ProductPageClient({ product }) {
       {/* Product images */}
       <div className="flex gap-4 mb-6">
         {product.images?.map((img, idx) => (
-          <img
+          <Image
             key={idx}
             src={img.url}
             alt={img.alt || product.productName}
+            width={192}
+            height={192}
+            sizes="192px"
             className="w-48 h-48 object-cover rounded-lg"
           />
         ))}

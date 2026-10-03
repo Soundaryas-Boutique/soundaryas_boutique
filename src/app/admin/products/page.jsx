@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -68,9 +69,12 @@ export default function AdminProducts() {
             <tr key={p.id} className="text-center hover:bg-gray-50">
               <td className="border p-2">
                 {p.images && p.images[0] ? (
-                  <img
+                  <Image
                     src={p.images[0].url}
                     alt={p.images[0].alt || p.productName}
+                    width={64}
+                    height={64}
+                    sizes="64px"
                     className="h-16 w-16 object-cover mx-auto"
                   />
                 ) : (

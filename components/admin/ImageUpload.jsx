@@ -62,9 +62,9 @@ export default function ImageUpload({ onImageUpload, initialImages }) {
               <Image
                 src={img.url}
                 alt={img.alt || "Product image"}
-                layout="fill"
-                objectFit="cover"
-                className="rounded"
+                fill
+                sizes="96px"
+                className="rounded object-cover"
               />
               <button
                 type="button"

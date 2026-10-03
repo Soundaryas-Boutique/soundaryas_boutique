@@ -1,21 +1,27 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
+// alt carries the promotional text, since these banners are the offer -- a
+// screen reader user would otherwise miss the sale entirely.
 const slides = [
-  { 
-    id: 1, 
+  {
+    id: 1,
     image: '/slider_images/banner_1.webp',
-    mobileImage: '/slider_images/banner_1_mobile.webp' 
+    mobileImage: '/slider_images/banner_1_mobile.webp',
+    alt: 'Aadi Sale: Mayuri Soft Silk sarees. From looms to legends, never goes out of style.',
   },
-  { 
-    id: 2, 
+  {
+    id: 2,
     image: '/slider_images/banner_2.webp',
-    mobileImage: '/slider_images/banner_2_mobile.webp' 
+    mobileImage: '/slider_images/banner_2_mobile.webp',
+    alt: 'Free international shipping, and free domestic delivery on orders above Rs. 30,000. Terms apply; not available for packages over 10 kg.',
   },
-  { 
-    id: 3, 
+  {
+    id: 3,
     image: '/slider_images/banner_3.webp',
-    mobileImage: '/slider_images/banner_3_mobile.webp' 
+    mobileImage: '/slider_images/banner_3_mobile.webp',
+    alt: 'Chiffon saree collection, starting from Rs. 700.',
   },
 ];
 
@@ -46,18 +52,30 @@ useEffect(() => {
           className="flex transition-transform duration-[1000ms] ease-in-out" // 1s animation
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
         >
-          {slides.map((slide) => (
+          {slides.map((slide, index) => (
             <div key={slide.id} className="flex-shrink-0 w-full">
-              {/* Mobile Image */}
-              <img 
-                src={slide.mobileImage} 
-                alt={`Mobile Slide ${slide.id}`} 
+              {/* Mobile Image. Intrinsic dimensions are passed so the browser
+                  reserves the right box before the file arrives -- the previous
+                  bare <img> with h-auto shifted the whole page on load. */}
+              <Image
+                src={slide.mobileImage}
+                alt={slide.alt}
+                width={1200}
+                height={1600}
+                sizes="100vw"
+                /* Only the first slide is the LCP candidate; preloading all
+                   three would fetch six images before anything renders. */
+                priority={index === 0}
                 className="w-full h-auto object-cover md:hidden"
               />
               {/* Desktop Image */}
-              <img 
-                src={slide.image} 
-                alt={`Slide ${slide.id}`} 
+              <Image
+                src={slide.image}
+                alt={slide.alt}
+                width={2000}
+                height={714}
+                sizes="100vw"
+                priority={index === 0}
                 className="hidden w-full h-auto object-cover md:block"
               />
             </div>

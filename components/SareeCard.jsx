@@ -5,6 +5,7 @@ import { AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
 import { useCart } from "@/app/context/CartContext";
 import { useWishlist } from "@/app/context/WishlistContext";
 import { formatPrice } from "@/app/lib/money";
+import Image from "next/image";
 
 export default function SareeCard({ saree, variant = "desktop" }) {
   const href = `/collections/${saree.category}/${encodeURIComponent(
@@ -37,10 +38,12 @@ export default function SareeCard({ saree, variant = "desktop" }) {
       {/* Product Image Wrapper */}
       <Link href={href} className="relative block overflow-hidden aspect-[3/4]">
         {saree.images && saree.images[0] ? (
-          <img
+          <Image
             src={saree.images[0].url}
             alt={saree.images[0].alt || saree.productName}
-            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            fill
+            sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="object-cover transition-transform duration-1000 group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full bg-ivory/20 flex items-center justify-center">
