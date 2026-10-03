@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
 import ProfileClient from "./ProfileClient";
 
 export default async function ProfilePage() {
@@ -13,9 +12,14 @@ export default async function ProfilePage() {
 
   let userInfo = null;
   try {
-    await connectDB();
-    userInfo = await User.findOne({ email: session.user.email }).lean();
-    userInfo = JSON.parse(JSON.stringify(userInfo));
+    const { data, error } = await supabase()
+      .from("users")
+      .select("id, name, email, phone, role, address, city, state, country, pincode, createdAt")
+      .eq("email", session.user.email)
+      .maybeSingle();
+
+    if (error) throw error;
+    userInfo = data;
   } catch (error) {
     console.error("Error pre-fetching user info:", error);
   }

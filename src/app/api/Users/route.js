@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import { connectDB } from "@/app/lib/mongoose";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
+import { ADMIN_ROLE } from "@/app/lib/authUtils";
+
+const PROFILE_FIELDS =
+  "id, name, email, phone, role, address, city, state, country, pincode, createdAt, updatedAt";
 
 // POST /api/Users — Create a user
 export async function POST(req) {
   try {
-    await connectDB();
     const body = await req.json();
     const userData = body.formData;
 
@@ -29,18 +31,30 @@ export async function POST(req) {
       );
     }
 
-    const duplicate = await User.findOne({ email: userData.email }).lean();
-    if (duplicate) {
+    const { name, email, password, phone, address, city, state, country, pincode } = userData;
+
+    const { error } = await supabase()
+      .from("users")
+      .insert({
+        name,
+        email,
+        phone,
+        address,
+        city,
+        state,
+        country,
+        pincode,
+        password: await bcrypt.hash(password, 10),
+      });
+
+    // 23505 = unique_violation, i.e. the email is already registered.
+    if (error?.code === "23505") {
       return NextResponse.json(
         { message: "User already exists (Email)" },
         { status: 409 }
       );
     }
-
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-    userData.password = hashedPassword;
-
-    await User.create(userData);
+    if (error) throw error;
 
     return NextResponse.json(
       { message: "User created successfully" },
@@ -65,7 +79,7 @@ export async function GET(req) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (session.user.role !== "Admin" && session.user.email !== emailToFetch) {
+    if (session.user.role !== ADMIN_ROLE && session.user.email !== emailToFetch) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -73,15 +87,19 @@ export async function GET(req) {
       return NextResponse.json({ error: "Email parameter is missing" }, { status: 400 });
     }
 
-    await connectDB();
-    const user = await User.findOne({ email: emailToFetch }).lean();
+    const { data: user, error } = await supabase()
+      .from("users")
+      .select(PROFILE_FIELDS)
+      .eq("email", emailToFetch)
+      .maybeSingle();
+
+    if (error) throw error;
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const serializedUser = JSON.parse(JSON.stringify(user));
-    return NextResponse.json(serializedUser, { status: 200 });
+    return NextResponse.json(user, { status: 200 });
 
   } catch (error) {
     console.error("API Error fetching user:", error);

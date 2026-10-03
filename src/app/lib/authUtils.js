@@ -2,12 +2,18 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "./auth";
 
 /**
+ * The only spelling of the admin role. The users.role check constraint stores
+ * it lowercase, so comparing against "Admin" can never match.
+ */
+export const ADMIN_ROLE = "admin";
+
+/**
  * Checks if the current session belongs to an admin.
  * @returns {Promise<boolean>}
  */
 export async function isAdmin() {
   const session = await getServerSession(authOptions);
-  return session?.user?.role === "admin";
+  return session?.user?.role === ADMIN_ROLE;
 }
 
 /**

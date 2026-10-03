@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Subscriber from "@/app/(models)/Subscriber";
+import { supabase } from "@/app/lib/supabase";
 import twilio from "twilio";
 import { isAdmin } from "@/app/lib/authUtils";
 
@@ -16,7 +15,6 @@ export async function POST(req) {
   }
 
   try {
-    await connectDB();
     const { messageContent } = await req.json();
 
     if (!messageContent) {
@@ -24,7 +22,13 @@ export async function POST(req) {
     }
     
     // Fetch all subscribers who have a phone number
-    const subscribers = await Subscriber.find({ phone: { $exists: true, $ne: null } }, 'phone');
+    const { data: subscribers, error } = await supabase()
+      .from("subscribers")
+      .select("phone")
+      .not("phone", "is", null)
+      .neq("phone", "");
+
+    if (error) throw error;
 
     if (subscribers.length === 0) {
       return NextResponse.json({ message: "No subscribers with a phone number found." }, { status: 200 });

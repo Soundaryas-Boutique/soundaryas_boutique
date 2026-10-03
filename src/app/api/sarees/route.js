@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
+import { supabase } from "@/app/lib/supabase";
 import { isAdmin } from "@/app/lib/authUtils";
 
-export async function GET(req) {
+export async function GET() {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
   try {
-    const sarees = await Saree.find({});
+    const { data: sarees, error } = await supabase()
+      .from("sarees")
+      .select("*")
+      .order("createdAt", { ascending: false });
+
+    if (error) throw error;
     return NextResponse.json(sarees);
   } catch (err) {
     console.error("API GET Error:", err);
@@ -23,10 +26,17 @@ export async function POST(request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
   try {
     const data = await request.json();
-    const newSaree = await Saree.create(data);
+    const { id, ...insertData } = data;
+
+    const { data: newSaree, error } = await supabase()
+      .from("sarees")
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (error) throw error;
     return NextResponse.json(newSaree, { status: 201 });
   } catch (err) {
     console.error("API POST Error:", err);
@@ -39,11 +49,26 @@ export async function PUT(request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
   try {
     const data = await request.json();
-    const { _id, ...updateData } = data;
-    const updatedSaree = await Saree.findByIdAndUpdate(_id, updateData, { new: true });
+    const { id, ...updateData } = data;
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing saree id" }, { status: 400 });
+    }
+
+    const { data: updatedSaree, error } = await supabase()
+      .from("sarees")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!updatedSaree) {
+      return NextResponse.json({ error: "Saree not found" }, { status: 404 });
+    }
+
     return NextResponse.json(updatedSaree);
   } catch (err) {
     console.error("API PUT Error:", err);

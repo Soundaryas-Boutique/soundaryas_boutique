@@ -6,7 +6,7 @@ import { Plus, Search, Edit, Trash2, X, Building, User, Phone, Mail, Box, Loader
 // --- MOCK DATA (unchanged) ---
 const mockSuppliers = [
   {
-    _id: "sup1",
+    id: "sup1",
     supplierName: "Kanchipuram Weavers Collective",
     contactPerson: "Mr. Ravi Kumar",
     contactNumber: "9876543210",
@@ -16,7 +16,7 @@ const mockSuppliers = [
     gstNumber: "33ABCDE1234F1Z5",
   },
   {
-    _id: "sup2",
+    id: "sup2",
     supplierName: "Banaras Fabric House",
     contactPerson: "Mrs. Sunita Singh",
     contactNumber: "8765432109",
@@ -143,15 +143,15 @@ export default function SuppliersPage() {
   const handleSaveSupplier = async (formData) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     if (editingSupplier) {
-      setSuppliers(suppliers.map(s => s._id === editingSupplier._id ? { ...s, ...formData } : s));
+      setSuppliers(suppliers.map(s => s.id === editingSupplier.id ? { ...s, ...formData } : s));
     } else {
-      setSuppliers([...suppliers, { ...formData, _id: `sup${Date.now()}` }]);
+      setSuppliers([...suppliers, { ...formData, id: `sup${Date.now()}` }]);
     }
     handleCloseModal();
   };
   const handleDeleteSupplier = (supplierId) => {
     if (window.confirm("Are you sure you want to delete this supplier? This action cannot be undone.")) {
-      setSuppliers(suppliers.filter(s => s._id !== supplierId));
+      setSuppliers(suppliers.filter(s => s.id !== supplierId));
     }
   };
 
@@ -189,14 +189,14 @@ export default function SuppliersPage() {
                 </thead>
                 <tbody>
                   {filteredSuppliers.map((s) => (
-                    <tr key={s._id} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                    <tr key={s.id} className="border-b border-slate-100 hover:bg-slate-50 transition">
                       <td className="p-3 font-medium text-gray-800">{s.supplierName}<span className="block text-xs text-gray-500">{s.address}</span></td>
                       <td className="p-3 text-sm text-gray-600">{s.contactPerson}<span className="block text-xs text-blue-600 hover:underline"><a href={`mailto:${s.email}`}>{s.email}</a></span></td>
                       <td className="p-3"><span className="px-2 py-1 text-xs font-semibold bg-slate-200 text-slate-700 rounded-full">{s.specialty}</span></td>
                       <td className="p-3">
                         <div className="flex items-center gap-3">
                           <button onClick={() => handleOpenModal(s)} className="text-blue-600 hover:text-blue-800"><Edit size={18}/></button>
-                          <button onClick={() => handleDeleteSupplier(s._id)} className="text-red-600 hover:text-red-800"><Trash2 size={18}/></button>
+                          <button onClick={() => handleDeleteSupplier(s.id)} className="text-red-600 hover:text-red-800"><Trash2 size={18}/></button>
                         </div>
                       </td>
                     </tr>

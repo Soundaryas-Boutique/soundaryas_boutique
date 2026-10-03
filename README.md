@@ -50,7 +50,7 @@ This project is a full-stack e-commerce solution developed as a group project by
 
   - **Frontend:** React.js, Next.js, Tailwind CSS, Recharts.
   - **Backend:** Node.js, Next.js API Routes.
-  - **Database:** MongoDB (Mongoose ODM).
+  - **Database:** Supabase (PostgreSQL).
   - **Authentication:** NextAuth.js.
   - **Payment:** Stripe API.
   - **Image Hosting:** Cloudinary.
@@ -83,8 +83,11 @@ yarn install
 Create a file named `.env.local` in the root of your project and add the following keys.
 
 ```env
-# MongoDB Connection
-MONGODB_URI=your_mongodb_atlas_connection_string
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+# The secret key, not the publishable one: it runs server-side and must
+# bypass RLS. Settings -> API Keys in the Supabase dashboard.
+SUPABASE_SECRET_KEY=sb_secret_...
 
 # NextAuth.js
 NEXTAUTH_SECRET=a_long_random_secret_string
@@ -112,7 +115,19 @@ TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_PHONE_NUMBER=whatsapp:+1234567890
 ```
 
-### **4. Run the Development Server**
+### **4. Create the Database Schema**
+
+Create a Supabase project, then apply the schema in `supabase/schema.sql` —
+either by pasting it into the project's SQL editor, or with `psql`:
+
+```bash
+psql "$DATABASE_URL" -f supabase/schema.sql
+```
+
+The file is the source of truth for the database: change it there rather than
+editing tables only in the dashboard.
+
+### **5. Run the Development Server**
 
 ```bash
 npm run dev
@@ -120,7 +135,7 @@ npm run dev
 yarn dev
 ```
 
-### **5. Run the Stripe Webhook Listener**
+### **6. Run the Stripe Webhook Listener**
 
 In a **separate terminal**, run the Stripe CLI to forward webhooks to your local server.
 

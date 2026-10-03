@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Order from "@/app/(models)/Order";
-import User from "@/app/(models)/User";
+import { supabase } from "@/app/lib/supabase";
 import { isAdmin } from "@/app/lib/authUtils";
+import { ADMIN_ORDER_FIELDS, ORDER_FIELDS } from "@/app/lib/orders";
 
 // GET: Fetch ALL orders for Admin Dashboard
 export async function GET() {
@@ -10,15 +9,14 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 
-  await connectDB();
   try {
-    // ✅ FIX: Populate ALL user details, including address, for the modal
-    const orders = await Order.find({})
-      .sort({ createdAt: -1 })
-      .populate('userId', 'name email phone address city state country pincode');
+    const { data: orders, error } = await supabase()
+      .from("orders")
+      .select(ADMIN_ORDER_FIELDS)
+      .order("createdAt", { ascending: false });
 
-    const serializedOrders = JSON.parse(JSON.stringify(orders));
-    return NextResponse.json(serializedOrders);
+    if (error) throw error;
+    return NextResponse.json(orders);
   } catch (err) {
     console.error("Admin GET Orders Error:", err);
     return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
@@ -31,7 +29,6 @@ export async function PUT(request) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 
-  await connectDB();
   try {
     const { orderId, newStatus } = await request.json();
 
@@ -44,11 +41,14 @@ export async function PUT(request) {
       return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
     }
 
-    const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
-      { orderStatus: newStatus },
-      { new: true }
-    );
+    const { data: updatedOrder, error } = await supabase()
+      .from("orders")
+      .update({ orderStatus: newStatus })
+      .eq("id", orderId)
+      .select(ORDER_FIELDS)
+      .maybeSingle();
+
+    if (error) throw error;
 
     if (!updatedOrder) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });
@@ -68,7 +68,6 @@ export async function DELETE(request) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 
-  await connectDB();
   try {
     const { searchParams } = new URL(request.url);
     const orderId = searchParams.get('id');
@@ -76,8 +75,16 @@ export async function DELETE(request) {
     if (!orderId) {
       return NextResponse.json({ error: "Missing order ID" }, { status: 400 });
     }
-    
-    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    // order_items rows go with it via ON DELETE CASCADE.
+    const { data: deletedOrder, error } = await supabase()
+      .from("orders")
+      .delete()
+      .eq("id", orderId)
+      .select("id")
+      .maybeSingle();
+
+    if (error) throw error;
 
     if (!deletedOrder) {
       return NextResponse.json({ message: "Order not found" }, { status: 404 });

@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Contact from "@/app/(models)/Contact";
+import { supabase } from "@/app/lib/supabase";
 
 // GET → fetch all messages
 export async function GET() {
   try {
-    await connectDB();
-    const messages = await Contact.find().sort({ createdAt: -1 });
+    const { data: messages, error } = await supabase()
+      .from("contacts")
+      .select("*")
+      .order("createdAt", { ascending: false });
+
+    if (error) throw error;
     return NextResponse.json(messages);
   } catch (err) {
     console.error("Error fetching contact messages:", err);
@@ -20,8 +23,6 @@ export async function GET() {
 // POST → save new contact form submission
 export async function POST(request) {
   try {
-    await connectDB();
-
     const body = await request.json();
     const { name, phone, email, subject, message } = body;
 
@@ -32,15 +33,11 @@ export async function POST(request) {
       );
     }
 
-    const newContact = new Contact({
-      name,
-      phone,
-      email,
-      subject,
-      message,
-    });
+    const { error } = await supabase()
+      .from("contacts")
+      .insert({ name, phone, email, subject, message });
 
-    await newContact.save();
+    if (error) throw error;
 
     return NextResponse.json(
       { success: true, message: "Form submitted successfully!" },

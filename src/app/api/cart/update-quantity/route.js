@@ -1,16 +1,6 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/app/lib/mongoose';
-import Cart from '@/app/(models)/Cart';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-
-const getUserId = async () => {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user.id) {
-        return { error: 'Unauthorized' };
-    }
-    return { userId: session.user.id };
-};
+import { supabase } from '@/app/lib/supabase';
+import { getCart, getUserId, normaliseColor } from '@/app/lib/cart';
 
 // POST: Update the quantity of a specific item (or remove it if quantity <= 0)
 export async function POST(req) {
@@ -18,31 +8,44 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
-    await connectDB();
     const { productId, selectedColor, newQuantity } = await req.json();
+    const colour = normaliseColor(selectedColor);
 
-    const cart = await Cart.findOne({ userId });
+    const { data: cart, error: cartError } = await supabase()
+      .from('carts')
+      .select('id')
+      .eq('userId', userId)
+      .maybeSingle();
+
+    if (cartError) throw cartError;
     if (!cart) {
       return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
     }
 
-    const itemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId && item.selectedColor === selectedColor
-    );
+    const match = supabase()
+      .from('cart_items')
+      .select('id')
+      .eq('cartId', cart.id)
+      .eq('productId', productId)
+      .eq('selectedColor', colour);
 
-    if (itemIndex > -1) {
-      if (newQuantity <= 0) {
-        cart.items.splice(itemIndex, 1);
-      } else {
-        cart.items[itemIndex].quantity = newQuantity;
-      }
+    const { data: item, error: itemError } = await match.maybeSingle();
+    if (itemError) throw itemError;
+
+    if (item) {
+      // quantity has a `>= 1` check constraint, so dropping to zero is a delete.
+      const { error: writeError } =
+        newQuantity <= 0
+          ? await supabase().from('cart_items').delete().eq('id', item.id)
+          : await supabase()
+              .from('cart_items')
+              .update({ quantity: newQuantity })
+              .eq('id', item.id);
+
+      if (writeError) throw writeError;
     }
 
-    await cart.save();
-    
-    // Re-fetch and populate the cart to get the latest data
-    const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
-    return NextResponse.json(JSON.parse(JSON.stringify(updatedCart)), { status: 200 });
+    return NextResponse.json(await getCart(userId), { status: 200 });
   } catch (err) {
     console.error('Error updating cart quantity:', err);
     return NextResponse.json({ error: 'Failed to update cart quantity' }, { status: 500 });

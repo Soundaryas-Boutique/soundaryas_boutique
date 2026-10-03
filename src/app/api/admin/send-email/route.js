@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Subscriber from "@/app/(models)/Subscriber";
+import { supabase } from "@/app/lib/supabase";
 import nodemailer from "nodemailer";
 import { isAdmin } from "@/app/lib/authUtils";
 
@@ -48,7 +47,6 @@ export async function POST(req) {
   }
 
   try {
-    await connectDB();
     const { category, productName, professionTarget } = await req.json(); // ✅ Get professionTarget
 
     if (!category) {
@@ -56,12 +54,13 @@ export async function POST(req) {
     }
     
     // ✅ FIX: Conditionally filter subscribers based on professionTarget
-    let query = {};
+    let query = supabase().from("subscribers").select("email");
     if (professionTarget && professionTarget !== 'all') {
-      query = { profession: professionTarget };
+      query = query.eq("profession", professionTarget);
     }
 
-    const subscribers = await Subscriber.find(query, 'email'); // ✅ Use the query to filter
+    const { data: subscribers, error } = await query;
+    if (error) throw error;
     const subscriberEmails = subscribers.map(sub => sub.email).join(', ');
 
     if (subscriberEmails.length === 0) {

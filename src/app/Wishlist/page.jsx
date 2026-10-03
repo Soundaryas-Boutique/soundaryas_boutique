@@ -78,7 +78,7 @@ export default function WishlistPage() {
         <div className="lg:col-span-2 space-y-6">
           {wishlistItems.map((item) => (
             <div
-              key={item._id}
+              key={item.id}
               className="group flex flex-col sm:flex-row items-center bg-white border border-transparent hover:border-ivory transition-all duration-500 hover:shadow-premium p-4 md:p-6"
             >
               <div className="flex-shrink-0 w-32 h-44 mb-4 sm:mb-0 sm:mr-8 relative overflow-hidden aspect-[3/4]">
@@ -109,13 +109,13 @@ export default function WishlistPage() {
 
               <div className="flex items-center gap-6 mt-6 sm:mt-0 pt-6 sm:pt-0 border-t sm:border-t-0 sm:border-l border-ivory/50 sm:pl-8">
                 <button
-                  onClick={() => handleMoveToCart(item._id)}
+                  onClick={() => handleMoveToCart(item.id)}
                   className="btn-primary !px-6 !py-2.5 text-[10px] uppercase tracking-[0.2em]"
                 >
                   Move to Cart
                 </button>
                 <button
-                  onClick={() => handleRemove(item._id)}
+                  onClick={() => handleRemove(item.id)}
                   className="p-2 text-grey-medium hover:text-primary transition-colors duration-300"
                   title="Remove from Wishlist"
                 >

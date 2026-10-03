@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Subscriber from "@/app/(models)/Subscriber";
+import { supabase } from "@/app/lib/supabase";
 import { isAdmin } from "@/app/lib/authUtils";
 
 // GET: Fetch ALL subscribers for Admin Dashboard
@@ -9,12 +8,14 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 403 });
   }
 
-  await connectDB();
   try {
-    const subscribers = await Subscriber.find({}).sort({ createdAt: -1 });
+    const { data: subscribers, error } = await supabase()
+      .from("subscribers")
+      .select("*")
+      .order("createdAt", { ascending: false });
 
-    const serializedSubscribers = JSON.parse(JSON.stringify(subscribers));
-    return NextResponse.json(serializedSubscribers);
+    if (error) throw error;
+    return NextResponse.json(subscribers);
   } catch (err) {
     console.error("Admin GET Subscribers Error:", err);
     return NextResponse.json({ error: "Failed to fetch subscribers" }, { status: 500 });

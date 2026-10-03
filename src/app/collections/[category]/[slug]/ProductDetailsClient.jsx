@@ -182,7 +182,7 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
 
              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5">
                 {relatedSarees.map((related) => (
-                  <SareeCard key={related._id} saree={related} />
+                  <SareeCard key={related.id} saree={related} />
                 ))}
              </div>
           </section>

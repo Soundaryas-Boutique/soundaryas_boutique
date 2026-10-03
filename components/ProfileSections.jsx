@@ -64,12 +64,12 @@ export const OrdersSection = () => {
       {orders.length > 0 ? (
         <div className="space-y-4">
           {orders.map((order) => (
-            <div key={order._id} className="border border-gray-100 bg-white group p-6">
+            <div key={order.id} className="border border-gray-100 bg-white group p-6">
               <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
                 <div className="flex items-center gap-6">
                   <div>
                     <p className="text-[9px] uppercase tracking-widest text-grey-medium font-bold">Order ID</p>
-                    <p className="text-[10px] text-primary font-bold">#{order._id.slice(-8).toUpperCase()}</p>
+                    <p className="text-[10px] text-primary font-bold">#{order.id.slice(-8).toUpperCase()}</p>
                   </div>
                   <div>
                     <p className="text-[9px] uppercase tracking-widest text-grey-medium font-bold">Placed On</p>

@@ -31,7 +31,7 @@ export default function AdminProducts() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete product");
-      setProducts(products.filter((p) => p._id !== id));
+      setProducts(products.filter((p) => p.id !== id));
     } catch (err) {
       alert(err.message);
     }
@@ -65,7 +65,7 @@ export default function AdminProducts() {
         </thead>
         <tbody>
           {products.map((p) => (
-            <tr key={p._id} className="text-center hover:bg-gray-50">
+            <tr key={p.id} className="text-center hover:bg-gray-50">
               <td className="border p-2">
                 {p.images && p.images[0] ? (
                   <img
@@ -92,13 +92,13 @@ export default function AdminProducts() {
               <td className="border p-2">{p.stock}</td>
               <td className="border p-2 space-x-2">
                 <Link
-                  href={`/admin/products/edit/${p._id}`}
+                  href={`/admin/products/edit/${p.id}`}
                   className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
                 >
                   Edit
                 </Link>
                 <button
-                  onClick={() => handleDelete(p._id)}
+                  onClick={() => handleDelete(p.id)}
                   className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                 >
                   Delete

@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Contact from "@/app/(models)/Contact";
+import { supabase } from "@/app/lib/supabase";
 
 // GET → single message
 export async function GET(req, { params }) {
   try {
-    await connectDB();
     const { id } = await params;
-    const msg = await Contact.findById(id);
+    const { data: msg, error } = await supabase()
+      .from("contacts")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
     if (!msg) {
       return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
@@ -21,9 +25,10 @@ export async function GET(req, { params }) {
 // DELETE → delete message
 export async function DELETE(req, { params }) {
   try {
-    await connectDB();
     const { id } = await params;
-    await Contact.findByIdAndDelete(id);
+    const { error } = await supabase().from("contacts").delete().eq("id", id);
+
+    if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Error deleting message:", err);

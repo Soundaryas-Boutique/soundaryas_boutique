@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Subscriber from "@/app/(models)/Subscriber"; // relative path from api/subscribe
+import { supabase } from "@/app/lib/supabase";
 
 // GET all subscribers
 export async function GET() {
   try {
-    await connectDB();
-    const subscribers = await Subscriber.find({});
+    const { data: subscribers, error } = await supabase()
+      .from("subscribers")
+      .select("*");
+
+    if (error) throw error;
     return NextResponse.json({ subscribers });
   } catch (error) {
     return NextResponse.json({ message: "Server error", details: error.message }, { status: 500 });
@@ -16,27 +18,32 @@ export async function GET() {
 // POST new subscriber
 export async function POST(req) {
   try {
-    await connectDB();
     const { email, profession, phone, gender, exclusiveOffer, subscriptionType } = await req.json();
 
     if (!email || !profession || !gender || !subscriptionType) {
       return NextResponse.json({ message: "Required fields missing" }, { status: 400 });
     }
 
-    const subscriber = new Subscriber({
-      email,
-      profession,
-      phone,
-      gender,
-      exclusiveOffer: exclusiveOffer || false,
-      subscriptionType,
-    });
+    const { error } = await supabase()
+      .from("subscribers")
+      .insert({
+        // The Mongoose schema lowercased this; the column is plain text.
+        email: email.toLowerCase(),
+        profession,
+        phone,
+        gender,
+        exclusiveOffer: exclusiveOffer || false,
+        subscriptionType,
+      });
 
-    await subscriber.save();
+    // 23505 = unique_violation
+    if (error?.code === "23505") {
+      return NextResponse.json({ message: "Email already subscribed" }, { status: 409 });
+    }
+    if (error) throw error;
+
     return NextResponse.json({ message: "Subscribed successfully!" }, { status: 201 });
   } catch (error) {
-    if (error.code === 11000)
-      return NextResponse.json({ message: "Email already subscribed" }, { status: 409 });
     return NextResponse.json({ message: "Server error", details: error.message }, { status: 500 });
   }
 }

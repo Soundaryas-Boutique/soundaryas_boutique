@@ -1,14 +1,15 @@
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
+import { supabase } from "@/app/lib/supabase";
 import ProductsList from "../../../../components/ProductsList";
 
 export default async function ProductsPage({ params }) {
   const { category } = await params;
 
   try {
-    await connectDB();
-    let sarees = await Saree.find({ category }).lean();
-    sarees = JSON.parse(JSON.stringify(sarees));
+    const { data: sarees, error } = await supabase()
+      .from("sarees")
+      .select("*")
+      .eq("category", category);
+    if (error) throw error;
 
     return (
       <main className="max-w-[1440px] mx-auto py-8 lg:py-12 px-6 md:px-12 bg-white">

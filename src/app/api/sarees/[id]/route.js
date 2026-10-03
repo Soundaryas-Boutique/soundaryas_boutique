@@ -1,74 +1,85 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongoose";
-import Saree from "@/app/(models)/Saree";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/lib/auth";
+import { supabase } from "@/app/lib/supabase";
+import { isAdmin } from "@/app/lib/authUtils";
 
 // GET: fetch a single saree by ID (admin only)
-export async function GET(req, context) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "Admin") {
+export async function GET(req, { params }) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
-
-  // Unwrap params
-  const { id } = await context.params;
+  const { id } = await params;
 
   try {
-    const saree = await Saree.findById(id);
+    const { data: saree, error } = await supabase()
+      .from("sarees")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (error) throw error;
     if (!saree) {
       return NextResponse.json({ error: "Saree not found" }, { status: 404 });
     }
     return NextResponse.json(saree);
   } catch (err) {
+    console.error("Error fetching saree:", err);
     return NextResponse.json({ error: "Failed to fetch saree" }, { status: 500 });
   }
 }
 
 // PUT: update a saree by ID (admin only)
 export async function PUT(req, { params }) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "Admin") {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
   try {
     const { id } = await params;
-    const body = await req.json();
-    const updated = await Saree.findByIdAndUpdate(id, body, { new: true });
+    const { id: _ignored, ...body } = await req.json();
 
+    const { data: updated, error } = await supabase()
+      .from("sarees")
+      .update(body)
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
     if (!updated) {
       return NextResponse.json({ error: "Saree not found" }, { status: 404 });
     }
 
     return NextResponse.json(updated);
   } catch (err) {
+    console.error("Error updating saree:", err);
     return NextResponse.json({ error: "Failed to update saree" }, { status: 500 });
   }
 }
 
 // DELETE: remove saree by id (admin only)
-export async function DELETE(req, context) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "Admin") {
+export async function DELETE(req, { params }) {
+  if (!(await isAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await connectDB();
-
-  // Unwrap params
-  const { id } = await context.params;
+  const { id } = await params;
 
   try {
-    const deleted = await Saree.findByIdAndDelete(id);
+    const { data: deleted, error } = await supabase()
+      .from("sarees")
+      .delete()
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    if (error) throw error;
     if (!deleted) {
       return NextResponse.json({ error: "Saree not found" }, { status: 404 });
     }
     return NextResponse.json({ success: true, deleted });
   } catch (err) {
+    console.error("Error deleting saree:", err);
     return NextResponse.json({ error: "Failed to delete saree" }, { status: 500 });
   }
 }

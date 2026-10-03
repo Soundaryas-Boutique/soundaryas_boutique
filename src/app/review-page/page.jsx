@@ -34,7 +34,7 @@ function EditReviewModal({ review, onClose, onUpdate }) {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      await onUpdate(formData._id, formData);
+      await onUpdate(formData.id, formData);
       onClose();
     } catch (error) {
       console.error("Failed to update:", error);
@@ -172,7 +172,7 @@ export default function ReviewPage() {
       try {
         const res = await fetch(`/api/site-reviews/${reviewId}`, { method: 'DELETE' });
         if (!res.ok) throw new Error("Delete failed");
-        setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
+        setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId));
       } catch (error) {
         alert("Failed to delete review.");
       }
@@ -188,7 +188,7 @@ export default function ReviewPage() {
       });
       if (!res.ok) throw new Error("Update failed");
       const { review: newReview } = await res.json();
-      setReviews(prevReviews => prevReviews.map(review => review._id === reviewId ? newReview : review));
+      setReviews(prevReviews => prevReviews.map(review => review.id === reviewId ? newReview : review));
     } catch (error) {
       console.error("Update error:", error);
       throw error;
@@ -304,7 +304,7 @@ export default function ReviewPage() {
                     <div className="text-center py-8 text-gray-500">Loading reviews...</div>
                   ) : displayedReviews.length > 0 ? (
                     displayedReviews.map((rev) => (
-                      <div key={rev._id} className="border p-4 rounded-lg shadow-sm bg-gray-50/50">
+                      <div key={rev.id} className="border p-4 rounded-lg shadow-sm bg-gray-50/50">
                         <div className="flex justify-between items-start">
                           <div><h4 className="font-bold text-gray-800">{rev.name}</h4><p className="text-sm text-gray-500 mb-2">Reviewed: <span className="font-medium text-[#B22222]">{rev.category} ({rev.material})</span></p></div>
                           <div className="text-xs text-gray-500 text-right flex-shrink-0">{formatDate(rev.date)}</div>
@@ -313,7 +313,7 @@ export default function ReviewPage() {
                         <p className="mt-3 text-gray-700 text-sm leading-relaxed">{rev.comment}</p>
                         <div className="flex items-center gap-3 mt-4 border-t pt-3">
                           <button onClick={() => setEditingReview(rev)} className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline"><Edit size={14}/> Edit</button>
-                          <button onClick={() => handleDeleteReview(rev._id)} className="flex items-center gap-1.5 text-xs text-red-600 hover:underline"><Trash2 size={14}/> Delete</button>
+                          <button onClick={() => handleDeleteReview(rev.id)} className="flex items-center gap-1.5 text-xs text-red-600 hover:underline"><Trash2 size={14}/> Delete</button>
                         </div>
                       </div>
                     ))

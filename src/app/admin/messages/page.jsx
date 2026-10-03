@@ -62,8 +62,8 @@ export default function AdminMessagesPage() {
     if (!confirm("Are you sure you want to delete this message?")) return;
     try {
       await fetch(`/api/contact/${id}`, { method: "DELETE" });
-      setMessages((prev) => prev.filter((msg) => msg._id !== id));
-      if (selectedMessage?._id === id) setSelectedMessage(null);
+      setMessages((prev) => prev.filter((msg) => msg.id !== id));
+      if (selectedMessage?.id === id) setSelectedMessage(null);
     } catch (e) {
       console.error("Failed to delete:", e);
       alert("Delete failed. Please try again.");
@@ -242,7 +242,7 @@ export default function AdminMessagesPage() {
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {filteredMessages.map((msg) => (
                 <button
-                  key={msg._id}
+                  key={msg.id}
                   className="text-left rounded-xl border p-4 transition hover:shadow focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   onClick={() => setSelectedMessage(msg)}
                   aria-label={`Open details for message from ${msg?.name || "Unknown"}`}
@@ -293,7 +293,7 @@ export default function AdminMessagesPage() {
                 Close
               </button>
               <button
-                onClick={() => handleDelete(selectedMessage._id)}
+                onClick={() => handleDelete(selectedMessage.id)}
                 className="rounded-xl bg-red-500 px-4 py-2 text-sm text-white transition hover:bg-red-600"
               >
                 Delete

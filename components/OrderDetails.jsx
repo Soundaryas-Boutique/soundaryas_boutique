@@ -66,11 +66,11 @@ export default function OrderDetails() {
         </div>
       ) : (
         orders.map((order) => (
-          <div key={order._id} className={`w-full p-8 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl ${getCardBgColor(order.orderStatus)}`}>
+          <div key={order.id} className={`w-full p-8 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl ${getCardBgColor(order.orderStatus)}`}>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b-2 border-gray-200 pb-4">
               <div>
                 <h3 className="font-extrabold text-2xl text-gray-900 mb-1">
-                  Order ID: <span className="font-normal text-lg">{order._id.substring(0, 8).toUpperCase()}...</span>
+                  Order ID: <span className="font-normal text-lg">{order.id.substring(0, 8).toUpperCase()}...</span>
                 </h3>
                 <p className="text-sm text-gray-500">
                   Date Placed: {new Date(order.createdAt).toLocaleDateString("en-GB", { day: 'numeric', month: 'long', year: 'numeric' })}

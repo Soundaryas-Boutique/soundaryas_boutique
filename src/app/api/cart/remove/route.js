@@ -1,16 +1,6 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/app/lib/mongoose';
-import Cart from '@/app/(models)/Cart';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/lib/auth';
-
-const getUserId = async () => {
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user.id) {
-        return { error: 'Unauthorized' };
-    }
-    return { userId: session.user.id };
-};
+import { supabase } from '@/app/lib/supabase';
+import { getCart, getUserId, normaliseColor } from '@/app/lib/cart';
 
 // POST: Remove a single item from the cart
 export async function POST(req) {
@@ -18,23 +8,29 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
-    await connectDB();
     const { productId, selectedColor } = await req.json();
 
-    const cart = await Cart.findOne({ userId });
+    const { data: cart, error: cartError } = await supabase()
+      .from('carts')
+      .select('id')
+      .eq('userId', userId)
+      .maybeSingle();
+
+    if (cartError) throw cartError;
     if (!cart) {
       return NextResponse.json({ error: 'Cart not found' }, { status: 404 });
     }
 
-    cart.items = cart.items.filter(
-      item => !(item.productId.toString() === productId && item.selectedColor === selectedColor)
-    );
+    const { error: deleteError } = await supabase()
+      .from('cart_items')
+      .delete()
+      .eq('cartId', cart.id)
+      .eq('productId', productId)
+      .eq('selectedColor', normaliseColor(selectedColor));
 
-    await cart.save();
+    if (deleteError) throw deleteError;
 
-    // Re-fetch and populate the cart to get the latest data
-    const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
-    return NextResponse.json(JSON.parse(JSON.stringify(updatedCart)), { status: 200 });
+    return NextResponse.json(await getCart(userId), { status: 200 });
   } catch (err) {
     console.error('Error removing from cart:', err);
     return NextResponse.json({ error: 'Failed to remove from cart' }, { status: 500 });
