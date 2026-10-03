@@ -69,7 +69,10 @@ export default function AdminNav() {
   return (
     <>
       {/* ---------------------------------------------- Side rail (md and up) */}
-      <aside className="hidden md:flex md:w-60 md:shrink-0 md:flex-col bg-rail text-rail-ink">
+      {/* sticky + h-dvh pins the rail to the viewport. Sticky rather than
+          fixed so the rail keeps its place in the flex row and the main
+          column does not need a matching left margin. */}
+      <aside className="hidden md:sticky md:top-0 md:flex md:h-dvh md:w-60 md:shrink-0 md:flex-col bg-rail text-rail-ink">
         <div className="px-6 py-7">
           <p className="font-secondary text-lg leading-tight text-rail-ink">
             Soundarya&rsquo;s
@@ -77,7 +80,7 @@ export default function AdminNav() {
           <p className="text-xs text-rail-muted">Back office</p>
         </div>
 
-        <nav aria-label="Admin" className="flex-1 px-3">
+        <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3">
           <ul className="space-y-1">
             {NAV.map((item) => (
               <li key={item.href}>
