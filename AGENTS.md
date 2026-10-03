@@ -114,11 +114,12 @@ Co-Authored-By: Claude Code
 
 ## Known gotchas
 
-- Compare the admin role through `isAdmin()` or `ADMIN_ROLE` from
-  `src/app/lib/authUtils.js`, never an inline string. Several routes used to
-  test for `"Admin"` while the stored value is `"admin"`, so those admin-only
-  checks rejected everyone. `components/admin/ProductForm.jsx` still has a
-  client-side `"Admin"` comparison; it only hides UI, but it is wrong too.
+- The role is stored lowercase (`check (role in ('user', 'admin'))`). Server
+  code compares it through `isAdmin()` or `ADMIN_ROLE` from
+  `src/app/lib/authUtils.js`, never an inline string. Client Components cannot
+  import that module — it pulls in `next-auth/next` — so they use the literal
+  `"admin"`; keep the spelling exact. Several routes once tested for `"Admin"`,
+  which no stored value can equal, and so rejected everyone.
 - RLS is on with no policies, so the anon key can read nothing. Any query from
   client code needs a policy written in `supabase/schema.sql` first.
 - The `middleware.js` matcher guards `/cart/:path*`, but the route directory is

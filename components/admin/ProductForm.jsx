@@ -31,7 +31,7 @@ export default function ProductForm({ productId }) {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || session.user.role !== "Admin") {
+    if (!session || session.user.role !== "admin") {
       router.push("/");
     }
   }, [session, status, router]);
