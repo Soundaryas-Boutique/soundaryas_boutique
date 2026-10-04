@@ -1,350 +1,296 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Trash2 } from "lucide-react";
+import PageHeading from "../../../../components/admin/PageHeading";
+
+const UNCATEGORISED = "Uncategorised";
+
+const subjectOf = (m) => m?.subject?.trim() || UNCATEGORISED;
+
+const dateLabel = (iso) =>
+  new Date(iso).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+const timeLabel = (iso) =>
+  new Date(iso).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+function Modal({ open, onClose, labelledBy, children }) {
+  const closeRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === "Escape" && onClose?.();
+    window.addEventListener("keydown", onKey);
+    closeRef.current?.focus();
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center sm:p-4">
+      <button
+        type="button"
+        aria-label="Close"
+        tabIndex={-1}
+        onClick={onClose}
+        className="absolute inset-0 cursor-default"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy}
+        className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto border border-ivory bg-white p-6"
+      >
+        {children}
+        <button ref={closeRef} type="button" className="sr-only" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DetailRow({ label, value }) {
+  return (
+    <div className="border-b border-ivory py-3 last:border-0">
+      <dt className="text-xs text-grey-medium">{label}</dt>
+      <dd className="mt-0.5 break-words text-grey-dark">{value || "—"}</dd>
+    </div>
+  );
+}
 
 export default function MessagesDashboard({ initialMessages }) {
   const [messages, setMessages] = useState(initialMessages);
-  const [selectedMessage, setSelectedMessage] = useState(null); // opens modal when set
+  const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
-  const [activeSubject, setActiveSubject] = useState("All");
-  const chartRef = useRef(null);
+  const [subject, setSubject] = useState("All");
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [busyId, setBusyId] = useState(null);
+  const [error, setError] = useState("");
 
-  // Subject counts
   const subjectCounts = useMemo(() => {
     const counts = {};
     for (const m of messages) {
-      const s = m?.subject || "Uncategorized";
+      const s = subjectOf(m);
       counts[s] = (counts[s] || 0) + 1;
     }
     return counts;
   }, [messages]);
 
-  const subjectList = useMemo(() => {
-    const list = Object.keys(subjectCounts).sort((a, b) => a.localeCompare(b));
-    return ["All", ...list];
-  }, [subjectCounts]);
-
-  // Filter + search
-  const filteredMessages = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return messages.filter((m) => {
-      const subject = m?.subject || "Uncategorized";
-      const subjectOk = activeSubject === "All" ? true : subject === activeSubject;
-      if (!q) return subjectOk;
-      const blob =
-        `${m?.name ?? ""} ${m?.email ?? ""} ${m?.phone ?? ""} ${m?.subject ?? ""} ${m?.message ?? ""}`.toLowerCase();
-      return subjectOk && blob.includes(q);
-    });
-  }, [messages, search, activeSubject]);
-
-  // Delete
-  const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this message?")) return;
-    try {
-      await fetch(`/api/contact/${id}`, { method: "DELETE" });
-      setMessages((prev) => prev.filter((msg) => msg.id !== id));
-      if (selectedMessage?.id === id) setSelectedMessage(null);
-    } catch (e) {
-      console.error("Failed to delete:", e);
-      alert("Delete failed. Please try again.");
-    }
-  };
-
-  const totalCount = messages.length;
-
-  // Chart
-  const pieData = useMemo(() => {
-    const entries = Object.entries(subjectCounts);
-    const labels = entries.map(([s]) => s);
-    const data = entries.map(([, c]) => c);
-
-    const palette = [
-      "#1D4ED8", "#059669", "#D97706", "#DC2626", "#0891B2",
-      "#7C3AED", "#65A30D", "#BE123C", "#0284C7", "#EA580C",
-      "#0EA5E9", "#DB2777", "#14B8A6", "#8B5CF6", "#3B82F6",
-    ];
-    const colors = labels.map((_, i) => palette[i % palette.length]);
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Message Subjects",
-          data,
-          backgroundColor: colors,
-          borderWidth: 1,
-        },
-      ],
-    };
-  }, [subjectCounts]);
-
-  const pieOptions = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const count = ctx.parsed || 0;
-              const pct = totalCount ? ((count / totalCount) * 100).toFixed(1) : 0;
-              return `${ctx.label}: ${count} (${pct}%)`;
-            },
-          },
-        },
-        title: {
-          display: true,
-          text: "Distribution of Message Topics",
-          font: { size: 16, weight: "bold" },
-        },
-      },
-    }),
-    [totalCount]
+  const subjects = useMemo(
+    () => Object.keys(subjectCounts).sort((a, b) => a.localeCompare(b)),
+    [subjectCounts]
   );
 
-  const formatDate = (iso) => {
-    if (!iso) return "";
+  const visible = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return messages.filter((m) => {
+      if (subject !== "All" && subjectOf(m) !== subject) return false;
+      if (!q) return true;
+      return `${m.name} ${m.email} ${m.phone ?? ""} ${m.subject ?? ""} ${m.message}`
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [messages, search, subject]);
+
+  const handleDelete = async (id) => {
+    setError("");
+    setBusyId(id);
     try {
-      const d = new Date(iso);
-      return d.toLocaleString();
-    } catch {
-      return iso;
+      const res = await fetch(`/api/contact/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Could not delete that message.");
+      setMessages((cur) => cur.filter((m) => m.id !== id));
+      setConfirmingId(null);
+      if (selected?.id === id) setSelected(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
     }
   };
 
+  if (messages.length === 0) {
+    return (
+      <>
+        <PageHeading title="Messages" />
+        <p className="border border-ivory bg-white px-6 py-16 text-center text-grey-medium">
+          No messages yet. Anything sent through the contact form lands here.
+        </p>
+      </>
+    );
+  }
+
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-white to-gray-50">
-      {/* Page header */}
-      <div className="border-b bg-white/70 backdrop-blur px-6 py-5">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">User Messages</h1>
-            <p className="text-sm text-gray-600">
-              {totalCount} {totalCount === 1 ? "message" : "messages"} • Review, filter, and analyze
-            </p>
-          </div>
-          <div className="hidden md:block">
-            <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-              Admin Dashboard
-            </span>
-          </div>
-        </div>
-      </div>
+    <>
+      <PageHeading title="Messages" count={messages.length} />
 
-      {/* Single-section container */}
-      <div className="mx-auto max-w-6xl p-6 space-y-6">
-        {/* Chart on top */}
-        <div className="rounded-2xl border bg-white p-4 shadow-sm">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-sm text-gray-500">
-              Total: <span className="font-semibold text-gray-700">{totalCount}</span>
-            </span>
-            {activeSubject !== "All" && (
-              <button
-                className="text-xs text-indigo-600 hover:underline"
-                onClick={() => setActiveSubject("All")}
-              >
-                Reset subject filter
-              </button>
-            )}
-          </div>
-          <div className="h-80">
-            <Pie ref={chartRef} data={pieData} options={pieOptions} />
-          </div>
-          {Object.keys(subjectCounts).length === 0 && (
-            <p className="mt-3 text-center text-sm text-gray-500">No data to plot yet.</p>
-          )}
-        </div>
+      {error && (
+        <p role="alert" className="mb-4 border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-primary">
+          {error}
+        </p>
+      )}
 
-        {/* Filters (pills) + Search */}
-        <div className="rounded-2xl border bg-white p-4 shadow-sm">
-          <div className="flex flex-wrap gap-2">
-            {subjectList.map((s) => (
+      <label className="mb-4 block sm:max-w-xs">
+        <span className="sr-only">Search messages</span>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search name, email or text"
+          /* 16px keeps iOS from zooming the page on focus */
+          className="min-h-[44px] w-full border border-ivory bg-white px-4 text-base text-grey-dark placeholder:text-grey-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:text-sm"
+        />
+      </label>
+
+      {/* Counts per subject, as a filter rather than a chart that only
+          restates them. */}
+      <div className="mb-8 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div role="group" aria-label="Filter by subject" className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+          {["All", ...subjects].map((s) => {
+            const active = subject === s;
+            const count = s === "All" ? messages.length : subjectCounts[s];
+            return (
               <button
                 key={s}
-                onClick={() => setActiveSubject(s)}
-                className={`rounded-full px-3 py-1 text-sm transition ${
-                  activeSubject === s
-                    ? "bg-indigo-600 text-white shadow"
-                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                type="button"
+                onClick={() => setSubject(s)}
+                aria-pressed={active}
+                className={`inline-flex min-h-[40px] items-center gap-2 whitespace-nowrap border px-4 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary ${
+                  active
+                    ? "border-grey-dark bg-grey-dark text-white"
+                    : "border-ivory bg-white text-grey-medium hover:text-grey-dark"
                 }`}
               >
                 {s}
-                {s !== "All" && (
-                  <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs text-gray-900">
-                    {subjectCounts[s]}
-                  </span>
-                )}
+                <span className="tabular-nums opacity-70">{count}</span>
               </button>
-            ))}
-          </div>
-
-          <div className="mt-4 flex items-center gap-2">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search name, email, subject, message…"
-              className="w-full rounded-xl border px-3 py-2 outline-none transition focus:border-indigo-400 md:w-1/2"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className="rounded-lg bg-gray-100 px-3 py-2 text-sm hover:bg-gray-200"
-              >
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Messages grid */}
-        <div className="rounded-2xl border bg-white p-4 shadow-sm">
-          <h2 className="mb-3 text-lg font-bold">Messages</h2>
-          {filteredMessages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-14 text-center">
-              <div className="text-3xl">📭</div>
-              <p className="text-lg font-semibold">No messages match your filters</p>
-              <p className="text-sm text-gray-600">Try clearing the search or picking a different subject.</p>
-            </div>
-          ) : (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {filteredMessages.map((msg) => (
-                <button
-                  key={msg.id}
-                  className="text-left rounded-xl border p-4 transition hover:shadow focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  onClick={() => setSelectedMessage(msg)}
-                  aria-label={`Open details for message from ${msg?.name || "Unknown"}`}
-                >
-                  <div className="mb-1 flex items-center justify-between">
-                    <p className="font-semibold">{msg?.name || "Unknown user"}</p>
-                    <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-700">
-                      {(msg?.subject || "Uncategorized").slice(0, 28)}
-                      {(msg?.subject || "").length > 28 ? "…" : ""}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">{msg?.email}</p>
-                  {msg?.createdAt && (
-                    <p className="mt-1 text-xs text-gray-400">{formatDate(msg.createdAt)}</p>
-                  )}
-                  <p className="mt-2 line-clamp-2 text-sm text-gray-700">{msg?.message}</p>
-                </button>
-              ))}
-            </div>
-          )}
+            );
+          })}
         </div>
       </div>
 
-      {/* Modal for details */}
-      <Modal open={!!selectedMessage} onClose={() => setSelectedMessage(null)} title="Message Details">
-        {selectedMessage && (
-          <div className="space-y-3">
-            <div className="rounded-xl bg-gray-50 p-3">
-              <DetailRow label="Name" value={selectedMessage.name} />
-              <DetailRow label="Email" value={selectedMessage.email} />
-              <DetailRow label="Phone" value={selectedMessage.phone || "N/A"} />
-              <DetailRow label="Subject" value={selectedMessage.subject || "Uncategorized"} />
-              {selectedMessage.createdAt && (
-                <DetailRow label="Received" value={formatDate(selectedMessage.createdAt)} />
-              )}
-            </div>
-            <div>
-              <p className="mb-1 text-sm font-semibold">Message</p>
-              <p className="whitespace-pre-line rounded-xl border bg-white p-3 text-sm">
-                {selectedMessage.message}
-              </p>
-            </div>
-            <div className="flex items-center justify-end gap-2 pt-2">
+      {visible.length === 0 ? (
+        <p className="border border-ivory bg-white px-6 py-12 text-center text-grey-medium">
+          No messages match that search.
+        </p>
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {visible.map((m) => (
+            <li key={m.id} className="flex flex-col border border-ivory bg-white">
               <button
-                onClick={() => setSelectedMessage(null)}
-                className="rounded-xl border px-4 py-2 text-sm transition hover:bg-gray-50"
+                type="button"
+                onClick={() => setSelected(m)}
+                className="flex-1 p-4 text-left transition-colors hover:bg-grey-light focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+              >
+                <span className="flex items-baseline justify-between gap-3">
+                  <span className="truncate text-grey-dark">{m.name}</span>
+                  <span className="shrink-0 text-xs text-grey-medium tabular-nums">
+                    {dateLabel(m.createdAt)}
+                  </span>
+                </span>
+                <span className="mt-0.5 block truncate text-sm text-grey-medium">
+                  {m.email}
+                </span>
+                <span className="mt-3 block text-sm text-grey-dark">
+                  {subjectOf(m)}
+                </span>
+                <span className="mt-1 line-clamp-2 block text-sm text-grey-medium">
+                  {m.message}
+                </span>
+              </button>
+
+              <div className="flex items-center justify-between border-t border-ivory px-4 py-2">
+                <span className="text-xs text-grey-medium">
+                  {m.phone || "No phone"}
+                </span>
+                {confirmingId === m.id ? (
+                  <span className="inline-flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(m.id)}
+                      disabled={busyId === m.id}
+                      className="min-h-[36px] bg-primary px-3 text-sm text-white disabled:opacity-60"
+                    >
+                      {busyId === m.id ? "Deleting…" : "Delete"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingId(null)}
+                      className="min-h-[36px] px-2 text-sm text-grey-medium"
+                    >
+                      Keep
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingId(m.id)}
+                    aria-label={`Delete message from ${m.name}`}
+                    className="inline-flex h-11 w-11 items-center justify-center text-grey-medium transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                  >
+                    <Trash2 size={16} aria-hidden />
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Modal open={!!selected} onClose={() => setSelected(null)} labelledBy="message-dialog-title">
+        {selected && (
+          <>
+            <h2 id="message-dialog-title" className="font-admin text-xl font-semibold text-grey-dark">
+              {selected.name}
+            </h2>
+
+            <dl className="mt-4 text-sm">
+              <DetailRow label="Email" value={selected.email} />
+              <DetailRow label="Phone" value={selected.phone} />
+              <DetailRow label="Subject" value={subjectOf(selected)} />
+              <DetailRow label="Received" value={timeLabel(selected.createdAt)} />
+            </dl>
+
+            <p className="mt-4 whitespace-pre-line border border-ivory bg-grey-light p-4 text-sm text-grey-dark">
+              {selected.message}
+            </p>
+
+            <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
+              <a
+                href={`mailto:${selected.email}?subject=${encodeURIComponent(
+                  `Re: ${subjectOf(selected)}`
+                )}`}
+                className="inline-flex min-h-[44px] items-center bg-primary px-4 text-sm text-white transition-colors hover:bg-rail"
+              >
+                Reply by email
+              </a>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="inline-flex min-h-[44px] items-center border border-ivory px-4 text-sm text-grey-dark hover:bg-grey-light"
               >
                 Close
               </button>
-              <button
-                onClick={() => handleDelete(selectedMessage.id)}
-                className="rounded-xl bg-red-500 px-4 py-2 text-sm text-white transition hover:bg-red-600"
-              >
-                Delete
-              </button>
             </div>
-          </div>
+          </>
         )}
       </Modal>
-    </div>
-  );
-}
-
-/* ---------- UI bits ---------- */
-
-function DetailRow({ label, value }) {
-  return (
-    <div className="flex items-start gap-2 text-sm">
-      <span className="w-24 shrink-0 text-gray-500">{label}:</span>
-      <span className="break-all font-medium text-gray-900">{value || "—"}</span>
-    </div>
-  );
-}
-
-function Modal({ open, onClose, title, children }) {
-  // Close on ESC
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => e.key === "Escape" && onClose?.();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  // Lock body scroll when open
-  useEffect(() => {
-    if (!open) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [open]);
-
-  if (!open) return null;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="modal-title"
-      onClick={onClose} // click outside to close
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]" />
-
-      {/* Dialog */}
-      <div
-        className="relative z-10 mx-4 w-full max-w-2xl rounded-2xl border bg-white p-5 shadow-xl"
-        onClick={(e) => e.stopPropagation()} // prevent outside click
-      >
-        <div className="mb-3 flex items-center justify-between">
-          <h3 id="modal-title" className="text-lg font-bold">
-            {title}
-          </h3>
-          <button
-            aria-label="Close"
-            className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-            onClick={onClose}
-          >
-            {/* Close icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {children}
-      </div>
-    </div>
+    </>
   );
 }

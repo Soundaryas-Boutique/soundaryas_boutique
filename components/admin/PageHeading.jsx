@@ -1,15 +1,15 @@
 /**
  * The one display moment on an admin screen.
  *
- * Yeseva One appears here and nowhere else in the back office -- it is what
- * ties these screens to the storefront without the admin having to shout.
- * Everything below this line is Poppins.
+ * Fraunces appears here and nowhere else in the back office. Everything
+ * below this line is Poppins -- the heading carries the character so the
+ * data underneath does not have to.
  */
 export default function PageHeading({ title, count, children }) {
   return (
     <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-ivory pb-5">
       <div>
-        <h1 className="font-secondary text-2xl text-primary md:text-3xl">
+        <h1 className="font-admin text-2xl font-semibold text-grey-dark md:text-3xl">
           {title}
         </h1>
         {count != null && (

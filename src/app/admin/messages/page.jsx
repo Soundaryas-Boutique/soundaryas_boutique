@@ -4,7 +4,7 @@ import { isAdmin } from "@/app/lib/authUtils";
 import MessagesDashboard from "./MessagesDashboard";
 
 export const metadata = {
-  title: "Contact Messages | Admin",
+  title: "Messages | Admin",
 };
 
 export default async function AdminMessagesPage() {

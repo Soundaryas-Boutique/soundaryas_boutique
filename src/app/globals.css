@@ -41,6 +41,10 @@
      Status colours are drawn from the brand palette rather than generic
      traffic lights, so a paid order is emerald silk and a cancelled one is
      the sindoor red the shop already uses. */
+  /* Admin headings. Loaded in src/app/admin/layout.jsx, so it resolves only
+     inside the back office. */
+  --font-admin: var(--font-fraunces);
+
   --color-rail: #4A0E0E;
   --color-rail-ink: #F4E9D7;
   --color-rail-muted: #C8A98F;
