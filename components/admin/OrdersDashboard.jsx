@@ -1,281 +1,351 @@
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
-import { formatPrice } from '@/app/lib/money';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import OrderStatus from './OrderStatus';
-import { Trash2, Download } from 'lucide-react'; // Added Download icon
-import CustomerDetailsModal from './CustomerDetailsModal';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import { CSVLink } from 'react-csv';
 
-const PIE_CHART_COLORS = ['#8B0000', '#FFBB28', '#00C49F', '#0088FE'];
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
+import { formatPrice } from "@/app/lib/money";
+import PageHeading from "./PageHeading";
+import OrderStatus from "./OrderStatus";
+import CustomerDetailsModal from "./CustomerDetailsModal";
+import { ORDER_STATUSES, OPEN_STATUSES, statusMeta } from "./orderStatus";
 
-export default function OrdersDashboard() {
-  const { data: session, status } = useSession();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+const shortId = (id) => id.slice(0, 8).toUpperCase();
 
-  const fetchOrders = async () => {
-    if (status !== 'authenticated' || session.user.role !== 'admin') {
-      setLoading(false);
-      return;
-    }
-    try {
-      const res = await fetch('/api/admin/orders');
-      if (!res.ok) {
-        throw new Error('Failed to fetch orders from admin API.');
+const dateLabel = (iso) =>
+  new Date(iso).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+function Stat({ label, value, hint }) {
+  return (
+    <div className="border border-ivory bg-white p-5">
+      <p className="text-sm text-grey-medium">{label}</p>
+      <p className="mt-1 text-3xl text-grey-dark tabular-nums">{value}</p>
+      {hint && <p className="mt-1 text-xs text-grey-medium">{hint}</p>}
+    </div>
+  );
+}
+
+/** Top sellers as plain proportional bars. Three rows do not need a chart
+ *  library, and an empty one does not draw a pair of bare axes. */
+function TopProducts({ rows }) {
+  if (rows.length === 0) return null;
+  const max = Math.max(...rows.map((r) => r.quantity));
+
+  return (
+    <section className="mb-8 border border-ivory bg-white p-5">
+      <h2 className="mb-4 font-main text-base font-medium text-grey-dark">
+        Best sellers
+      </h2>
+      <ul className="space-y-3">
+        {rows.map((row) => (
+          <li key={row.name}>
+            <div className="mb-1 flex items-baseline justify-between gap-4">
+              <span className="truncate text-sm text-grey-dark">{row.name}</span>
+              <span className="shrink-0 text-sm text-grey-medium tabular-nums">
+                {row.quantity} sold
+              </span>
+            </div>
+            <div className="h-2 w-full bg-grey-light">
+              <div
+                className="h-2 bg-primary"
+                style={{ width: `${(row.quantity / max) * 100}%` }}
+              />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export default function OrdersDashboard({ initialOrders }) {
+  const router = useRouter();
+  const [orders, setOrders] = useState(initialOrders);
+  const [filter, setFilter] = useState("all");
+  const [customer, setCustomer] = useState(null);
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [busyId, setBusyId] = useState(null);
+  const [error, setError] = useState("");
+
+  const counts = useMemo(() => {
+    const c = { all: orders.length };
+    for (const s of ORDER_STATUSES) c[s.value] = 0;
+    for (const o of orders) if (c[o.orderStatus] !== undefined) c[o.orderStatus]++;
+    return c;
+  }, [orders]);
+
+  const revenue = useMemo(
+    () =>
+      orders
+        .filter((o) => o.paymentStatus === "paid")
+        .reduce((sum, o) => sum + Number(o.totalAmount), 0),
+    [orders]
+  );
+
+  const openCount = orders.filter((o) => OPEN_STATUSES.includes(o.orderStatus)).length;
+
+  const topProducts = useMemo(() => {
+    const tally = {};
+    for (const o of orders) {
+      for (const p of o.products ?? []) {
+        tally[p.productName] = (tally[p.productName] || 0) + p.quantity;
       }
-      const data = await res.json();
-      setOrders(data);
+    }
+    return Object.entries(tally)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([name, quantity]) => ({ name, quantity }));
+  }, [orders]);
+
+  const visible = filter === "all" ? orders : orders.filter((o) => o.orderStatus === filter);
+
+  const handleDelete = async (orderId) => {
+    setError("");
+    setBusyId(orderId);
+    try {
+      const res = await fetch(`/api/admin/orders?id=${orderId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Could not delete that order.");
+      setOrders((cur) => cur.filter((o) => o.id !== orderId));
+      setConfirmingId(null);
+      router.refresh();
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setBusyId(null);
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, [session, status]);
-
-  const { topProductsData, orderStatusData } = useMemo(() => {
-    const productCounts = {};
-    const statusCounts = { processing: 0, shipped: 0, delivered: 0, cancelled: 0 };
-    
-    orders.forEach(order => {
-      if (statusCounts[order.orderStatus] !== undefined) {
-        statusCounts[order.orderStatus]++;
-      }
-      order.products.forEach(product => {
-        const name = product.productName;
-        if (productCounts[name]) {
-          productCounts[name] += product.quantity;
-        } else {
-          productCounts[name] = product.quantity;
-        }
-      });
-    });
-
-    const statusChartData = Object.keys(statusCounts).map(status => ({
-      name: status.charAt(0).toUpperCase() + status.slice(1),
-      value: statusCounts[status],
-    }));
-
-    const sortedProducts = Object.entries(productCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-      .map(([name, quantity]) => ({ name, quantity }));
-
-    return { topProductsData: sortedProducts, orderStatusData: statusChartData };
-  }, [orders]);
-
-
-  const handleOrderDelete = async (orderId) => {
-    if (!confirm('Are you sure you want to delete this order? This cannot be undone.')) return;
-
-    try {
-      const res = await fetch(`/api/admin/orders?id=${orderId}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to delete order.');
-      }
-      
-      setOrders(orders.filter(order => order.id !== orderId));
-    } catch (err) {
-      alert(`Error deleting order: ${err.message}`);
-    }
-  };
-
-  const handleStatusUpdate = (orderId, newStatus) => {
-    console.log(`Order ${orderId} updated to ${newStatus}`);
-  };
-
-  const openCustomerModal = (customer) => {
-    setSelectedCustomer(customer);
-    setIsModalOpen(true);
-  };
-
-  const closeCustomerModal = () => {
-    setIsModalOpen(false);
-    setSelectedCustomer(null);
-  };
-
-  // ✅ New function to handle PDF download
-  const handleDownloadPdf = () => {
-    const doc = new jsPDF();
-    doc.text('Customer Orders Dashboard Report', 14, 20);
-
-    // Prepare data for the autoTable plugin
-    const tableColumn = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
-    const tableRows = orders.map(order => [
-      order.id.substring(0, 8) + '...',
-      order.userId?.name || 'User Deleted',
-      order.userId?.email || 'N/A',
-      order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
-      formatPrice(order.totalAmount),
-      order.orderStatus,
-      new Date(order.createdAt).toLocaleDateString()
-    ]);
-
-    // Use jspdf-autotable to generate the table
-    doc.autoTable({
-      head: [tableColumn],
-      body: tableRows,
-      startY: 30,
-    });
-
-    // Save the PDF
-    doc.save('orders-report.pdf');
-  };
-
-  // ✅ New function to prepare data for CSV download
-  const getCsvData = () => {
-    const csvHeaders = ["Order ID", "Customer Name", "Customer Email", "Items (Qty)", "Total", "Status", "Date"];
-    const csvRows = orders.map(order => ({
-      "Order ID": order.id,
-      "Customer Name": order.userId?.name || 'User Deleted',
-      "Customer Email": order.userId?.email || 'N/A',
-      "Items (Qty)": order.products.map(p => `${p.productName} (x${p.quantity})`).join(', '),
-      "Total": formatPrice(order.totalAmount),
-      "Status": order.orderStatus,
-      "Date": new Date(order.createdAt).toLocaleDateString()
-    }));
-    return csvRows;
-  };
-
-  if (loading) return <div className="p-10 text-center">Loading all orders...</div>;
-  if (error) return <div className="p-10 text-center text-red-600">Error loading orders: {error}</div>;
-  if (status !== 'authenticated' || session.user.role !== 'admin') {
-    return <div className="p-10 text-center text-red-600">ACCESS DENIED. Only Admin can view this page.</div>;
+  if (orders.length === 0) {
+    return (
+      <>
+        <PageHeading title="Orders" />
+        <p className="border border-ivory bg-white px-6 py-16 text-center text-grey-medium">
+          No orders yet. They will appear here as soon as a customer checks out.
+        </p>
+      </>
+    );
   }
-  
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">All Customer Orders</h1>
-      
-      {/* ✅ Download Buttons */}
-      <div className="flex justify-end gap-4 mb-6">
-        <button
-          onClick={handleDownloadPdf}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
-          title="Download as PDF"
-        >
-          <Download size={16} /> Download PDF
-        </button>
-        <CSVLink
-          data={getCsvData()}
-          filename={"orders-report.csv"}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
-          target="_blank"
-        >
-          <Download size={16} /> Download CSV
-        </CSVLink>
-      </div>
+    <>
+      <PageHeading title="Orders" count={orders.length} />
 
-      {/* Visualizations Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        <div className="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Top 3 Selling Products</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={topProductsData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <XAxis dataKey="name" stroke="#8B0000" />
-              <YAxis stroke="#8B0000" />
-              <Tooltip />
-              <Bar dataKey="quantity" fill="#FFD700" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-xl border border-gray-200 flex flex-col items-center">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">Order Status Breakdown</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={orderStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label>
-                {orderStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto bg-white rounded-lg shadow-xl">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items (Qty)</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Delivery Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {orders.length === 0 ? (
-              <tr><td colSpan="6" className="py-4 text-center text-gray-500">No orders found yet.</td></tr>
-            ) : (
-              orders.map((order) => (
-                <tr key={order.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order.id.substring(0, 8)}...
-                    <div className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button 
-                      onClick={() => openCustomerModal(order.userId)}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-900 hover:underline"
-                    >
-                      {order.userId?.name || 'User Deleted'}
-                    </button>
-                    <div className="text-sm text-gray-500">{order.userId?.email}</div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {order.products.map(p => 
-                      <div key={p.id}>- {p.productName} (x{p.quantity})</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-gray-900">
-                    {formatPrice(order.totalAmount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <OrderStatus 
-                      orderId={order.id}
-                      currentStatus={order.orderStatus}
-                      onStatusUpdate={handleStatusUpdate}
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => handleOrderDelete(order.id)}
-                      className="text-red-600 hover:text-red-900 transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-      
-      {isModalOpen && selectedCustomer && (
-        <CustomerDetailsModal
-          customer={selectedCustomer}
-          onClose={closeCustomerModal}
-        />
+      {error && (
+        <p role="alert" className="mb-4 border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-primary">
+          {error}
+        </p>
       )}
-    </div>
+
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Stat label="Orders" value={orders.length} />
+        <Stat label="Revenue" value={formatPrice(revenue)} hint="Paid orders only" />
+        <Stat label="Needs attention" value={openCount} hint="Pending or processing" />
+      </div>
+
+      {/* The filter doubles as the status breakdown, so there is no pie chart
+          restating what these counts already say. */}
+      <div className="mb-8 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div role="group" aria-label="Filter by status" className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+          {[{ value: "all", label: "All", color: "#333333" }, ...ORDER_STATUSES].map((s) => {
+            const active = filter === s.value;
+            return (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => setFilter(s.value)}
+                aria-pressed={active}
+                className="inline-flex min-h-[40px] items-center gap-2 whitespace-nowrap border px-4 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                style={
+                  active
+                    ? { borderColor: s.color, backgroundColor: `${s.color}14`, color: s.color }
+                    : { borderColor: "#FFFDD0", backgroundColor: "#FFFFFF", color: "#757575" }
+                }
+              >
+                {s.label}
+                <span className="tabular-nums opacity-70">{counts[s.value] ?? 0}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <TopProducts rows={topProducts} />
+
+      {visible.length === 0 ? (
+        <p className="border border-ivory bg-white px-6 py-12 text-center text-grey-medium">
+          No {statusMeta(filter).label.toLowerCase()} orders.
+        </p>
+      ) : (
+        <>
+          {/* Desktop table */}
+          <div className="hidden overflow-x-auto border border-ivory bg-white md:block">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-ivory text-left text-grey-medium">
+                  <th className="px-5 py-3 font-medium">Order</th>
+                  <th className="px-5 py-3 font-medium">Customer</th>
+                  <th className="px-5 py-3 font-medium">Items</th>
+                  <th className="px-5 py-3 font-medium">Total</th>
+                  <th className="px-5 py-3 font-medium">Status</th>
+                  <th className="px-5 py-3 font-medium"><span className="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((order) => (
+                  <tr key={order.id} className="border-b border-ivory/60 align-top last:border-0 hover:bg-grey-light">
+                    <td className="px-5 py-4">
+                      <span className="text-grey-dark tabular-nums">{shortId(order.id)}</span>
+                      <span className="mt-0.5 block text-xs text-grey-medium tabular-nums">
+                        {dateLabel(order.createdAt)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      {order.userId ? (
+                        <button
+                          type="button"
+                          onClick={() => setCustomer(order.userId)}
+                          className="text-left text-grey-dark underline decoration-ivory underline-offset-4 hover:decoration-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                        >
+                          {order.userId.name}
+                          <span className="mt-0.5 block text-xs text-grey-medium">
+                            {order.userId.email}
+                          </span>
+                        </button>
+                      ) : (
+                        <span className="text-grey-medium italic">Account removed</span>
+                      )}
+                    </td>
+                    <td className="px-5 py-4 text-grey-medium">
+                      {order.products.map((p) => (
+                        <span key={p.id} className="block">
+                          {p.productName}
+                          <span className="tabular-nums"> ×{p.quantity}</span>
+                        </span>
+                      ))}
+                    </td>
+                    <td className="px-5 py-4 text-grey-dark tabular-nums">
+                      {formatPrice(order.totalAmount)}
+                    </td>
+                    <td className="px-5 py-4">
+                      <OrderStatus orderId={order.id} currentStatus={order.orderStatus} />
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      {confirmingId === order.id ? (
+                        <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(order.id)}
+                            disabled={busyId === order.id}
+                            className="min-h-[36px] bg-primary px-3 text-sm text-white disabled:opacity-60"
+                          >
+                            {busyId === order.id ? "Deleting…" : "Delete"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmingId(null)}
+                            className="min-h-[36px] px-2 text-sm text-grey-medium hover:text-grey-dark"
+                          >
+                            Keep
+                          </button>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmingId(order.id)}
+                          aria-label={`Delete order ${shortId(order.id)}`}
+                          className="inline-flex h-11 w-11 items-center justify-center text-grey-medium transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+                        >
+                          <Trash2 size={16} aria-hidden />
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Phone cards: a six column table cannot be read at 390px */}
+          <ul className="space-y-3 md:hidden">
+            {visible.map((order) => (
+              <li key={order.id} className="border border-ivory bg-white p-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-grey-dark tabular-nums">{shortId(order.id)}</span>
+                  <span className="text-lg text-grey-dark tabular-nums">
+                    {formatPrice(order.totalAmount)}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-grey-medium tabular-nums">
+                  {dateLabel(order.createdAt)}
+                </p>
+
+                <div className="mt-3">
+                  {order.userId ? (
+                    <button
+                      type="button"
+                      onClick={() => setCustomer(order.userId)}
+                      className="text-left text-sm text-grey-dark underline decoration-ivory underline-offset-4"
+                    >
+                      {order.userId.name}
+                      <span className="block text-xs text-grey-medium">{order.userId.email}</span>
+                    </button>
+                  ) : (
+                    <span className="text-sm text-grey-medium italic">Account removed</span>
+                  )}
+                </div>
+
+                <ul className="mt-3 space-y-0.5 text-sm text-grey-medium">
+                  {order.products.map((p) => (
+                    <li key={p.id}>
+                      {p.productName}
+                      <span className="tabular-nums"> ×{p.quantity}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-ivory pt-3">
+                  <OrderStatus orderId={order.id} currentStatus={order.orderStatus} />
+                  {confirmingId === order.id ? (
+                    <span className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(order.id)}
+                        disabled={busyId === order.id}
+                        className="min-h-[44px] bg-primary px-3 text-sm text-white disabled:opacity-60"
+                      >
+                        {busyId === order.id ? "Deleting…" : "Delete"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingId(null)}
+                        className="min-h-[44px] px-2 text-sm text-grey-medium"
+                      >
+                        Keep
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmingId(order.id)}
+                      aria-label={`Delete order ${shortId(order.id)}`}
+                      className="inline-flex h-11 w-11 items-center justify-center text-grey-medium hover:text-primary"
+                    >
+                      <Trash2 size={16} aria-hidden />
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {customer && (
+        <CustomerDetailsModal customer={customer} onClose={() => setCustomer(null)} />
+      )}
+    </>
   );
 }
