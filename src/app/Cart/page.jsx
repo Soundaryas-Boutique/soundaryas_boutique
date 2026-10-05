@@ -96,7 +96,7 @@ export default function CartPage() {
         <div className="lg:col-span-2 space-y-6">
           {cartItems.map((item) => (
             <div
-              key={`${item.productId}_${item.selectedColor}`}
+              key={item.productId}
               className="group flex flex-col sm:flex-row items-center bg-white border border-transparent hover:border-ivory transition-all duration-500 hover:shadow-premium p-4 md:p-6"
             >
               <div className="flex-shrink-0 w-32 h-44 mb-4 sm:mb-0 sm:mr-8 relative overflow-hidden aspect-[3/4]">
@@ -119,12 +119,6 @@ export default function CartPage() {
                 <h2 className="text-xl font-secondary text-primary tracking-wide mb-2 uppercase">
                   {item.productName}
                 </h2>
-                {item.selectedColor && (
-                  <p className="text-xs uppercase tracking-widest text-secondary font-medium mb-3 flex items-center justify-center sm:justify-start gap-2">
-                    <span className="w-2 h-2 rounded-full bg-secondary"></span>
-                    {item.selectedColor}
-                  </p>
-                )}
                 <p className="text-grey-dark font-main font-semibold text-lg">
                   {formatPrice(item.price)}
                 </p>
@@ -136,7 +130,7 @@ export default function CartPage() {
                   <select
                     value={item.quantity}
                     onChange={(e) =>
-                      updateQuantity(item.productId, item.selectedColor, parseInt(e.target.value))
+                      updateQuantity(item.productId, parseInt(e.target.value))
                     }
                     className="bg-transparent border-none py-2 pr-4 font-main text-sm focus:ring-0 cursor-pointer appearance-none"
                   >
@@ -151,7 +145,7 @@ export default function CartPage() {
                   {formatPrice(item.price * item.quantity)}
                 </p>
                 <button
-                  onClick={() => removeFromCart(item.productId, item.selectedColor)}
+                  onClick={() => removeFromCart(item.productId)}
                   className="p-2 text-grey-medium hover:text-primary transition-colors duration-300"
                   title="Remove Item"
                 >

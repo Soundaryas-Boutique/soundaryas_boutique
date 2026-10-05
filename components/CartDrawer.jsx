@@ -103,7 +103,7 @@ export default function CartDrawer() {
                       ) : (
                         <div className="space-y-8">
                           {cartItems.map((item) => (
-                            <div key={`${item.productId}-${item.selectedColor}`} className="flex gap-4 group">
+                            <div key={item.productId} className="flex gap-4 group">
                               <div className="h-28 w-20 flex-shrink-0 overflow-hidden border border-ivory/50 silk-bg relative shadow-sm">
                                 <Image
                                   src={item.images?.[0]?.url || "/no-image.jpg"}
@@ -122,28 +122,24 @@ export default function CartDrawer() {
                                   <p className="text-sm font-bold text-grey-dark tabular-nums">{formatPrice(item.price)}</p>
                                 </div>
                                 
-                                {item.selectedColor && (
-                                  <p className="text-eyebrow uppercase tracking-widest text-secondary mt-1">{item.selectedColor}</p>
-                                )}
-
                                 <div className="mt-auto flex items-center justify-between">
                                   <div className="flex items-center border border-ivory bg-ivory/20 px-1 py-0.5">
                                     <button 
-                                      onClick={() => updateQuantity(item.productId, item.selectedColor, item.quantity - 1)}
+                                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                                       className="p-1 hover:text-primary transition-colors"
                                     >
                                       <Minus size={12} />
                                     </button>
                                     <span className="px-3 text-xs font-bold text-grey-dark min-w-[24px] text-center">{item.quantity}</span>
                                     <button 
-                                      onClick={() => updateQuantity(item.productId, item.selectedColor, item.quantity + 1)}
+                                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                                       className="p-1 hover:text-primary transition-colors"
                                     >
                                       <Plus size={12} />
                                     </button>
                                   </div>
                                   <button
-                                    onClick={() => removeFromCart(item.productId, item.selectedColor)}
+                                    onClick={() => removeFromCart(item.productId)}
                                     className="text-grey-medium hover:text-primary transition-colors p-1"
                                   >
                                     <Trash2 size={16} />

@@ -45,6 +45,10 @@ There is **no** `typecheck`, `test`, or `e2e` script. Do not invent them. See
   block. All design tokens live here.
 - `supabase/schema.sql` — the whole database definition and the source of
   truth. Change it here, not only in the dashboard.
+- `supabase/migrations/` — dated SQL for changes to a database that already
+  exists. PostgREST cannot run DDL, so anything structural has to be pasted
+  into the Supabase SQL editor by hand; write the migration here so the
+  change is recorded rather than only applied.
 - `middleware.js` — route guards at the repo root.
 
 ## Data layer

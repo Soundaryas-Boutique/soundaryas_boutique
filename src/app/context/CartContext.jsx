@@ -47,12 +47,10 @@ export const CartProvider = ({ children }) => {
 
     // Update locally first for instant feedback
     setCartItems(prevItems => {
-      const existingItem = prevItems.find(
-        item => item.productId === product.id && item.selectedColor === product.selectedColor
-      );
+      const existingItem = prevItems.find(item => item.productId === product.id);
       if (existingItem) {
-        return prevItems.map(item => 
-          item.productId === product.id && item.selectedColor === product.selectedColor
+        return prevItems.map(item =>
+          item.productId === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -69,8 +67,7 @@ export const CartProvider = ({ children }) => {
         productId: product.id,
         productName: product.productName,
         price: product.discountPrice || product.price,
-        quantity: 1, 
-        selectedColor: product.selectedColor || null,
+        quantity: 1,
         images: product.images
       }),
     });
@@ -80,13 +77,13 @@ export const CartProvider = ({ children }) => {
     return true; 
   };
 
-  const updateQuantity = (productId, selectedColor, newQuantity) => {
+  const updateQuantity = (productId, newQuantity) => {
     if (status !== 'authenticated') return;
 
     // Update the state locally for instant UI changes
     setCartItems(prevItems => {
       const updatedItems = prevItems.map(item =>
-        item.productId === productId && item.selectedColor === selectedColor
+        item.productId === productId
           ? { ...item, quantity: newQuantity }
           : item
       );
@@ -101,20 +98,20 @@ export const CartProvider = ({ children }) => {
       fetch('/api/cart/update-quantity', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, selectedColor, newQuantity }),
+        body: JSON.stringify({ productId, newQuantity }),
       });
     }, 500); 
   };
   
-  const removeFromCart = (productId, selectedColor) => {
+  const removeFromCart = (productId) => {
     if (status !== 'authenticated') return;
 
-    setCartItems(prevItems => prevItems.filter(item => !(item.productId === productId && item.selectedColor === selectedColor)));
+    setCartItems(prevItems => prevItems.filter(item => item.productId !== productId));
 
     fetch('/api/cart/remove', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId, selectedColor }),
+      body: JSON.stringify({ productId }),
     });
   };
 

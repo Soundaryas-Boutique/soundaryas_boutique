@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/app/lib/supabase';
-import { ensureCart, getCart, getUserId, normaliseColor } from '@/app/lib/cart';
+import { ensureCart, getCart, getUserId } from '@/app/lib/cart';
 
 // GET: Fetch the user's cart with each item's product images
 export async function GET() {
@@ -21,8 +21,7 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
-    const { productId, productName, price, selectedColor } = await req.json();
-    const colour = normaliseColor(selectedColor);
+    const { productId, productName, price } = await req.json();
     const cartId = await ensureCart(userId);
     const db = supabase();
 
@@ -31,7 +30,6 @@ export async function POST(req) {
       .select('id, quantity')
       .eq('cartId', cartId)
       .eq('productId', productId)
-      .eq('selectedColor', colour)
       .maybeSingle();
 
     if (selectError) throw selectError;
@@ -49,7 +47,6 @@ export async function POST(req) {
         productId,
         productName,
         price,
-        selectedColor: colour,
         quantity: 1,
       });
 

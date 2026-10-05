@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/app/lib/supabase';
-import { getCart, getUserId, normaliseColor } from '@/app/lib/cart';
+import { getCart, getUserId } from '@/app/lib/cart';
 
 // POST: Remove a single item from the cart
 export async function POST(req) {
@@ -8,7 +8,7 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
-    const { productId, selectedColor } = await req.json();
+    const { productId } = await req.json();
 
     const { data: cart, error: cartError } = await supabase()
       .from('carts')
@@ -25,8 +25,7 @@ export async function POST(req) {
       .from('cart_items')
       .delete()
       .eq('cartId', cart.id)
-      .eq('productId', productId)
-      .eq('selectedColor', normaliseColor(selectedColor));
+      .eq('productId', productId);
 
     if (deleteError) throw deleteError;
 

@@ -14,11 +14,6 @@ export async function getUserId() {
   return { userId: session.user.id };
 }
 
-/** selectedColor is `not null default ''`, so the unique index can rely on it. */
-export function normaliseColor(selectedColor) {
-  return selectedColor ?? "";
-}
-
 /** Returns the user's cart id, creating the cart row on first use. */
 export async function ensureCart(userId) {
   const db = supabase();
@@ -52,7 +47,7 @@ export async function getCart(userId) {
   const { data: cart, error } = await supabase()
     .from("carts")
     .select(
-      "id, userId, createdAt, updatedAt, items:cart_items(id, productId, productName, price, selectedColor, quantity, sarees(images))"
+      "id, userId, createdAt, updatedAt, items:cart_items(id, productId, productName, price, quantity, sarees(images))"
     )
     .eq("id", cartId)
     .single();

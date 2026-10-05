@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/app/lib/supabase';
-import { getCart, getUserId, normaliseColor } from '@/app/lib/cart';
+import { getCart, getUserId } from '@/app/lib/cart';
 
 // POST: Update the quantity of a specific item (or remove it if quantity <= 0)
 export async function POST(req) {
@@ -8,8 +8,7 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error }, { status: 401 });
 
   try {
-    const { productId, selectedColor, newQuantity } = await req.json();
-    const colour = normaliseColor(selectedColor);
+    const { productId, newQuantity } = await req.json();
 
     const { data: cart, error: cartError } = await supabase()
       .from('carts')
@@ -26,8 +25,7 @@ export async function POST(req) {
       .from('cart_items')
       .select('id')
       .eq('cartId', cart.id)
-      .eq('productId', productId)
-      .eq('selectedColor', colour);
+      .eq('productId', productId);
 
     const { data: item, error: itemError } = await match.maybeSingle();
     if (itemError) throw itemError;

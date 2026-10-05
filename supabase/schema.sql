@@ -51,14 +51,13 @@ create table sarees (
   stock           integer not null default 0 check (stock >= 0),
   sold            integer not null default 0 check (sold >= 0),
   category        text not null check (category in ('Silk', 'Cotton', 'Designer', 'Banarasi', 'Casual', 'Other')),
-  tags            text[] not null default '{}',
-  colors          text[] not null default '{}',
-  sizes           text[] not null default '{}',
+  -- The code the shop says out loud, on the phone and on a label. Order ids
+  -- are uuids, so without this there is nothing human to quote.
+  sku             text not null unique,
   material        text,
   -- [{ url, alt }]; kept as jsonb because it is always read and written whole.
   images          jsonb not null default '[]',
   slug            text not null unique,
-  "isFeatured"    boolean not null default false,
   status          text not null default 'active' check (status in ('active', 'inactive')),
   "createdAt"     timestamptz not null default now(),
   "updatedAt"     timestamptz not null default now()
@@ -85,19 +84,14 @@ create trigger carts_set_updated_at before update on carts
 
 -- productName and price are denormalised on purpose: they freeze what the
 -- shopper saw when they added the item.
---
--- selectedColor defaults to '' rather than null so the unique constraint can do
--- its job -- in Postgres two null colours would not collide, which would let
--- duplicate rows for the same product pile up.
 create table cart_items (
-  id              uuid primary key default gen_random_uuid(),
-  "cartId"        uuid not null references carts (id) on delete cascade,
-  "productId"     uuid not null references sarees (id) on delete cascade,
-  "productName"   text not null,
-  price           numeric(10, 2) not null check (price >= 0),
-  "selectedColor" text not null default '',
-  quantity        integer not null check (quantity >= 1),
-  unique ("cartId", "productId", "selectedColor")
+  id            uuid primary key default gen_random_uuid(),
+  "cartId"      uuid not null references carts (id) on delete cascade,
+  "productId"   uuid not null references sarees (id) on delete cascade,
+  "productName" text not null,
+  price         numeric(10, 2) not null check (price >= 0),
+  quantity      integer not null check (quantity >= 1),
+  unique ("cartId", "productId")
 );
 
 create index cart_items_cart_id_idx on cart_items ("cartId");

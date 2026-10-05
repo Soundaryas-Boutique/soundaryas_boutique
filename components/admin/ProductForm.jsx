@@ -17,12 +17,9 @@ export default function ProductForm({ productId }) {
     discountPrice: "",
     stock: "",
     category: "Silk",
-    tags: "",
-    colors: "",
-    sizes: "",
     material: "",
     slug: "",
-    isFeatured: false,
+    sku: "",
     status: "active",
     images: [],
   });
@@ -47,9 +44,6 @@ export default function ProductForm({ productId }) {
           setProduct({
             ...data,
             images: data.images || [],
-            tags: data.tags ? data.tags.join(", ") : "",
-            colors: data.colors ? data.colors.join(", ") : "",
-            sizes: data.sizes ? data.sizes.join(", ") : "",
           });
         })
         .catch((err) => console.error("Failed to fetch product:", err));
@@ -78,9 +72,6 @@ export default function ProductForm({ productId }) {
     try {
       const payload = {
         ...product,
-        tags: product.tags ? product.tags.split(",").map((i) => i.trim()) : [],
-        colors: product.colors ? product.colors.split(",").map((i) => i.trim()) : [],
-        sizes: product.sizes ? product.sizes.split(",").map((i) => i.trim()) : [],
         price: Number(product.price),
         discountPrice: product.discountPrice ? Number(product.discountPrice) : null,
         stock: Number(product.stock),
@@ -167,30 +158,6 @@ export default function ProductForm({ productId }) {
         </select>
         <input
           type="text"
-          name="tags"
-          value={product.tags || ""}
-          onChange={handleChange}
-          placeholder="Tags (comma separated)"
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="text"
-          name="colors"
-          value={product.colors || ""}
-          onChange={handleChange}
-          placeholder="Colors (comma separated)"
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="text"
-          name="sizes"
-          value={product.sizes || ""}
-          onChange={handleChange}
-          placeholder="Sizes (comma separated)"
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="text"
           name="material"
           value={product.material || ""}
           onChange={handleChange}
@@ -203,6 +170,15 @@ export default function ProductForm({ productId }) {
         />
         <input
           type="text"
+          name="sku"
+          value={product.sku || ""}
+          onChange={handleChange}
+          placeholder="SKU, e.g. KAN-SLK-001"
+          required
+          className="w-full border p-2 rounded"
+        />
+        <input
+          type="text"
           name="slug"
           value={product.slug || ""}
           onChange={handleChange}
@@ -211,15 +187,6 @@ export default function ProductForm({ productId }) {
           className="w-full border p-2 rounded"
         />
         <div className="flex items-center space-x-4">
-          <label className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              name="isFeatured"
-              checked={product.isFeatured}
-              onChange={handleChange}
-            />
-            <span>Featured Product</span>
-          </label>
           <select
             name="status"
             value={product.status || "active"}

@@ -74,6 +74,7 @@ export default function ProductsTable({ initialProducts }) {
     return products.filter(
       (p) =>
         p.productName.toLowerCase().includes(q) ||
+        p.sku?.toLowerCase().includes(q) ||
         p.category.toLowerCase().includes(q)
     );
   }, [products, query]);
@@ -134,7 +135,7 @@ export default function ProductsTable({ initialProducts }) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by name or category"
+            placeholder="Search by name, SKU or category"
             /* 16px keeps iOS from zooming the page on focus */
             className="min-h-[44px] w-full border border-ivory bg-white px-4 text-base text-grey-dark placeholder:text-grey-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:text-sm"
           />
@@ -173,9 +174,10 @@ export default function ProductsTable({ initialProducts }) {
                         <Thumb product={p} />
                         <span>
                           <span className="block text-grey-dark">{p.productName}</span>
-                          {p.status !== "active" && (
-                            <span className="text-xs text-grey-medium">Hidden from shop</span>
-                          )}
+                          <span className="block text-xs text-grey-medium tabular-nums">
+                            {p.sku}
+                            {p.status !== "active" && " · hidden from shop"}
+                          </span>
                         </span>
                       </span>
                     </td>
@@ -233,7 +235,9 @@ export default function ProductsTable({ initialProducts }) {
                   <Thumb product={p} />
                   <div className="min-w-0 flex-1">
                     <p className="text-grey-dark">{p.productName}</p>
-                    <p className="mt-0.5 text-sm text-grey-medium">{p.category}</p>
+                    <p className="mt-0.5 text-sm text-grey-medium">
+                      <span className="tabular-nums">{p.sku}</span> · {p.category}
+                    </p>
                     <p className="mt-1 text-sm"><Price product={p} /></p>
                   </div>
                 </div>
