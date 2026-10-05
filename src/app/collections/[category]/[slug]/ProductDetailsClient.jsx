@@ -9,6 +9,10 @@ import Link from "next/link";
 import { formatPrice } from "@/app/lib/money";
 
 export default function ProductDetailsClient({ saree, relatedSarees }) {
+  // discountPrice is nullable, and `price > null` coerces null to 0 -- which
+  // made every product without a discount show a struck-through price and a
+  // "100% OFF" badge. Same guard SareeCard already uses.
+  const hasOffer = saree.discountPrice != null && saree.discountPrice < saree.price;
   const { addToCart } = useCart();
   const { addToWishlist } = useWishlist(); 
   const [showBuyToast, setShowBuyToast] = useState(false);
@@ -17,8 +21,8 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
   const [mainImage, setMainImage] = useState(defaultImage);
 
   const handleAddToCart = () => {
+    // addToCart opens the drawer itself; there is no separate acknowledgement.
     addToCart(saree);
-    setIsCartAckOpen(true);
   };
   
   const handleBuyNow = () => {
@@ -96,12 +100,12 @@ export default function ProductDetailsClient({ saree, relatedSarees }) {
 
             <div className="flex items-center gap-4 mb-6">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-grey-dark tabular-nums">{formatPrice(saree.discountPrice ?? saree.price)}</span>
-                {saree.price > saree.discountPrice && (
+                <span className="text-2xl font-bold text-grey-dark tabular-nums">{formatPrice(hasOffer ? saree.discountPrice : saree.price)}</span>
+                {hasOffer && (
                   <span className="text-xs text-grey-medium line-through opacity-60 italic tabular-nums">{formatPrice(saree.price)}</span>
                 )}
               </div>
-              {saree.price > saree.discountPrice && (
+              {hasOffer && (
                 <div className="px-2 py-0.5 border border-secondary text-secondary text-eyebrow font-bold tracking-widest uppercase">
                   {Math.round(((saree.price - saree.discountPrice) / saree.price) * 100)}% OFF
                 </div>
