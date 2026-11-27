@@ -170,7 +170,8 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => setIsSignInOpen(true)} // ✅ Trigger Custom Popup
-                  className="group relative hidden lg:block outline-none"
+                  aria-label="Sign in"
+                  className="group relative hidden lg:block outline-none cursor-pointer"
                 >
                   <FiUser className="w-5 h-5 transition-colors group-hover:text-black" />
                 </button>
