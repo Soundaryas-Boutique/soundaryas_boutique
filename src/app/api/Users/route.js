@@ -14,19 +14,16 @@ export async function POST(req) {
     const body = await req.json();
     const userData = body.formData;
 
-    if (
-      !userData?.name ||
-      !userData?.email ||
-      !userData?.password ||
-      !userData?.phone ||
-      !userData?.address||
-      !userData?.state ||
-      !userData?.country ||
-      !userData?.pincode ||
-      !userData?.city
-    ) {
+    if (!userData?.name?.trim() || !userData?.email?.trim() || !userData?.password) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        { message: "Name, email, and password are required" },
+        { status: 400 }
+      );
+    }
+
+    if (userData.password.length < 6) {
+      return NextResponse.json(
+        { message: "Password must be at least 6 characters long" },
         { status: 400 }
       );
     }
@@ -36,21 +33,21 @@ export async function POST(req) {
     const { error } = await supabase()
       .from("users")
       .insert({
-        name,
-        email,
-        phone,
-        address,
-        city,
-        state,
-        country,
-        pincode,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone || null,
+        address: address || null,
+        city: city || null,
+        state: state || null,
+        country: country || null,
+        pincode: pincode || null,
         password: await bcrypt.hash(password, 10),
       });
 
     // 23505 = unique_violation, i.e. the email is already registered.
     if (error?.code === "23505") {
       return NextResponse.json(
-        { message: "User already exists (Email)" },
+        { message: "User already exists with this email" },
         { status: 409 }
       );
     }

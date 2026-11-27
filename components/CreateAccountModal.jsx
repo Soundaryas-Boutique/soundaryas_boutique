@@ -1,318 +1,279 @@
 "use client";
 
-import { Fragment, useState, useMemo } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FiX } from "react-icons/fi";
-import Select from "react-select";
-import countryList from "react-select-country-list";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+
+const INITIAL_FORM_STATE = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
 export default function CreateAccountModal({ isOpen, onClose, onSwitchToSignIn }) {
-    const router = useRouter();
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phone: "",
-        address: "",
-        state: "",
-        country: "",
-        pincode: "",
-        city: "",
-    });
-    const [errorMessage, setErrorMessage] = useState("");
-    const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    // Country options
-    const countryOptions = useMemo(() => countryList().getData(), []);
+  const resetState = () => {
+    setFormData(INITIAL_FORM_STATE);
+    setErrorMessage("");
+    setLoading(false);
+  };
 
-    const handleChange = (e) => {
-        const { value, name } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+  const handleClose = () => {
+    resetState();
+    onClose();
+  };
 
-    const handleCountryChange = (selected) => {
-        setFormData((prev) => ({
-            ...prev,
-            country: selected.label,
-        }));
-    };
+  const handleSwitchToSignIn = () => {
+    resetState();
+    onSwitchToSignIn();
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setErrorMessage("");
-        setLoading(true);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-        // Password match check
-        if (formData.password !== formData.confirmPassword) {
-            setErrorMessage("Passwords do not match");
-            setLoading(false);
-            return;
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
 
-        // Additional password validation
-        if (formData.password.length < 6) {
-            setErrorMessage("Password must be at least 6 characters long");
-            setLoading(false);
-            return;
-        }
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
 
-        try {
-            const res = await fetch("/api/Users", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ formData }),
-            });
+    if (formData.password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long");
+      return;
+    }
 
-            if (!res.ok) {
-                const { message } = await res.json();
-                setErrorMessage(message || "Something went wrong");
-                setLoading(false);
-                return;
-            }
+    setLoading(true);
 
-            // Success
-            setLoading(false);
-            onSwitchToSignIn(); // Switch to sign in modal after successful registration
-            // optionally show a success message or toast
-        } catch (error) {
-            console.error(error);
-            setErrorMessage("An error occurred. Please try again.");
-            setLoading(false);
-        }
-    };
+    try {
+      const res = await fetch("/api/Users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formData: {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+          },
+        }),
+      });
 
-    return (
-        <Transition show={isOpen} as={Fragment}>
-            <Dialog onClose={onClose} className="relative z-[200]">
-                {/* Backdrop */}
-                <Transition.Child
-                    as={Fragment}
-                    enter="transition-opacity ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="transition-opacity ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
-                </Transition.Child>
+      const data = await res.json();
 
-                {/* Modal Content */}
-                <Transition.Child
-                    as={Fragment}
-                    enter="transition-transform ease-out duration-300"
-                    enterFrom="scale-95 opacity-0 translate-y-4"
-                    enterTo="scale-100 opacity-100 translate-y-0"
-                    leave="transition-transform ease-in duration-200"
-                    leaveFrom="scale-100 opacity-100 translate-y-0"
-                    leaveTo="scale-95 opacity-0 translate-y-4"
-                >
-                    <div className="fixed inset-0 flex items-center justify-center p-4">
-                        <Dialog.Panel className="w-full max-w-2xl bg-white shadow-premium relative overflow-hidden transition-all max-h-[90vh] overflow-y-auto no-scrollbar">
-                            {/* Decorative Gradient Top */}
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary sticky z-10" />
+      if (!res.ok) {
+        setErrorMessage(data?.message || "Failed to create account");
+        setLoading(false);
+        return;
+      }
 
-                            {/* Close Button */}
-                            <button
-                                onClick={onClose}
-                                className="absolute top-4 right-4 text-grey-medium hover:text-primary transition-colors z-20 bg-white rounded-full p-1"
-                            >
-                                <FiX className="w-6 h-6" />
-                            </button>
+      // Automatically sign in upon successful registration
+      const loginRes = await signIn("credentials", {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
 
-                            <div className="p-8 md:p-10">
-                                <Dialog.Title className="text-3xl md:text-3xl font-secondary text-center mb-2 text-primary">
-                                    Create Account
-                                </Dialog.Title>
+      setLoading(false);
 
-                                <div className="flex justify-center items-center gap-2 mb-6">
-                                    <div className="h-[1px] w-8 bg-secondary/50"></div>
-                                    <div className="w-1.5 h-1.5 rotate-45 border border-secondary"></div>
-                                    <div className="h-[1px] w-8 bg-secondary/50"></div>
-                                </div>
+      if (loginRes?.error) {
+        handleSwitchToSignIn();
+      } else {
+        handleClose();
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Account creation error:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
+  };
 
-                                <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    {/* Name */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Name</label>
-                                        <input
-                                            name="name"
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={formData.name}
-                                            required
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+  return (
+    <Transition show={isOpen} as={Fragment}>
+      <Dialog onClose={handleClose} className="relative z-[200]">
+        {/* Backdrop */}
+        <Transition.Child
+          as={Fragment}
+          enter="transition-opacity ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="transition-opacity ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+        </Transition.Child>
 
-                                    {/* Email */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Email</label>
-                                        <input
-                                            name="email"
-                                            type="email"
-                                            onChange={handleChange}
-                                            value={formData.email}
-                                            required
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+        {/* Modal Content */}
+        <Transition.Child
+          as={Fragment}
+          enter="transition-transform ease-out duration-300"
+          enterFrom="scale-95 opacity-0 translate-y-4"
+          enterTo="scale-100 opacity-100 translate-y-0"
+          leave="transition-transform ease-in duration-200"
+          leaveFrom="scale-100 opacity-100 translate-y-0"
+          leaveTo="scale-95 opacity-0 translate-y-4"
+        >
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Dialog.Panel className="w-full max-w-md bg-white shadow-premium relative overflow-hidden transition-all max-h-[90vh] overflow-y-auto">
+              {/* Decorative Gradient Top */}
+              <div className="w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary sticky top-0 z-10" />
 
-                                    {/* Password */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Password</label>
-                                        <input
-                                            name="password"
-                                            type="password"
-                                            onChange={handleChange}
-                                            value={formData.password}
-                                            required
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={handleClose}
+                aria-label="Close create account modal"
+                className="absolute top-4 right-4 text-grey-medium hover:text-primary transition-colors z-20 bg-white rounded-full p-2 flex items-center justify-center min-w-[44px] min-h-[44px]"
+              >
+                <FiX className="w-5 h-5" />
+              </button>
 
-                                    {/* Confirm Password */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Confirm Password</label>
-                                        <input
-                                            name="confirmPassword"
-                                            type="password"
-                                            onChange={handleChange}
-                                            value={formData.confirmPassword}
-                                            required
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+              <div className="p-8 sm:p-10">
+                <Dialog.Title className="text-3xl font-secondary text-center mb-2 text-primary">
+                  Create Account
+                </Dialog.Title>
 
-                                    {/* Phone */}
-                                    <div className="flex flex-col md:col-span-2">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Phone</label>
-                                        <PhoneInput
-                                            country={"in"}
-                                            value={formData.phone}
-                                            onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
-                                            inputClass="!w-full !h-[46px] !text-sm !bg-ivory/30 !border-secondary/30 !rounded-none focus:!border-primary !font-main"
-                                            containerClass="w-full"
-                                            buttonClass="!bg-ivory/30 !border-secondary/30 !rounded-none"
-                                        />
-                                    </div>
+                <div className="flex justify-center items-center gap-2 mb-6">
+                  <div className="h-px w-8 bg-secondary/50" />
+                  <div className="w-1.5 h-1.5 rotate-45 border border-secondary" />
+                  <div className="h-px w-8 bg-secondary/50" />
+                </div>
 
-                                    {/* Street */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Street</label>
-                                        <input
-                                            name="address"
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={formData.address}
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                  {/* Name */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="modal-name"
+                      className="text-grey-dark text-xs font-bold uppercase tracking-wider mb-2"
+                    >
+                      Full Name
+                    </label>
+                    <input
+                      id="modal-name"
+                      name="name"
+                      type="text"
+                      autoComplete="name"
+                      onChange={handleChange}
+                      value={formData.name}
+                      required
+                      placeholder="e.g. Priya Sharma"
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-base"
+                    />
+                  </div>
 
-                                    {/* Pincode */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Pincode</label>
-                                        <input
-                                            name="pincode"
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={formData.pincode}
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+                  {/* Email */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="modal-email"
+                      className="text-grey-dark text-xs font-bold uppercase tracking-wider mb-2"
+                    >
+                      Email Address
+                    </label>
+                    <input
+                      id="modal-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      onChange={handleChange}
+                      value={formData.email}
+                      required
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-base"
+                    />
+                  </div>
 
-                                    {/* City */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">City</label>
-                                        <input
-                                            name="city"
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={formData.city}
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+                  {/* Password */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="modal-password"
+                      className="text-grey-dark text-xs font-bold uppercase tracking-wider mb-2"
+                    >
+                      Password
+                    </label>
+                    <input
+                      id="modal-password"
+                      name="password"
+                      type="password"
+                      autoComplete="new-password"
+                      onChange={handleChange}
+                      value={formData.password}
+                      required
+                      minLength={6}
+                      placeholder="At least 6 characters"
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-base"
+                    />
+                  </div>
 
-                                    {/* State */}
-                                    <div className="flex flex-col">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">State</label>
-                                        <input
-                                            name="state"
-                                            type="text"
-                                            onChange={handleChange}
-                                            value={formData.state}
-                                            className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-sm"
-                                        />
-                                    </div>
+                  {/* Confirm Password */}
+                  <div className="flex flex-col">
+                    <label
+                      htmlFor="modal-confirmPassword"
+                      className="text-grey-dark text-xs font-bold uppercase tracking-wider mb-2"
+                    >
+                      Confirm Password
+                    </label>
+                    <input
+                      id="modal-confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      autoComplete="new-password"
+                      onChange={handleChange}
+                      value={formData.confirmPassword}
+                      required
+                      minLength={6}
+                      placeholder="Re-enter your password"
+                      className="w-full px-4 py-3 bg-ivory/30 border border-secondary/30 focus:border-primary focus:ring-0 outline-none transition-all placeholder:text-grey-medium/50 font-main text-base"
+                    />
+                  </div>
 
-                                    {/* Country */}
-                                    <div className="flex flex-col md:col-span-2">
-                                        <label className="text-grey-dark text-eyebrow font-bold uppercase tracking-wider mb-2">Country</label>
-                                        <Select
-                                            options={countryOptions}
-                                            onChange={handleCountryChange}
-                                            className="text-sm font-main"
-                                            placeholder="Select your country"
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    backgroundColor: 'rgba(255, 253, 208, 0.3)', // bg-ivory/30
-                                                    borderColor: 'rgba(212, 175, 55, 0.3)', // border-secondary/30
-                                                    borderRadius: 0,
-                                                    padding: '2px',
-                                                    boxShadow: 'none',
-                                                    '&:hover': {
-                                                        borderColor: '#B71C1C' // border-primary
-                                                    }
-                                                }),
-                                                option: (base, state) => ({
-                                                    ...base,
-                                                    backgroundColor: state.isSelected ? '#B71C1C' : state.isFocused ? 'rgba(212, 175, 55, 0.1)' : 'white',
-                                                    color: state.isSelected ? 'white' : 'black',
-                                                })
-                                            }}
-                                        />
-                                    </div>
-
-                                    {/* Submit */}
-                                    <div className="md:col-span-2 mt-4">
-                                        <button
-                                            type="submit"
-                                            disabled={loading}
-                                            className="w-full btn-primary disabled:opacity-70"
-                                        >
-                                            {loading ? "Creating Account..." : "Create Account"}
-                                        </button>
-                                    </div>
-                                </form>
-
-                                {errorMessage && (
-                                    <div className="mt-6 bg-red-50 border-l-4 border-primary p-4 text-center">
-                                        <p className="text-primary text-sm font-medium">{errorMessage}</p>
-                                    </div>
-                                )}
-
-                                <div className="mt-8 text-center border-t border-grey-medium/10 pt-6">
-                                    <span className="text-grey-medium text-xs">Already have an account? </span>
-                                    <button
-                                        onClick={onSwitchToSignIn}
-                                        className="text-primary hover:text-secondary font-medium transition-colors ml-1 uppercase text-xs tracking-wide"
-                                    >
-                                        Login
-                                    </button>
-                                </div>
-                            </div>
-                        </Dialog.Panel>
+                  {/* Error Message */}
+                  {errorMessage && (
+                    <div className="bg-red-50 border-l-4 border-primary p-3 text-center">
+                      <p className="text-primary text-sm font-medium">{errorMessage}</p>
                     </div>
-                </Transition.Child>
-            </Dialog>
-        </Transition>
-    );
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full btn-primary disabled:opacity-70 mt-2 py-3"
+                  >
+                    {loading ? "Creating Account..." : "Create Account"}
+                  </button>
+                </form>
+
+                {/* Switch to Sign In */}
+                <div className="mt-6 text-center border-t border-grey-medium/10 pt-5">
+                  <span className="text-grey-medium text-sm">Already have an account? </span>
+                  <button
+                    type="button"
+                    onClick={handleSwitchToSignIn}
+                    className="text-primary hover:text-secondary font-medium transition-colors ml-1 uppercase text-sm tracking-wide"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              </div>
+            </Dialog.Panel>
+          </div>
+        </Transition.Child>
+      </Dialog>
+    </Transition>
+  );
 }
